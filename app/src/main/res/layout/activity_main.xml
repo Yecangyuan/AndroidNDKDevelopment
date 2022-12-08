@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_face_detection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="人脸识别" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_bank_card_organize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="银行卡识别" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="车牌号识别" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_text_recognition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="文本识别" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_play_interface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="播放界面" />
+
+
+</LinearLayout>
