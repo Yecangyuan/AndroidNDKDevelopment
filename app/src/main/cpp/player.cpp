@@ -6,6 +6,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <android/native_window_jni.h>
+#include <unistd.h>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -13,6 +14,7 @@ extern "C" {
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 #include "libavutil/time.h"
+#include "libswresample/swresample.h"
 }
 
 #define TAG "PLAYER_TAG"
@@ -182,6 +184,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_Player_playSound(JNIEnv *env, jobject thiz, jstring url_) {
     const char *url = env->GetStringUTFChars(url_, JNI_FALSE);
+
+    // 初始化网络支持模块
+    avformat_network_init();
+
     AVFormatContext *avformat_context = avformat_alloc_context();
 
     int ret = avformat_open_input(&avformat_context, url, NULL, NULL);
@@ -223,36 +229,91 @@ Java_com_simley_ndk_1day78_player_Player_playSound(JNIEnv *env, jobject thiz, js
         return;
     }
     AVPacket *av_packet = av_packet_alloc();
+    // 分配av_frame对象，作为解码后数据的容器
     AVFrame *av_frame = av_frame_alloc();
 
     int out_channel_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
 
+    SwrContext *swr_context = swr_alloc();
+    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+    enum AVSampleFormat out_formart = AV_SAMPLE_FMT_S16;
+    int out_sample_rate = av_codec_context->sample_rate;
+//    转换器的代码
+    swr_alloc_set_opts(swr_context, out_ch_layout, out_formart, out_sample_rate,
+//            输出的
+                       av_codec_context->channel_layout, av_codec_context->sample_fmt,
+                       av_codec_context->sample_rate, 0, NULL
+    );
+
+//    AVChannelLayout *out_channel_layout;
+//    AVChannelLayout *in_channel_layout;
+//
+////    out_channel_layout->nb_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+////    in_channel_layout->nb_channels = c->ch_layout->nb_channels;
+//
+//    if (swr_alloc_set_opts2(&swr_context, out_channel_layout, AV_SAMPLE_FMT_S16, out_sample_rate,
+//                            in_channel_layout, av_codec_context->sample_fmt,
+//                            av_codec_context->sample_rate, 0, NULL) != 0) {
+//        LOGE("swr_alloc_set_opts2 failed.");
+//        return;
+//    }
+
+    // 初始化转换上下文
+    swr_init(swr_context);
+    // 1s的pcm个数
+    auto *out_buffer = (uint8_t *) av_malloc(44100 * 2);
+
     // 通过反射的方式调用java层的代码
     jclass divide_player = env->GetObjectClass(thiz);
-    jmethodID createAudio = env->GetMethodID(divide_player, "createAudioTrack", "(II)V");
-    env->CallVoidMethod(thiz, createAudio, 44100, out_channel_nb);
+    jmethodID createAudio = env->GetMethodID(divide_player, "createAudioTrack",
+                                             "(II)Landroid/media/AudioTrack;");
+    jobject audio_track = env->CallObjectMethod(thiz, createAudio, 44100, out_channel_nb);
+
+    jclass audio_track_class = env->GetObjectClass(audio_track);
+    jmethodID audio_track_play = env->GetMethodID(audio_track_class, "play", "()V");
+    env->CallVoidMethod(audio_track, audio_track_play);
+
+    jmethodID audio_track_write = env->GetMethodID(audio_track_class, "write", "([BII)I");
+
     while (av_read_frame(avformat_context, av_packet) >= 0) {
         if (av_packet->stream_index == audio_index) {
-            int ret = avcodec_send_packet(av_codec_context, av_packet);
-            if (ret != 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+            ret = avcodec_send_packet(av_codec_context, av_packet);
+            // LOGE("解码成功%d", ret);
+            if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
                 LOGE("解码出错");
-                return;
-            }
-
-            ret = avcodec_receive_frame(av_codec_context, av_frame);
-            if (ret == AVERROR(EAGAIN)) {
-                continue;
-            } else if (ret < 0) {
                 break;
             }
+            ret = avcodec_receive_frame(av_codec_context, av_frame);
+            if (ret < 0 && ret != AVERROR_EOF) {
+                LOGE("读取出错");
+                break;
+            }
+            if (ret >= 0) {
+                swr_convert(swr_context, &out_buffer, 44100 * 2,
+                            (const uint8_t **) (av_frame->data), av_frame->nb_samples);
 
+                // 解码了
+                int size = av_samples_get_buffer_size(NULL, out_channel_nb, av_frame->nb_samples,
+                                                      AV_SAMPLE_FMT_S16, 1);
+                // java的字节数组
+                jbyteArray audio_sample_array = env->NewByteArray(size);
+                env->SetByteArrayRegion(audio_sample_array, 0, size,
+                                        reinterpret_cast<const jbyte *>(out_buffer));
+                env->CallIntMethod(audio_track, audio_track_write, audio_sample_array, 0, size);
+                env->DeleteLocalRef(audio_sample_array);
+                usleep(1000 * 16);
+            }
         }
     }
+    LOGI("音频播放完毕");
 
+    // 以下释放所有相关的资源
+    av_free(out_buffer);
+    swr_free(&swr_context);
     av_packet_free(&av_packet);
     av_frame_free(&av_frame);
     avcodec_free_context(&av_codec_context);
     avformat_free_context(avformat_context);
+    avformat_network_deinit();
     env->ReleaseStringUTFChars(url_, url);
-
 }

@@ -11,9 +11,9 @@ AUX_SOURCE_DIRECTORY(./ SRC_LIST) # 当前文件夹下的所有文件，不包�
 # add_library的作用就是将()中的所有文件打包成一个.so文件，第一个是这个.so文件的文件名libndk_day78.so
 add_library(ndk_day78  # Sets the name of the library.
         SHARED
-        text_recognize.cpp
-        player.cpp
-        native-lib.cpp
+#        text_recognize.cpp
+#        player.cpp
+#        native-lib.cpp
         ${SRC_LIST})
 
 
@@ -62,5 +62,6 @@ target_link_libraries( # Specifies the target library.
         swscale
         android
         avformat
+        swresample
         libopencv_java4
         ${log-lib})

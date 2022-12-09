@@ -2056,7 +2056,7 @@ typedef struct AVCodecContext {
      * - decoding: may be set by the caller if known e.g. from the container.
      *             The decoder can then override during decoding as needed.
      */
-    AVChannelLayout ch_layout;
+    long ch_layout;
 } AVCodecContext;
 
 /**

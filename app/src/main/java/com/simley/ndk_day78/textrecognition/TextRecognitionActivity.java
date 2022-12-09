@@ -1,12 +1,8 @@
 package com.simley.ndk_day78.textrecognition;
 
 import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -16,16 +12,14 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.simley.ndk_day78.R;
+import com.simley.ndk_day78.databinding.ActivityMainBinding;
+import com.simley.ndk_day78.databinding.ActivityTextRecognitionBinding;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
-import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,16 +27,17 @@ import java.io.IOException;
 
 public class TextRecognitionActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private static final int REQUEST_CODE_ADDRESS = 101;
     private TextRecognition mTextRecognition;
     private CameraBridgeViewBase mCameraBridgeViewBase;
     private Mat mRgba;
     private Bitmap mTextBitmap;
+    private ActivityTextRecognitionBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_text_recognition);
+        binding = ActivityTextRecognitionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         mTextRecognition = new TextRecognition();
         Button mBtnCapture = findViewById(R.id.btn_capture);
@@ -87,24 +82,19 @@ public class TextRecognitionActivity extends AppCompatActivity implements Camera
 
 
     private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        new RxPermissions(this).request(Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        ).subscribe(granted -> {
+            if (granted) {
                 activateOpenCVCameraView();
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-            } else {
-                requestPermissions(new String[]{Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_CODE_ADDRESS);
             }
-        }
+        });
     }
 
     private void activateOpenCVCameraView() {
         // everything needed to start a camera preview
-        mCameraBridgeViewBase = findViewById(R.id.javaCameraView);
+        mCameraBridgeViewBase = binding.javaCameraView;
 //        mCameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mCameraBridgeViewBase.setCameraPermissionGranted();
         mCameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
