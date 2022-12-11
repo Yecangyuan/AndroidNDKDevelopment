@@ -345,6 +345,8 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
         play_status = new YEPlayStatus();
         ffmpeg = new YEFFmpeg(play_status, call_java, source);
         ffmpeg->prepared();
+    } else {
+
     }
 }
 extern "C"

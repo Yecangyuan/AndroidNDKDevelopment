@@ -91,8 +91,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     //监听
     private void play(final int index) {
-        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
-//        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
+//        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
+        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
         yePlayer.setSource(mp3File);
         yePlayer.prepare();
     }

@@ -170,9 +170,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             case PLAY:
                 play();
                 break;
-            case PAUSE:
-                pause();
-                break;
+//            case PAUSE:
+//                pause();
+//                break;
             case NEXT: {
                 next();
                 break;
@@ -202,9 +202,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     private void stop() {
         binding.ivPlayOrPause.setImageResource(R.drawable.ic_play);
-        binding.tvCurrentTime.setText(displayUtil.duration2Time(0));
-        binding.tvTotalTime.setText(displayUtil.duration2Time(0));
-        binding.musicSeekBar.setProgress(0);
+//        binding.tvCurrentTime.setText(displayUtil.duration2Time(0));
+//        binding.tvTotalTime.setText(displayUtil.duration2Time(0));
+//        binding.musicSeekBar.setProgress(0);
     }
 
     private void next() {
