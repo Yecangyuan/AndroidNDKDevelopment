@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <string>
-#include <android/log.h>
+#include "ye_log.h"
 #include <vector>
 #include "opencv2/opencv.hpp"
 #include "opencv2/face.hpp"
@@ -18,11 +18,6 @@ using namespace std;
 using namespace face;
 
 #define IMAGE_SIZE 24
-#define TAG "FACE_TAG"
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
 
 // 加载人脸识别的级联分类器
 CascadeClassifier faceCascadeClassifier;

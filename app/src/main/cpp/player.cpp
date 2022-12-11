@@ -4,9 +4,12 @@
 //
 
 #include <jni.h>
-#include <android/log.h>
+#include "ye_log.h"
 #include <android/native_window_jni.h>
 #include <unistd.h>
+#include "YECallJava.h"
+#include "YEPlayStatus.h"
+#include "YEFFmpeg.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -17,16 +20,10 @@ extern "C" {
 #include "libswresample/swresample.h"
 }
 
-#define TAG "PLAYER_TAG"
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
-
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_simley_ndk_1day78_player_Player_play(JNIEnv *env, jobject thiz, jstring url_,
-                                              jobject surface) {
+Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstring url_,
+                                                jobject surface) {
     const char *url = env->GetStringUTFChars(url_, JNI_FALSE);
     // 获取上下文对象
     AVFormatContext *avformat_context = avformat_alloc_context();
@@ -182,7 +179,7 @@ Java_com_simley_ndk_1day78_player_Player_play(JNIEnv *env, jobject thiz, jstring
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_simley_ndk_1day78_player_Player_playSound(JNIEnv *env, jobject thiz, jstring url_) {
+Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, jstring url_) {
     const char *url = env->GetStringUTFChars(url_, JNI_FALSE);
 
     // 初始化网络支持模块
@@ -316,4 +313,79 @@ Java_com_simley_ndk_1day78_player_Player_playSound(JNIEnv *env, jobject thiz, js
     avformat_free_context(avformat_context);
     avformat_network_deinit();
     env->ReleaseStringUTFChars(url_, url);
+}
+
+
+_JavaVM *java_vm = NULL;
+YECallJava *call_java = NULL;
+YEFFmpeg *ffmpeg = NULL;
+YEPlayStatus *play_status = NULL;
+
+extern "C"
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    jint result = -1;
+    java_vm = vm;
+    JNIEnv *env;
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        return result;
+    }
+    return JNI_VERSION_1_6;
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz, jstring source_) {
+    const char *source = env->GetStringUTFChars(source_, JNI_FALSE);
+
+    if (ffmpeg == NULL) {
+        if (call_java == NULL) {
+            call_java = new YECallJava(java_vm, env, &thiz);
+        }
+        play_status = new YEPlayStatus();
+        ffmpeg = new YEFFmpeg(play_status, call_java, source);
+        ffmpeg->prepared();
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1start(JNIEnv *env, jobject thiz) {
+    if (ffmpeg != NULL) {
+        ffmpeg->start();
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1volume(JNIEnv *env, jobject thiz, jint percent) {
+    if (ffmpeg != NULL) {
+        ffmpeg->set_volume(percent);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1mute(JNIEnv *env, jobject thiz, jint mute) {
+    if (ffmpeg != NULL) {
+        ffmpeg->set_mute(mute);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1pause(JNIEnv *env, jobject thiz) {
+    if (ffmpeg != NULL) {
+        ffmpeg->pause();
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1resume(JNIEnv *env, jobject thiz) {
+    if (ffmpeg != NULL) {
+        ffmpeg->resume();
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1seek(JNIEnv *env, jobject thiz, jint secds) {
+    if (ffmpeg != NULL) {
+        ffmpeg->seek(secds);
+    }
 }
