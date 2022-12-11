@@ -70,10 +70,6 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initView() {
-//        yePlayer.setListener(() -> {
-//            Log.d(PlayerActivity.class.getSimpleName(), "准备好了，可以开始播放声音了");
-//            yePlayer.start();
-//        });
         mDisc = findViewById(R.id.discview);
         mDisc.setPlayInfoListener(this);
         binding.ivLast.setOnClickListener(this);
