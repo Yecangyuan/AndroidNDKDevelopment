@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -40,6 +41,15 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private static final String[] PERMISSIONS = {
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
+            android.Manifest.permission.MOUNT_FORMAT_FILESYSTEMS,
+            android.Manifest.permission.INTERNET,
+            android.Manifest.permission.ACCESS_NETWORK_STATE,
+            android.Manifest.permission.ACCESS_WIFI_STATE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,21 +76,14 @@ public class MainActivity extends AppCompatActivity {
      * 请求所有相关权限
      */
     private void requestPermissionWithRx() {
-        Disposable disposable = new RxPermissions(this).request(
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                android.Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
-                android.Manifest.permission.MOUNT_FORMAT_FILESYSTEMS,
-                android.Manifest.permission.INTERNET,
-                android.Manifest.permission.ACCESS_NETWORK_STATE,
-                android.Manifest.permission.ACCESS_WIFI_STATE
-        ).subscribe(granted -> {
-            if (granted) {
-                Log.d(MainActivity.class.getSimpleName(), "相关权限获取成功");
-            } else {
-                Log.d(MainActivity.class.getSimpleName(), "相关权限获取失败");
-            }
-        });
+        Disposable disposable = new RxPermissions(this)
+                .request(PERMISSIONS).subscribe(granted -> {
+                    if (granted) {
+                        Log.d(MainActivity.class.getSimpleName(), "相关权限获取成功");
+                    } else {
+                        Log.d(MainActivity.class.getSimpleName(), "相关权限获取失败");
+                    }
+                });
         disposable.dispose();
     }
 

@@ -108,24 +108,46 @@ public class YEPlayer {
     }
 
 
+    /**
+     * 跳转到指定的 播放 时间点
+     *
+     * @param secds
+     */
     public void seek(int secds) {
         n_seek(secds);
     }
 
+    /**
+     * 设置音量
+     *
+     * @param percent
+     */
     public void setVolume(int percent) {
         if (percent >= 0 && percent <= 100) {
             n_volume(percent);
         }
     }
 
+    /**
+     * 暂停播放
+     */
     public void pause() {
         n_pause();
     }
 
+    /**
+     * 继续播放
+     */
     public void resume() {
         n_resume();
     }
 
+    /**
+     * 静音
+     * 左声道 右声道 立体声
+     *
+     * @param mute
+     */
     public void setMute(int mute) {
         n_mute(mute);
     }
