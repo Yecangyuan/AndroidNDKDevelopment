@@ -32,6 +32,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String ACTION_OPT_MUSIC_RIGHT = "ACTION_OPT_MUSIC_RIGHT";
     public static final String ACTION_OPT_MUSIC_CENTER = "ACTION_OPT_MUSIC_CENTER";
     public static final String ACTION_OPT_MUSIC_VOLUME = "ACTION_OPT_MUSIC_VOLUME";
+    public static final String ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH = "ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH";
+    public static final String ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH = "ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH";
+    public static final String ACTION_OPT_MUSIC_SPEED_AN_PITCH = "ACTION_OPT_MUSIC_SPEED_AN_PITCH";
+    public static final String ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL = "ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL";
+
     /*状态指令*/
     public static final String ACTION_STATUS_MUSIC_PLAY = "ACTION_STATUS_MUSIC_PLAY";
     public static final String ACTION_STATUS_MUSIC_PAUSE = "ACTION_STATUS_MUSIC_PAUSE";
@@ -80,6 +85,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         intentFilter.addAction(ACTION_OPT_MUSIC_RIGHT);
         intentFilter.addAction(ACTION_OPT_MUSIC_VOLUME);
         intentFilter.addAction(ACTION_OPT_MUSIC_CENTER);
+        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH);
+        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH);
+        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_PITCH);
+        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMusicReceiver, intentFilter);
     }
 
@@ -115,7 +124,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     }
 
-    // 出发点      postion    ffmpeg   做 seek
     private void seekTo(int position) {
         yePlayer.seek(position);
     }
@@ -199,6 +207,23 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 case ACTION_OPT_MUSIC_VOLUME:
                     yePlayer.setVolume(i++);
                     Log.i(TAG, "onReceive: " + i);
+                    break;
+                case ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH:
+                    yePlayer.setSpeed(1.5f);
+                    yePlayer.setPitch(1.0f);
+                    break;
+                case ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH:
+                    yePlayer.setPitch(1.5f);
+                    yePlayer.setSpeed(1.0f);
+                    break;
+                case ACTION_OPT_MUSIC_SPEED_AN_PITCH:
+                    yePlayer.setSpeed(1.5f);
+                    yePlayer.setPitch(1.5f);
+                    break;
+                case ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL:
+//                yePlayer.setSpeed(1.0f);
+//                yePlayer.setPitch(1.0f);
+                    yePlayer.stop();
                     break;
             }
         }

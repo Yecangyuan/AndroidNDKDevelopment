@@ -37,6 +37,28 @@ public class YEPlayer {
 
     private native void n_volume(int percent);
 
+    private native void n_speed(float speed);
+
+    private native void n_pitch(float pitch);
+
+    private native void n_stop();
+
+    public void setSpeed(float speed) {
+        n_speed(speed);
+    }
+
+    public void setPitch(float pitch) {
+        n_pitch(pitch);
+    }
+
+    public void stop() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                n_stop();
+            }
+        }).start();
+    }
 
     public void prepare() {
         if (TextUtils.isEmpty(mSource)) {
@@ -55,10 +77,6 @@ public class YEPlayer {
     public void setSource(String mSource) {
         this.mSource = mSource;
     }
-
-//    public void setListener(YEPlayListener mYEPlayListener) {
-//        this.mYEPlayListener = mYEPlayListener;
-//    }
 
     public void onCallPrepared() {
         if (wlOnPreparedListener != null) {
@@ -93,14 +111,18 @@ public class YEPlayer {
      * @param nbChannels
      */
     private AudioTrack createAudioTrack(int sampleRateInHz, int nbChannels) {
-        Log.d("player", "初始化播放器成功");
+        Log.d(YEPlayer.class.getSimpleName(), "初始化播放器成功");
         int channelsConfig; // 通道数
-        if (nbChannels == 1) { // 单声道
-            channelsConfig = AudioFormat.CHANNEL_OUT_MONO;
-        } else if (nbChannels == 2) { // 立体声
-            channelsConfig = AudioFormat.CHANNEL_OUT_STEREO;
-        } else {
-            channelsConfig = AudioFormat.CHANNEL_OUT_MONO;
+        switch (nbChannels) {
+            case 1: // 单声道
+                channelsConfig = AudioFormat.CHANNEL_OUT_MONO;
+                break;
+            case 2: // 立体声
+                channelsConfig = AudioFormat.CHANNEL_OUT_STEREO;
+                break;
+            default:
+                channelsConfig = AudioFormat.CHANNEL_OUT_MONO;
+                break;
         }
         int minBufferSize = AudioTrack.getMinBufferSize(sampleRateInHz, channelsConfig, AudioFormat.ENCODING_PCM_16BIT);
         return new AudioTrack(AudioManager.STREAM_MUSIC, sampleRateInHz, channelsConfig, AudioFormat.ENCODING_PCM_16BIT,

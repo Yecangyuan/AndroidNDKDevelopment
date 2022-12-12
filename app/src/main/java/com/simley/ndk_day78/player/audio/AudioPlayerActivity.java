@@ -188,18 +188,6 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void play() {
-        optMusic(MusicService.ACTION_OPT_MUSIC_PLAY);
-    }
-
-    private void pause() {
-        optMusic(MusicService.ACTION_OPT_MUSIC_PAUSE);
-    }
-
-    public void resume() {
-        optMusic(MusicService.ACTION_OPT_MUSIC_RESUME);
-    }
-
     private void stop() {
         binding.ivPlayOrPause.setImageResource(R.drawable.ic_play);
 //        binding.tvCurrentTime.setText(displayUtil.duration2Time(0));
@@ -288,15 +276,31 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void speed(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH);
     }
 
     public void pitch(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH);
     }
 
     public void speedpitch(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_AN_PITCH);
     }
 
     public void normalspeedpitch(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL);
+    }
+
+    private void play() {
+        optMusic(MusicService.ACTION_OPT_MUSIC_PLAY);
+    }
+
+    private void pause() {
+        optMusic(MusicService.ACTION_OPT_MUSIC_PAUSE);
+    }
+
+    public void resume() {
+        optMusic(MusicService.ACTION_OPT_MUSIC_RESUME);
     }
 
 }

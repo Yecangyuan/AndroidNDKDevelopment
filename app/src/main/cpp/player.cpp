@@ -391,3 +391,18 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1seek(JNIEnv *env, jobject thiz, ji
         ffmpeg->seek(secds);
     }
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1speed(JNIEnv *env, jobject thiz, jfloat speed) {
+
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1pitch(JNIEnv *env, jobject thiz, jfloat pitch) {
+
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1stop(JNIEnv *env, jobject thiz) {
+
+}
