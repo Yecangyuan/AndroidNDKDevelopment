@@ -80,8 +80,6 @@ public:
 
     int get_current_sample_rate_for_opensles(int sample_rate);
 
-    void on_call_time_info(int type, int cur_time, int total_time);
-
     void pause();
 
     void resume();

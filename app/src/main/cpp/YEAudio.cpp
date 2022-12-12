@@ -123,7 +123,7 @@ void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
             if (wl_audio->clock - wl_audio->last_time >= 1) {
                 wl_audio->last_time = wl_audio->clock;
                 wl_audio->call_java->on_call_time_info(CHILD_THREAD, (int) wl_audio->clock,
-                                            wl_audio->duration);
+                                                       wl_audio->duration);
             }
             (*wl_audio->pcm_buffer_queue)->Enqueue(wl_audio->pcm_buffer_queue,
                                                    (char *) wl_audio->buffer, buffer_size);
@@ -170,8 +170,8 @@ void YEAudio::init_opensles() {
     };
     SLDataSource_ sl_datasource = {&android_queue, &pcm};
 
-    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
-    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
+    const SLInterfaceID ids[3] = {SL_IID_MUTESOLO, SL_IID_VOLUME, SL_IID_BUFFERQUEUE};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
     (*engine_engine)->CreateAudioPlayer(engine_engine, &pcm_player_object, &sl_datasource,
                                         &audio_sink, 1, ids, req);
@@ -179,10 +179,15 @@ void YEAudio::init_opensles() {
     (*pcm_player_object)->Realize(pcm_player_object, SL_BOOLEAN_FALSE);
     // 得到接口后调用， 获取Player接口
     (*pcm_player_object)->GetInterface(pcm_player_object, SL_IID_PLAY, &pcm_player_play);
+    // 获取声道操作接口
+    (*pcm_player_object)->GetInterface(pcm_player_object, SL_IID_MUTESOLO, &pcm_mute_play);
+    // 获取播放 暂停 恢复的句柄
+    (*pcm_player_object)->GetInterface(pcm_player_object, SL_IID_VOLUME, &pcm_volume_play);
     // 注册回调缓冲区 获取缓冲队列接口
     (*pcm_player_object)->GetInterface(pcm_player_object, SL_IID_BUFFERQUEUE, &pcm_buffer_queue);
     // 缓冲接口回调
     (*pcm_buffer_queue)->RegisterCallback(pcm_buffer_queue, pcm_buffer_callback, this);
+    // 获取播放状态接口
     (*pcm_player_play)->SetPlayState(pcm_player_play, SL_PLAYSTATE_PLAYING);
     pcm_buffer_callback(pcm_buffer_queue, this);
 }
@@ -236,7 +241,6 @@ int YEAudio::get_current_sample_rate_for_opensles(int sample_rate) {
 }
 
 
-
 void YEAudio::pause() {
     if (pcm_player_play != NULL) {
         (*pcm_player_play)->SetPlayState(pcm_player_play, SL_PLAYSTATE_PAUSED);
@@ -266,7 +270,6 @@ void YEAudio::set_mute(int mute) {
         (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
     } else if (mute == 2)//center
     {
-
         (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, false);
         (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
     }

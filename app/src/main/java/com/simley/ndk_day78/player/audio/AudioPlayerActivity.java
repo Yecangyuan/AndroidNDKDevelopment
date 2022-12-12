@@ -268,4 +268,35 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMusicReceiver);
+    }
+
+    public void left(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_LEFT);
+    }
+
+    public void right(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_RIGHT);
+    }
+
+    public void center(View view) {
+        optMusic(MusicService.ACTION_OPT_MUSIC_CENTER);
+    }
+
+    public void speed(View view) {
+    }
+
+    public void pitch(View view) {
+    }
+
+    public void speedpitch(View view) {
+    }
+
+    public void normalspeedpitch(View view) {
+    }
+
 }
