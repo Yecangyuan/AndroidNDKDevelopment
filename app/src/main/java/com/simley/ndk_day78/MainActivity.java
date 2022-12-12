@@ -23,6 +23,7 @@ import com.simley.ndk_day78.face.FaceDetection;
 import com.simley.ndk_day78.face.FaceDetectionActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
@@ -34,6 +35,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.reactivex.rxjava3.disposables.Disposable;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -43,13 +46,42 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        requestPermissionWithRx();
+        initListener();
+    }
 
+    /**
+     * 初始化监听器
+     */
+    private void initListener() {
         // 人脸识别
         binding.btnFaceDetection.setOnClickListener(v -> startActivity(new Intent(this, FaceDetectionActivity.class)));
         // 银行卡识别
         binding.btnBankCardOrganize.setOnClickListener(v -> startActivity(new Intent(this, BankCardRecognitionActivity.class)));
         binding.btnTextRecognition.setOnClickListener(v -> startActivity(new Intent(this, TextRecognitionActivity.class)));
         binding.btnPlayInterface.setOnClickListener(v -> startActivity(new Intent(this, PlayerActivity.class)));
+    }
+
+    /**
+     * 请求所有相关权限
+     */
+    private void requestPermissionWithRx() {
+        Disposable disposable = new RxPermissions(this).request(
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
+                android.Manifest.permission.MOUNT_FORMAT_FILESYSTEMS,
+                android.Manifest.permission.INTERNET,
+                android.Manifest.permission.ACCESS_NETWORK_STATE,
+                android.Manifest.permission.ACCESS_WIFI_STATE
+        ).subscribe(granted -> {
+            if (granted) {
+                Log.d(MainActivity.class.getSimpleName(), "相关权限获取成功");
+            } else {
+                Log.d(MainActivity.class.getSimpleName(), "相关权限获取失败");
+            }
+        });
+        disposable.dispose();
     }
 
 
