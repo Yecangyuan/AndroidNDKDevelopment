@@ -205,8 +205,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     yePlayer.setMute(2);
                     break;
                 case ACTION_OPT_MUSIC_VOLUME:
-                    yePlayer.setVolume(i++);
-                    Log.i(TAG, "onReceive: " + i);
+//                    yePlayer.setVolume(i++);
+//                    Log.i(TAG, "onReceive: " + i);
                     break;
                 case ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH:
                     yePlayer.setSpeed(1.5f);
@@ -229,5 +229,5 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         }
     }
 
-    int i = 0;
+//    int i = 0;
 }

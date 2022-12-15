@@ -5,11 +5,16 @@
 #include "YEFFmpeg.h"
 #include "ye_log.h"
 
+extern "C" {
+#include "libavutil/time.h"
+}
+
 YEFFmpeg::YEFFmpeg(YEPlayStatus *play_status, YECallJava *call_java, const char *url) {
     this->play_status = play_status;
     this->call_java = call_java;
     this->url = url;
     pthread_mutex_init(&seek_mutex, NULL);
+    pthread_mutex_init(&init_mutex, NULL);
 }
 
 YEFFmpeg::~YEFFmpeg() {
@@ -28,6 +33,7 @@ void YEFFmpeg::prepared() {
 }
 
 void YEFFmpeg::decode_ffmepg_thread() {
+    pthread_mutex_lock(&init_mutex);
     // 初始化网络支持模块
     avformat_network_init();
 
@@ -51,7 +57,7 @@ void YEFFmpeg::decode_ffmepg_thread() {
                                     av_format_context->streams[i]->codecpar->sample_rate,
                                     call_java);
                 audio->stream_index = i;
-                // 音频时长，单位微秒
+                // 音频时长，单位微秒，转换成秒
                 audio->duration = (int) (av_format_context->duration / AV_TIME_BASE);
                 audio->time_base = av_format_context->streams[i]->time_base;
                 audio->codec_par = av_format_context->streams[i]->codecpar;
@@ -82,7 +88,9 @@ void YEFFmpeg::decode_ffmepg_thread() {
         LOGE("打开编解码器失败");
         return;
     }
+
     call_java->on_call_prepared(CHILD_THREAD);
+    pthread_mutex_unlock(&init_mutex);
 }
 
 void YEFFmpeg::start() {
@@ -98,6 +106,7 @@ void YEFFmpeg::start() {
             continue;
         }
 
+        // 放入队列
         if (audio->queue->get_queue_size() > 40) {
             continue;
         }
@@ -129,10 +138,11 @@ void YEFFmpeg::start() {
     LOGI("解码完成");
 }
 
-void YEFFmpeg::seek(jint sec) {
+void YEFFmpeg::seek(int64_t sec) {
     if (duration <= 0) {
         return;
     }
+
     if (sec >= 0 && sec <= duration) {
         if (audio != NULL) {
             play_status->seek = true;
@@ -160,14 +170,68 @@ void YEFFmpeg::pause() {
     }
 }
 
-void YEFFmpeg::set_mute(jint mute) {
+void YEFFmpeg::set_mute(int mute) {
     if (audio != NULL) {
         audio->set_mute(mute);
     }
 }
 
-void YEFFmpeg::set_volume(jint percent) {
+void YEFFmpeg::set_volume(int percent) {
     if (audio != NULL) {
         audio->set_volume(percent);
     }
 }
+
+void YEFFmpeg::set_speed(float speed) {
+    if (audio != NULL) {
+        audio->set_speed(speed);
+    }
+}
+
+void YEFFmpeg::set_pitch(float pitch) {
+    if (audio != NULL) {
+        audio->set_pitch(pitch);
+    }
+}
+
+void YEFFmpeg::release() {
+    LOGE("开始释放YEFFmpeg");
+    play_status->exit = true;
+    int sleep_count = 0;
+    pthread_mutex_lock(&init_mutex);
+    while (!exit) {
+
+        if (sleep_count > 1000) {
+            exit = true;
+        }
+
+        LOGE("wait ffmpeg  exit %d", sleep_count);
+        sleep_count++;
+        av_usleep(1000 * 10);//暂停10毫秒
+    }
+
+    if (audio != NULL) {
+        audio->release();
+        delete (audio);
+        audio = NULL;
+    }
+
+    LOGE("释放 封装格式上下文");
+    if (av_format_context != NULL) {
+        avformat_close_input(&av_format_context);
+        avformat_free_context(av_format_context);
+        av_format_context = NULL;
+    }
+
+    LOGE("释放 callJava");
+    if (call_java != NULL) {
+        call_java = NULL;
+    }
+
+    LOGE("释放 playstatus");
+    if (play_status != NULL) {
+        play_status = NULL;
+    }
+    pthread_mutex_unlock(&init_mutex);
+}
+

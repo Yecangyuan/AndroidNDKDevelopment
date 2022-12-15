@@ -28,14 +28,15 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
     // 获取上下文对象
     AVFormatContext *avformat_context = avformat_alloc_context();
 
-    int ret = avformat_open_input(&avformat_context, url, NULL, NULL);
-    if (ret != 0) {
-        LOGE("Failed to open file, return value is %d", ret);
+    // Open an input stream and read the header
+    if (avformat_open_input(&avformat_context, url, NULL, NULL)) {
+        LOGE("打开文件失败，文件可能不存在");
         return;
     }
 
+    // Read packets of a media file to get stream information
     if (avformat_find_stream_info(avformat_context, NULL) < 0) {
-        LOGE("Couldn't open video");
+        LOGE("读取媒体文件的流信息失败");
         return;
     }
 
@@ -91,7 +92,6 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
 
     av_image_fill_arrays(rgb_frame->data, rgb_frame->linesize, out_buffer, AV_PIX_FMT_RGBA, width,
                          height, 1);
-
 
     // 获取转换器上下文
     SwsContext *sws_context = sws_getContext(width, height, av_codec_context->pix_fmt,
@@ -326,12 +326,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     jint result = -1;
     java_vm = vm;
     JNIEnv *env;
+
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
         return result;
     }
+
     return JNI_VERSION_1_6;
 }
-
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -339,14 +340,14 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
     const char *source = env->GetStringUTFChars(source_, JNI_FALSE);
 
     if (ffmpeg == NULL) {
+
         if (call_java == NULL) {
             call_java = new YECallJava(java_vm, env, &thiz);
         }
+
         play_status = new YEPlayStatus();
         ffmpeg = new YEFFmpeg(play_status, call_java, source);
         ffmpeg->prepared();
-    } else {
-
     }
 }
 extern "C"
@@ -394,15 +395,37 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1seek(JNIEnv *env, jobject thiz, ji
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1speed(JNIEnv *env, jobject thiz, jfloat speed) {
-
+    if (ffmpeg != NULL) {
+        ffmpeg->set_speed(speed);
+    }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1pitch(JNIEnv *env, jobject thiz, jfloat pitch) {
-
+    if (ffmpeg != NULL) {
+        ffmpeg->set_pitch(pitch);
+    }
 }
+
+bool n_exit = true;
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1stop(JNIEnv *env, jobject thiz) {
-
+    if (!n_exit) {
+        return;
+    }
+    n_exit = false;
+    if (ffmpeg != NULL) {
+        ffmpeg->release();
+        delete ffmpeg;
+        if (call_java != NULL) {
+            delete call_java;
+            call_java = NULL;
+        }
+        if (play_status != NULL) {
+            delete play_status;
+            play_status = NULL;
+        }
+    }
+    n_exit = true;
 }

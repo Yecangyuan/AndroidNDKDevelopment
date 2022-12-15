@@ -3,29 +3,25 @@ package com.simley.ndk_day78.player.audio;
 import static com.simley.ndk_day78.player.audio.service.MusicService.ACTION_OPT_MUSIC_VOLUME;
 import static com.simley.ndk_day78.player.audio.ui.widget.DiscView.DURATION_NEEDLE_ANIAMTOR;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityAudioPlayerBinding;
-import com.simley.ndk_day78.player.PlayerActivity;
-import com.simley.ndk_day78.player.YEPlayer;
 import com.simley.ndk_day78.player.audio.service.MusicService;
 import com.simley.ndk_day78.player.audio.ui.model.MusicData;
 import com.simley.ndk_day78.player.audio.ui.utils.DisplayUtil;
 import com.simley.ndk_day78.player.audio.ui.widget.DiscView;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -255,7 +251,6 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             }
         }
     }
-
 
     @Override
     protected void onDestroy() {

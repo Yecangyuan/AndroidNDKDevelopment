@@ -21,11 +21,13 @@ void YECallJava::on_call_prepared(int type) {
     if (type == MAIN_THREAD) {
         jni_env->CallVoidMethod(jobj, jmid_prepared);
     } else if (type == CHILD_THREAD) {
+
         JNIEnv *jni_env;
         if (java_vm->AttachCurrentThread(&jni_env, 0) != JNI_OK) {
             LOGE("get child thread jnienv wrong.");
             return;
         }
+
         jni_env->CallVoidMethod(jobj, jmid_prepared);
         java_vm->DetachCurrentThread();
     }

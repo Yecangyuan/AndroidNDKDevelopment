@@ -43,10 +43,20 @@ public class YEPlayer {
 
     private native void n_stop();
 
+    /**
+     * 音频变速
+     *
+     * @param speed
+     */
     public void setSpeed(float speed) {
         n_speed(speed);
     }
 
+    /**
+     * 设置 音高
+     *
+     * @param pitch
+     */
     public void setPitch(float pitch) {
         n_pitch(pitch);
     }

@@ -8,7 +8,7 @@
 #include "YEQueue.h"
 #include "YEPlayStatus.h"
 #include "YECallJava.h"
-
+#include "SoundTouch.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -16,6 +16,8 @@ extern "C" {
 #include "SLES/OpenSLES.h"
 #include "SLES/OpenSLES_Android.h"
 }
+
+using namespace soundtouch;
 
 class YEAudio {
 public:
@@ -58,8 +60,20 @@ public:
     double now_time;
     // 当前播放的时间准确时间
     double clock;
+    //新的缓冲区
+    SAMPLETYPE *sample_buffer = NULL;
+    uint8_t *out_buffer = NULL;
+    // 音高
+    float pitch = 1.0f;
+    // 倍速
+    float speed = 1.0f;
+    bool finished = true;
+    // 新波的实际个数
+    int nb = 0;
+    int num = 0;
 
     YECallJava *call_java = NULL;
+    SoundTouch *sound_touch = NULL;
     // 上一次调用时间
     double last_time;
     // 立体声
@@ -72,21 +86,70 @@ public:
 
     ~YEAudio();
 
+    /**
+     * 开始播放
+     */
     void play();
 
-    int resample_audio();
+    /**
+     * 对音频重采样
+     * @param pcmbuf
+     * @return
+     */
+    int resample_audio(void **pcmbuf);
 
+    /**
+     * 初始化opensles
+     */
     void init_opensles();
+
+    /**
+     * 初始化soundtouch
+     */
+    void init_soundtouch();
 
     int get_current_sample_rate_for_opensles(int sample_rate);
 
+    /**
+     * 暂停播放
+     */
     void pause();
 
+    /**
+     * 继续播放
+     */
     void resume();
 
+    /**
+     * 设置声道
+     * @param mute
+     */
     void set_mute(int mute);
 
+    /**
+     * 设置播放音量
+     * @param percent
+     */
     void set_volume(int percent);
+
+    /**
+     * 设置播放速度
+     * @param speed
+     */
+    void set_speed(float speed);
+
+    /**
+     * 设置音高 音调
+     * @param pitch
+     */
+    void set_pitch(float pitch);
+
+    /**
+     * 释放相关资源
+     */
+    void release();
+
+    int get_sound_touch_data();
 };
 
 

@@ -1,40 +1,17 @@
 package com.simley.ndk_day78;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.simley.ndk_day78.bandcard.BankCardRecognitionActivity;
 import com.simley.ndk_day78.databinding.ActivityMainBinding;
-import com.simley.ndk_day78.face.FaceDetection;
 import com.simley.ndk_day78.face.FaceDetectionActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
 import com.tbruyelle.rxpermissions3.RxPermissions;
-
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 

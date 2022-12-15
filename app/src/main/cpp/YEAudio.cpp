@@ -11,9 +11,20 @@ YEAudio::YEAudio(YEPlayStatus *play_status, int sample_rate, YECallJava *call_ja
     queue = new YEQueue(play_status);
     buffer = (uint8_t *) (av_malloc(sample_rate * 2 * 2));
     this->call_java = call_java;
+    sample_buffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2));
+    init_soundtouch();
 }
 
 YEAudio::~YEAudio() {}
+
+void YEAudio::init_soundtouch() {
+    sound_touch = new SoundTouch();
+    sound_touch->setSampleRate(sample_rate);
+    sound_touch->setChannels(2);
+    // speed  1.1   1.5  2.1
+    sound_touch->setTempo(speed);
+    sound_touch->setPitch(pitch);
+}
 
 void *decode_play(void *data) {
     auto *wl_audio = (YEAudio *) (data);
@@ -25,7 +36,7 @@ void YEAudio::play() {
     pthread_create(&pthread_play, NULL, decode_play, this);
 }
 
-int YEAudio::resample_audio() {
+int YEAudio::resample_audio(void **pcmbuf) {
     while (play_status != NULL && !play_status->exit) {
         av_packet = av_packet_alloc();
         if (queue->get_av_packet(av_packet) != 0) {
@@ -90,6 +101,8 @@ int YEAudio::resample_audio() {
             }
             clock = now_time;
 
+            *pcmbuf = buffer;
+
             av_packet_free(&av_packet);
             av_free(av_packet);
             av_packet = NULL;
@@ -112,12 +125,16 @@ int YEAudio::resample_audio() {
 }
 
 void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
-    LOGI("------->打印");
+    LOGI("pcm_buffer_callback被调用");
     auto *wl_audio = (YEAudio *) context;
+
     if (wl_audio != NULL) {
-        int buffer_size = wl_audio->resample_audio();
+        // int buffer_size = wl_audio->resample_audio();
+        int buffer_size = wl_audio->get_sound_touch_data();
+
         if (buffer_size > 0) {
             wl_audio->clock += buffer_size / ((double) wl_audio->sample_rate * 2 * 2);
+
             // 由于pcm_buffer_callback调用频率高，而且通过反射的方式调用java层的onCallTimeInfo方法会比较损耗性能
             // 所以每隔一秒才调用一次
             if (wl_audio->clock - wl_audio->last_time >= 1) {
@@ -125,8 +142,9 @@ void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 wl_audio->call_java->on_call_time_info(CHILD_THREAD, (int) wl_audio->clock,
                                                        wl_audio->duration);
             }
+
             (*wl_audio->pcm_buffer_queue)->Enqueue(wl_audio->pcm_buffer_queue,
-                                                   (char *) wl_audio->buffer, buffer_size);
+                                                   (char *) wl_audio->sample_buffer, buffer_size);
         }
     }
 }
@@ -170,11 +188,11 @@ void YEAudio::init_opensles() {
     };
     SLDataSource_ sl_datasource = {&android_queue, &pcm};
 
-    const SLInterfaceID ids[3] = {SL_IID_MUTESOLO, SL_IID_VOLUME, SL_IID_BUFFERQUEUE};
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
     (*engine_engine)->CreateAudioPlayer(engine_engine, &pcm_player_object, &sl_datasource,
-                                        &audio_sink, 1, ids, req);
+                                        &audio_sink, 2, ids, req);
     // 初始化播放器
     (*pcm_player_object)->Realize(pcm_player_object, SL_BOOLEAN_FALSE);
     // 得到接口后调用， 获取Player接口
@@ -259,19 +277,21 @@ void YEAudio::set_mute(int mute) {
         return;
     }
     this->mute = mute;
-    if (mute == 0)//right   0
-    {
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, false);
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, true);
-
-    } else if (mute == 1)//left
-    {
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, true);
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
-    } else if (mute == 2)//center
-    {
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, false);
-        (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
+    switch (mute) {
+        // it means that only left channel can hear sound.
+        case 0: //right   0
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, false);
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, true);
+            break;
+        case 1: //left
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, true);
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
+            break;
+        case 2: //center
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 1, false);
+            (*pcm_mute_play)->SetChannelMute(pcm_mute_play, 0, false);
+        default:
+            break;
     }
 }
 
@@ -297,4 +317,114 @@ void YEAudio::set_volume(int percent) {
             (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -100);
         }
     }
+}
+
+void YEAudio::set_speed(float speed) {
+    this->speed = speed;
+    if (sound_touch != NULL) {
+        sound_touch->setTempo(speed);
+    }
+}
+
+void YEAudio::set_pitch(float pitch) {
+    this->pitch = pitch;
+    if (sound_touch != NULL) {
+        sound_touch->setPitch(pitch);
+    }
+}
+
+void YEAudio::release() {
+
+    if (queue != NULL) {
+        delete (queue);
+        queue = NULL;
+    }
+
+    if (pcm_player_object != NULL) {
+        (*pcm_player_object)->Destroy(pcm_player_object);
+        pcm_player_object = NULL;
+        pcm_player_play = NULL;
+        pcm_buffer_queue = NULL;
+    }
+
+    if (output_mix_object != NULL) {
+        (*output_mix_object)->Destroy(output_mix_object);
+        output_mix_object = NULL;
+        output_mix_environmental_reverb = NULL;
+    }
+
+    if (engine_object != NULL) {
+        (*engine_object)->Destroy(engine_object);
+        engine_object = NULL;
+        engine_engine = NULL;
+    }
+
+    if (buffer != NULL) {
+        free(buffer);
+        buffer = NULL;
+    }
+
+    if (av_codec_context != NULL) {
+        avcodec_close(av_codec_context);
+        avcodec_free_context(&av_codec_context);
+        av_codec_context = NULL;
+    }
+
+    if (play_status != NULL) {
+        play_status = NULL;
+    }
+
+    if (call_java != NULL) {
+        call_java = NULL;
+    }
+}
+
+int YEAudio::get_sound_touch_data() {
+    // 重新整理波形 soundtouch
+    // 我们先取数据 pcm的数据 就在outbuffer
+    while (play_status != NULL && !play_status->exit) {
+        LOGE("------------------循环---------------------------finished %d", finished);
+        out_buffer = NULL;
+        if (finished) {
+            finished = false;
+            // 从网络流 文件 读取数据 out_buffer  字节数量  out_buffer   是一个旧波
+            data_size = this->resample_audio(reinterpret_cast<void **>(&out_buffer));
+
+            if (data_size > 0) {
+
+                for (int i = 0; i < data_size / 2 + 1; ++i) {
+                    // short 2个字节 pcm数据   ====波形
+                    sample_buffer[i] = (float) (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                }
+
+                // 让soundtouch对波进行整理
+                sound_touch->putSamples(sample_buffer, nb);
+                // 整理完成，接收一个新波，放到sample_buffer
+                num = sound_touch->receiveSamples(sample_buffer, data_size / 4);
+                LOGE("------------第一个num %d ", num);
+            } else {
+                sound_touch->flush();
+            }
+        }
+
+        if (num == 0) {
+            finished = true;
+            continue;
+        } else {
+
+            if (out_buffer == NULL) {
+                num = sound_touch->receiveSamples(sample_buffer, data_size / 4);
+                LOGE("------------第二个num %d ", num);
+
+                if (num == 0) {
+                    finished = true;
+                    continue;
+                }
+            }
+            LOGE("---------------- 结束1 -----------------------");
+            return num;
+        }
+    }
+    LOGE("---------------- 结束2 -----------------------");
+    return 0;
 }

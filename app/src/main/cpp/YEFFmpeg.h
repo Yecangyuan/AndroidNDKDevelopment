@@ -25,6 +25,8 @@ public:
 
     int duration = 0;
     pthread_mutex_t seek_mutex;
+    pthread_mutex_t init_mutex;
+    bool exit = false;
 
 public:
     YEFFmpeg(YEPlayStatus *play_status, YECallJava *call_java, const char *url);
@@ -37,15 +39,21 @@ public:
 
     void start();
 
-    void seek(jint sec);
+    void seek(int64_t sec);
 
     void resume();
 
     void pause();
 
-    void set_mute(jint mute);
+    void set_mute(int mute);
 
-    void set_volume(jint percent);
+    void set_volume(int percent);
+
+    void set_speed(float speed);
+
+    void set_pitch(float pitch);
+
+    void release();
 };
 
 

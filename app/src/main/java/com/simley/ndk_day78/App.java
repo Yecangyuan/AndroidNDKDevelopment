@@ -14,5 +14,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         CrashReport.initCrashReport(getApplicationContext(), "5c157f40e9", false);
+//        CrashReport.testJavaCrash();
+
     }
 }
