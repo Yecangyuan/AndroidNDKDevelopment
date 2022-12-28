@@ -60,20 +60,22 @@ int YEAudio::resample_audio(void **pcmbuf) {
                 av_frame->channels = av_get_channel_layout_nb_channels(av_frame->channel_layout);
             }
             SwrContext *swr_context;
-            swr_context = swr_alloc_set_opts(NULL,
-                                             AV_CH_LAYOUT_STEREO,
-                                             AV_SAMPLE_FMT_S16,
-                                             av_frame->sample_rate,
-                                             av_frame->channel_layout,
-                                             (AVSampleFormat) av_frame->format,
-                                             av_frame->sample_rate,
-                                             NULL, NULL
-            );
 
+            swr_context = swr_alloc_set_opts(
+                    NULL,
+                    AV_CH_LAYOUT_STEREO,
+                    AV_SAMPLE_FMT_S16,
+                    av_frame->sample_rate,
+                    av_frame->channel_layout,
+                    (AVSampleFormat) av_frame->format,
+                    av_frame->sample_rate,
+                    NULL, NULL
+            );
             if (!swr_context || swr_init(swr_context) < 0) {
                 av_packet_free(&av_packet);
                 av_free(av_packet);
                 av_packet = NULL;
+
                 av_frame_free(&av_frame);
                 av_free(av_frame);
                 av_frame = NULL;
@@ -88,20 +90,20 @@ int YEAudio::resample_audio(void **pcmbuf) {
                     (const uint8_t **) av_frame->data,
                     av_frame->nb_samples
             );
+            LOGE("nb:%d", nb);
 
             int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
-
-            // av_frame->pts * time_base.num / time_base.den; 等价于下面这行代码 计算时间
             now_time = av_frame->pts * av_q2d(time_base);
 
             if (now_time < clock) {
                 now_time = clock;
             }
             clock = now_time;
-
+//
             *pcmbuf = buffer;
-            LOGI("data size is %d", data_size);
+
+            LOGE("data_size is %d", data_size);
 
             av_packet_free(&av_packet);
             av_free(av_packet);
@@ -129,7 +131,6 @@ void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
     YEAudio *wl_audio = (YEAudio *) context;
 
     if (wl_audio != NULL) {
-        // int buffer_size = wl_audio->resample_audio();
         int buffer_size = wl_audio->get_sound_touch_data();
 
         if (buffer_size > 0) {
@@ -395,7 +396,7 @@ int YEAudio::get_sound_touch_data() {
 
                 for (int i = 0; i < data_size / 2 + 1; ++i) {
                     // short 2个字节 pcm数据   ====波形
-                    sample_buffer[i] = (float) (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                    sample_buffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
                 }
 
                 // 让soundtouch对波进行整理

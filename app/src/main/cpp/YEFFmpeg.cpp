@@ -34,78 +34,114 @@ void YEFFmpeg::prepared() {
 }
 
 int YEFFmpeg::get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context) {
-    int ret;
-    const AVCodec *avcodec = avcodec_find_decoder(codecpar->codec_id);
-    if (!avcodec) {
-        // call_java->on_call_error(CHILD_THREAD, ret, "找不到对应的编解码器");
+    const AVCodec *dec = avcodec_find_decoder(codecpar->codec_id);
+    if (!dec) {
+        LOGE("can not find decoder");
         exit = true;
-        avformat_close_input(&av_format_context);
-        avformat_free_context(av_format_context);
-        av_format_context = NULL;
-
         pthread_mutex_unlock(&init_mutex);
-        avformat_network_deinit();
-        LOGE("找不到对应的编解码器");
         return -1;
     }
 
-    *av_codec_context = avcodec_alloc_context3(avcodec);
-    if (!(*av_codec_context)) {
-        // call_java->on_call_error(CHILD_THREAD, ret, "分配编解码器上下文失败");
+    *av_codec_context = avcodec_alloc_context3(dec);
+    if (!audio->avcodec_context) {
 
+        LOGE("------------------can not alloc new decodecctx");
         exit = true;
-        avcodec_close(*av_codec_context);
-        avcodec_free_context(av_codec_context);
-        *av_codec_context = NULL;
-
-        avformat_close_input(&av_format_context);
-        avformat_free_context(av_format_context);
-        av_format_context = NULL;
-
         pthread_mutex_unlock(&init_mutex);
-        avformat_network_deinit();
-        LOGE("分配编解码器上下文失败");
         return -1;
     }
 
-    ret = avcodec_parameters_to_context(*av_codec_context, codecpar);
-    if (ret < 0) {
-        call_java->on_call_error(CHILD_THREAD, ret, av_err2str(ret));
+    if (avcodec_parameters_to_context(*av_codec_context, codecpar) < 0) {
+
+        LOGE("can not fill decodecctx");
         exit = true;
-        avcodec_close(*av_codec_context);
-        avcodec_free_context(av_codec_context);
-        *av_codec_context = NULL;
-
-        avformat_close_input(&av_format_context);
-        avformat_free_context(av_format_context);
-        av_format_context = NULL;
-
         pthread_mutex_unlock(&init_mutex);
-        avformat_network_deinit();
-        LOGE("设置 编解码器上下文 参数失败");
         return -1;
     }
 
-    // 打开编解码器
-    ret = avcodec_open2(*av_codec_context, avcodec, NULL);
-    if (ret != 0) {
-        call_java->on_call_error(CHILD_THREAD, ret, av_err2str(ret));
+    if (avcodec_open2(*av_codec_context, dec, 0) != 0) {
+
+        LOGE("cant not open audio strames");
         exit = true;
-        avcodec_close(*av_codec_context);
-        avcodec_free_context(av_codec_context);
-        *av_codec_context = NULL;
-
-        avformat_close_input(&av_format_context);
-        avformat_free_context(av_format_context);
-        av_format_context = NULL;
-
         pthread_mutex_unlock(&init_mutex);
-        avformat_network_deinit();
-        LOGE("打开编解码器失败");
         return -1;
     }
     return 0;
 }
+
+//int YEFFmpeg::get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context) {
+//    int ret;
+//    const AVCodec *avcodec = avcodec_find_decoder(codecpar->codec_id);
+//    if (!avcodec) {
+//        // call_java->on_call_error(CHILD_THREAD, ret, "找不到对应的编解码器");
+//        exit = true;
+//        avformat_close_input(&av_format_context);
+//        avformat_free_context(av_format_context);
+//        av_format_context = NULL;
+//
+//        pthread_mutex_unlock(&init_mutex);
+//        avformat_network_deinit();
+//        LOGE("找不到对应的编解码器");
+//        return -1;
+//    }
+//
+//    *av_codec_context = avcodec_alloc_context3(avcodec);
+//    if (!(*av_codec_context)) {
+//        // call_java->on_call_error(CHILD_THREAD, ret, "分配编解码器上下文失败");
+//
+//        exit = true;
+//        avcodec_close(*av_codec_context);
+//        avcodec_free_context(av_codec_context);
+//        *av_codec_context = NULL;
+//
+//        avformat_close_input(&av_format_context);
+//        avformat_free_context(av_format_context);
+//        av_format_context = NULL;
+//
+//        pthread_mutex_unlock(&init_mutex);
+//        avformat_network_deinit();
+//        LOGE("分配编解码器上下文失败");
+//        return -1;
+//    }
+//
+//    ret = avcodec_parameters_to_context(*av_codec_context, codecpar);
+//    if (ret < 0) {
+//        call_java->on_call_error(CHILD_THREAD, ret, av_err2str(ret));
+//        exit = true;
+//        avcodec_close(*av_codec_context);
+//        avcodec_free_context(av_codec_context);
+//        *av_codec_context = NULL;
+//
+//        avformat_close_input(&av_format_context);
+//        avformat_free_context(av_format_context);
+//        av_format_context = NULL;
+//
+//        pthread_mutex_unlock(&init_mutex);
+//        avformat_network_deinit();
+//        LOGE("设置 编解码器上下文 参数失败");
+//        return -1;
+//    }
+//
+//    // 打开编解码器
+//    ret = avcodec_open2(*av_codec_context, avcodec, NULL);
+//    if (ret != 0) {
+//        call_java->on_call_error(CHILD_THREAD, ret, av_err2str(ret));
+//        exit = true;
+//        avcodec_close(*av_codec_context);
+//        avcodec_free_context(av_codec_context);
+//        *av_codec_context = NULL;
+//
+//        avformat_close_input(&av_format_context);
+//        avformat_free_context(av_format_context);
+//        av_format_context = NULL;
+//
+//        pthread_mutex_unlock(&init_mutex);
+//        avformat_network_deinit();
+//        LOGE("打开编解码器失败");
+//        return -1;
+//    }
+//    return 0;
+//}
 
 void YEFFmpeg::decode_ffmepg_thread() {
     pthread_mutex_lock(&init_mutex);
@@ -162,6 +198,15 @@ void YEFFmpeg::decode_ffmepg_thread() {
                 video = new YEVideo(play_status, call_java);
                 video->stream_index = i;
                 video->codecpar = av_format_context->streams[i]->codecpar;
+                video->time_base = av_format_context->streams[i]->time_base;
+                // 默认  40ms  帧率   25   40ms    读取帧率     25帧    1       50  /2
+                int num = av_format_context->streams[i]->avg_frame_rate.num;
+                int den = av_format_context->streams[i]->avg_frame_rate.den;
+                // 25帧    平均下来  40ms     60帧    16,.66ms      3  defaultDelayTime   默认
+                if (num != 0 && den != 0) {
+                    int fps = num / den;//[25 / 1]
+                    video->default_delay_time = 1.0 / fps;//秒
+                }
             }
         }
     }
@@ -194,16 +239,19 @@ void YEFFmpeg::decode_ffmepg_thread() {
 }
 
 void YEFFmpeg::start() {
-    if (audio == NULL && video == NULL) {
-        LOGE("audio and video are null");
+//    if (audio == NULL && video == NULL) {
+//        LOGE("audio and video are null");
+//        return;
+//    }
+    if (audio == NULL) {
         return;
     }
-    if (audio != NULL) {
-        audio->play();
-    }
-    if (video != NULL) {
-        video->play();
-    }
+//    if (audio != NULL) {
+    audio->play();
+//    }
+//    if (video != NULL) {
+    video->play();
+//    }
 
     int count = 0;
     while (play_status != NULL && !play_status->exit) {

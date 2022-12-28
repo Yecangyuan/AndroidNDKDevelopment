@@ -18,14 +18,14 @@ YEVideo::~YEVideo() {
 
 double YEVideo::get_frame_diff_time(AVFrame *av_frame) {
     // 先获取视频时间戳
-    double pts = av_frame_get_best_effort_timestamp(av_frame);
-    if (pts == AV_NOPTS_VALUE) {
-        pts = 0;
-    }
-    pts *= av_q2d(time_base);
-    if (pts > 0) {
-        clock = pts;
-    }
+//    double pts = av_frame_get_best_effort_timestamp(av_frame);
+//    if (pts == AV_NOPTS_VALUE) {
+//        pts = 0;
+//    }
+//    pts *= av_q2d(time_base);
+//    if (pts > 0) {
+//        clock = pts;
+//    }
     double diff = audio->clock - clock;
     return diff;
 }
