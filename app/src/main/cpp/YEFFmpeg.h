@@ -8,6 +8,7 @@
 #include "YECallJava.h"
 #include "pthread.h"
 #include "YEAudio.h"
+#include "YEVideo.h"
 #include "YEPlayStatus.h"
 
 extern "C" {
@@ -21,6 +22,7 @@ public:
     pthread_t decode_thread;
     AVFormatContext *av_format_context = NULL;
     YEAudio *audio = NULL;
+    YEVideo *video = NULL;
     YEPlayStatus *play_status = NULL;
 
     int duration = 0;
@@ -54,6 +56,14 @@ public:
     void set_pitch(float pitch);
 
     void release();
+
+    /**
+     * 获取音视频编解码器的上下文对象
+     * @param codecpar
+     * @param av_codec_context
+     * @return
+     */
+    int get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context);
 };
 
 

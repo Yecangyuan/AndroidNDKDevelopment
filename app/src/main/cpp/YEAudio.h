@@ -9,6 +9,7 @@
 #include "YEPlayStatus.h"
 #include "YECallJava.h"
 #include "SoundTouch.h"
+#include "ye_log.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -22,8 +23,8 @@ using namespace soundtouch;
 class YEAudio {
 public:
     int stream_index = -1;
-    AVCodecContext *av_codec_context = NULL;
-    AVCodecParameters *codec_par = NULL;
+    AVCodecContext *avcodec_context = NULL;
+    AVCodecParameters *codecpar = NULL;
     YEQueue *queue = NULL;
     YEPlayStatus *play_status = NULL;
 

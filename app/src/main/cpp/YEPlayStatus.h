@@ -9,8 +9,9 @@
 class YEPlayStatus {
 public:
     bool exit;
-    bool seek;
-
+    bool seek = false;
+    bool pause = false;
+    bool load = true;
 public:
     YEPlayStatus();
 };

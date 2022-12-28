@@ -14,10 +14,6 @@ int YEQueue::put_av_packet(AVPacket *packet) {
     pthread_mutex_lock(&pthread_mutex);
 
     packets_queue.push(packet);
-
-//    if (AV_LOG_DEBUG) {
-//
-//    }
     pthread_cond_signal(&pthread_cond);
     pthread_mutex_unlock(&pthread_mutex);
     return 0;

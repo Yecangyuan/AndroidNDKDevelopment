@@ -20,6 +20,8 @@ extern "C" {
 #include "libswresample/swresample.h"
 }
 
+#define AUDIO_SAMPLE_RATE 44100 // 采样率
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstring url_,
@@ -30,6 +32,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
 
     // Open an input stream and read the header
     if (avformat_open_input(&avformat_context, url, NULL, NULL)) {
+
         LOGE("打开文件失败，文件可能不存在");
         return;
     }
@@ -177,54 +180,119 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
     env->ReleaseStringUTFChars(url_, url);
 }
 
+jobject init_audio_track(JNIEnv *env, jobject thiz, int out_channel_nb) {
+    // 通过反射的方式调用java层的代码 去创建音频轨对象
+    jclass divide_player = env->GetObjectClass(thiz);
+    jmethodID createAudio = env->GetMethodID(divide_player, "createAudioTrack",
+                                             "(II)Landroid/media/AudioTrack;");
+    jobject audio_track = env->CallObjectMethod(thiz, createAudio, AUDIO_SAMPLE_RATE,
+                                                out_channel_nb);
+    return audio_track;
+}
+
+jmethodID get_audio_track_write(JNIEnv *env, jobject audio_track) {
+    jclass audio_track_class = env->GetObjectClass(audio_track);
+    jmethodID audio_track_play = env->GetMethodID(audio_track_class, "play", "()V");
+    env->CallVoidMethod(audio_track, audio_track_play);
+
+    jmethodID audio_track_write = env->GetMethodID(audio_track_class, "write", "([BII)I");
+    return audio_track_write;
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, jstring url_) {
     const char *url = env->GetStringUTFChars(url_, JNI_FALSE);
 
+    AVFormatContext *avformat_context = avformat_alloc_context();
+
     // 初始化网络支持模块
     avformat_network_init();
 
-    AVFormatContext *avformat_context = avformat_alloc_context();
 
-    int ret = avformat_open_input(&avformat_context, url, NULL, NULL);
+    int ret;
+    ret = avformat_open_input(&avformat_context, url, NULL, NULL);
     if (ret != 0) {
-        LOGE("Failed to open file, return value is %d", ret);
+        // 1. 回调给java层，通知打开文件失败
+//        jclass divide_player = env->GetObjectClass(thiz);
+//        jmethodID onError = env->GetMethodID(divide_player, "onError", "(ILjava/lang/String;)V");
+//        char *a = av_err2str(ret);
+//        env->CallVoidMethod(thiz, onError, ret, av_err2str(ret));
+        // 2. 释放相关资源
+        avformat_close_input(&avformat_context);
+        avformat_free_context(avformat_context);
+        avformat_context = NULL;
+        avformat_network_deinit();
+        LOGE("Failed to open file, the error is %s", av_err2str(ret));
         return;
     }
 
-    if (avformat_find_stream_info(avformat_context, NULL) < 0) {
-        LOGE("Couldn't open video");
+    ret = avformat_find_stream_info(avformat_context, NULL);
+    if (ret < 0) {
+        avformat_close_input(&avformat_context);
+        avformat_free_context(avformat_context);
+        avformat_context = NULL;
+        avformat_network_deinit();
+        LOGE("Couldn't open video, the error is %s", av_err2str(ret));
         return;
     }
 
-    // 获取视频流索引
+    // int audio_index = av_find_best_stream(avformat_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+    // 获取音频流索引
     int audio_index = -1;
+    int video_index = -1;
     for (int i = 0; i < avformat_context->nb_streams; ++i) {
+        // 获取到音频索引
         if (avformat_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_index = i;
             break;
         }
+            // TODO 获取到视频流索引
+        else if (avformat_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video_index = i;
+        }
     }
     if (audio_index == -1) {
+        avformat_close_input(&avformat_context);
+        avformat_free_context(avformat_context);
+        avformat_context = NULL;
+        avformat_network_deinit();
         LOGE("There is no audio stream.");
         return;
     }
 
     AVCodecParameters *codecpar = avformat_context->streams[audio_index]->codecpar;
     const AVCodec *avcodec = avcodec_find_decoder(codecpar->codec_id);
-
     AVCodecContext *av_codec_context = avcodec_alloc_context3(avcodec);
     if (avcodec_parameters_to_context(av_codec_context, codecpar) < 0) {
+        avcodec_close(av_codec_context);
+        avcodec_free_context(&av_codec_context);
+        av_codec_context = NULL;
+
+        avformat_close_input(&avformat_context);
+        avformat_free_context(avformat_context);
+        avformat_context = NULL;
+
+        avformat_network_deinit();
         LOGE("设置 编解码器上下文 参数失败");
         return;
     }
 
     // 打开编解码器
     if (avcodec_open2(av_codec_context, avcodec, NULL) != 0) {
+        avcodec_close(av_codec_context);
+        avcodec_free_context(&av_codec_context);
+        av_codec_context = NULL;
+
+        avformat_close_input(&avformat_context);
+        avformat_free_context(avformat_context);
+        avformat_context = NULL;
+
+        avformat_network_deinit();
         LOGE("打开编解码器失败");
         return;
     }
+
     AVPacket *av_packet = av_packet_alloc();
     // 分配av_frame对象，作为解码后数据的容器
     AVFrame *av_frame = av_frame_alloc();
@@ -233,11 +301,10 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
 
     SwrContext *swr_context = swr_alloc();
     uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
-    enum AVSampleFormat out_formart = AV_SAMPLE_FMT_S16;
+    enum AVSampleFormat out_format = AV_SAMPLE_FMT_S16;
     int out_sample_rate = av_codec_context->sample_rate;
-//    转换器的代码
-    swr_alloc_set_opts(swr_context, out_ch_layout, out_formart, out_sample_rate,
-//            输出的
+    // 转换器的代码
+    swr_alloc_set_opts(swr_context, out_ch_layout, out_format, out_sample_rate,
                        av_codec_context->channel_layout, av_codec_context->sample_fmt,
                        av_codec_context->sample_rate, 0, NULL
     );
@@ -249,8 +316,8 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
 ////    in_channel_layout->nb_channels = c->ch_layout->nb_channels;
 //
 //    if (swr_alloc_set_opts2(&swr_context, out_channel_layout, AV_SAMPLE_FMT_S16, out_sample_rate,
-//                            in_channel_layout, av_codec_context->sample_fmt,
-//                            av_codec_context->sample_rate, 0, NULL) != 0) {
+//                            in_channel_layout, avcodec_context->sample_fmt,
+//                            avcodec_context->sample_rate, 0, NULL) != 0) {
 //        LOGE("swr_alloc_set_opts2 failed.");
 //        return;
 //    }
@@ -260,26 +327,27 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
     // 1s的pcm个数
     auto *out_buffer = (uint8_t *) av_malloc(44100 * 2);
 
-    // 通过反射的方式调用java层的代码
-    jclass divide_player = env->GetObjectClass(thiz);
-    jmethodID createAudio = env->GetMethodID(divide_player, "createAudioTrack",
-                                             "(II)Landroid/media/AudioTrack;");
-    jobject audio_track = env->CallObjectMethod(thiz, createAudio, 44100, out_channel_nb);
+    // 初始化audio_track
+    jobject audio_track = init_audio_track(env, thiz, out_channel_nb);
+    jmethodID audio_track_write = get_audio_track_write(env, audio_track);
 
-    jclass audio_track_class = env->GetObjectClass(audio_track);
-    jmethodID audio_track_play = env->GetMethodID(audio_track_class, "play", "()V");
-    env->CallVoidMethod(audio_track, audio_track_play);
+    int size = av_samples_get_buffer_size(NULL, out_channel_nb, av_frame->nb_samples,
+                                          av_codec_context->sample_fmt, 1);
+    // java的字节数组
+    jbyteArray audio_sample_array = env->NewByteArray(size);
 
-    jmethodID audio_track_write = env->GetMethodID(audio_track_class, "write", "([BII)I");
-
+    // 每次调用av_read_frame方法都会 读取流数据的下一帧并返回，读不到就退出
     while (av_read_frame(avformat_context, av_packet) >= 0) {
+        // 音频
         if (av_packet->stream_index == audio_index) {
+            // 1.调用avcodec_send_packet()方法发送一个未解码的packet
             ret = avcodec_send_packet(av_codec_context, av_packet);
             // LOGE("解码成功%d", ret);
             if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
                 LOGE("解码出错");
                 break;
             }
+            // 2.调用avcodec_receive_frame()方法接收一个解码后的frame
             ret = avcodec_receive_frame(av_codec_context, av_frame);
             if (ret < 0 && ret != AVERROR_EOF) {
                 LOGE("读取出错");
@@ -289,32 +357,73 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
                 swr_convert(swr_context, &out_buffer, 44100 * 2,
                             (const uint8_t **) (av_frame->data), av_frame->nb_samples);
 
-                // 解码了
-                int size = av_samples_get_buffer_size(NULL, out_channel_nb, av_frame->nb_samples,
-                                                      AV_SAMPLE_FMT_S16, 1);
-                // java的字节数组
-                jbyteArray audio_sample_array = env->NewByteArray(size);
+                // 1s的pcm个数
+                // jbyte *out_buffer = env->GetByteArrayElements(audio_sample_array, NULL);
+                // memcpy(out_buffer, av_frame->data, size);
                 env->SetByteArrayRegion(audio_sample_array, 0, size,
                                         reinterpret_cast<const jbyte *>(out_buffer));
+
+//                env->ReleaseByteArrayElements(audio_sample_array,
+//                                              reinterpret_cast<jbyte *>(out_buffer), JNI_COMMIT);
+
                 env->CallIntMethod(audio_track, audio_track_write, audio_sample_array, 0, size);
-                env->DeleteLocalRef(audio_sample_array);
                 usleep(1000 * 16);
             }
         }
-    }
-    LOGI("音频播放完毕");
+            // TODO 视频
+        else if (av_packet->stream_index == video_index) {
 
-    // 以下释放所有相关的资源
-    av_free(out_buffer);
-    swr_free(&swr_context);
-    av_packet_free(&av_packet);
-    av_frame_free(&av_frame);
+        }
+        // 解引用
+        av_packet_unref(av_packet);
+        av_frame_unref(av_frame);
+
+    }
+    LOGI("音频播放完毕，开始释放相关资源");
+
+    env->DeleteLocalRef(audio_track);
+    env->DeleteLocalRef(audio_sample_array);
+
+    if (out_buffer != NULL) {
+        av_free(out_buffer);
+    }
+
+    if (swr_context != NULL) {
+        swr_free(&swr_context);
+    }
+
+    if (av_packet != NULL) {
+        // 1.解引用data   2.销毁av_packet结构体 3.av_packet = NULL
+        av_packet_free(&av_packet);
+    }
+
+    if (av_frame != NULL) {
+        av_frame_free(&av_frame);
+    }
+
     avcodec_free_context(&av_codec_context);
-    avformat_free_context(avformat_context);
+
+    if (avformat_context != NULL) {
+        avformat_free_context(avformat_context);
+    }
+
     avformat_network_deinit();
-    env->ReleaseStringUTFChars(url_, url);
 }
 
+/*
+ * 释放相关资源
+ */
+//void ReleaseRes() {
+//
+//    env->ReleaseStringUTFChars(url_, url);
+//
+//    if (av_forma != NULL) {
+//
+//    }
+//    if () {
+//
+//    }
+//}
 
 _JavaVM *java_vm = NULL;
 YECallJava *call_java = NULL;
@@ -428,4 +537,15 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1stop(JNIEnv *env, jobject thiz) {
         }
     }
     n_exit = true;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1set_1looping(JNIEnv *env, jobject thiz,
+                                                           jboolean looping) {
+
+}
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_simley_ndk_1day78_player_YEPlayer_n_1is_1looping(JNIEnv *env, jobject thiz) {
+
 }

@@ -7,11 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.nfc.cardemulation.HostNfcFService;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -39,6 +45,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     public static final int MUSIC_MESSAGE = 0;
     private int position;
     private boolean playState = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

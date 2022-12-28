@@ -3,14 +3,20 @@ package com.simley.ndk_day78.player;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
+import com.simley.ndk_day78.opengl.YEGLSurfaceView;
 import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
 import com.simley.ndk_day78.player.audio.listener.WlOnPreparedListener;
 import com.simley.ndk_day78.player.audio.listener.YEPlayListener;
+import com.simley.ndk_day78.utils.ThreadPool;
 
+/**
+ * 音视频播放器
+ */
 public class YEPlayer {
 
     private AudioTrack audioTrack;
@@ -18,6 +24,11 @@ public class YEPlayer {
     private YEPlayListener mYEPlayListener;
     private IPlayerListener iPlayerListener;
     private WlOnPreparedListener wlOnPreparedListener;
+
+    private YEGLSurfaceView yeglSurfaceView;
+
+    private PlayState playState = PlayState.STARTED;
+    private int duration;
 
     public native void play(String url, Surface surface);
 
@@ -27,13 +38,15 @@ public class YEPlayer {
 
     private native void n_start();
 
-    private native void n_seek(int secds);
+    private native void n_seek(int sec);
 
     private native void n_resume();
 
     private native void n_pause();
 
     private native void n_mute(int mute);
+
+    public native void n_set_looping(boolean looping);
 
     private native void n_volume(int percent);
 
@@ -42,6 +55,17 @@ public class YEPlayer {
     private native void n_pitch(float pitch);
 
     private native void n_stop();
+
+    private native boolean n_is_looping();
+
+    /**
+     * 是否正在播放
+     *
+     * @return
+     */
+    public boolean isPlaying() {
+        return playState == PlayState.PLAYING;
+    }
 
     /**
      * 音频变速
@@ -61,31 +85,66 @@ public class YEPlayer {
         n_pitch(pitch);
     }
 
+    /**
+     * 设置循环播放
+     *
+     * @param looping
+     */
+    public void setLooping(boolean looping) {
+        n_set_looping(looping);
+    }
+
+    /**
+     * 是否循环播放中
+     *
+     * @return
+     */
+    public boolean isLooping() {
+        return n_is_looping();
+    }
+
+    /**
+     * 停止播放
+     */
     public void stop() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                n_stop();
-            }
-        }).start();
+        new MediaPlayer().start();
+        ThreadPool.getInstance().execute(this::n_stop);
     }
 
     public void prepare() {
         if (TextUtils.isEmpty(mSource)) {
             return;
         }
-        new Thread(() -> n_prepared(mSource)).start();
+        ThreadPool.getInstance().execute(() -> n_prepared(mSource));
     }
 
+    public void onCallLoad(boolean load) {
+
+    }
+
+    public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
+        if (yeglSurfaceView != null) {
+            yeglSurfaceView.setYUVData(width, height, y, u, v);
+        }
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+
+    /**
+     * 开始播放
+     */
     public void start() {
         if (TextUtils.isEmpty(mSource)) {
-            return;
+            throw new IllegalArgumentException("datasource is null, please set the datasource by calling setDataSource method.");
         }
-        new Thread(this::n_start).start();
+        ThreadPool.getInstance().execute(this::n_start);
     }
 
-    public void setSource(String mSource) {
-        this.mSource = mSource;
+    public void setDataSource(String dataSource) {
+        this.mSource = dataSource;
     }
 
     public void onCallPrepared() {
@@ -100,8 +159,19 @@ public class YEPlayer {
 
     public void onCallTimeInfo(int currentTime, int totalTime) {
         if (iPlayerListener != null) {
+            duration = totalTime;
             iPlayerListener.onCurrentTime(currentTime, totalTime);
         }
+    }
+
+    public void onError(int errorCode, String errorMsg) {
+        if (iPlayerListener != null) {
+            iPlayerListener.onError(errorCode, errorMsg);
+        }
+    }
+
+    public void setYeglSurfaceView(YEGLSurfaceView yeglSurfaceView) {
+        this.yeglSurfaceView = yeglSurfaceView;
     }
 
     /**
@@ -145,9 +215,17 @@ public class YEPlayer {
      *
      * @param secds
      */
-    public void seek(int secds) {
+    public void seekTo(int secds) {
         n_seek(secds);
     }
+
+    public void setVolume(int leftVolume, int rightVolume) {
+
+    }
+
+//    public void setVolume(int volume) {
+//        setVolume(volume, volume);
+//    }
 
     /**
      * 设置音量
@@ -182,6 +260,17 @@ public class YEPlayer {
      */
     public void setMute(int mute) {
         n_mute(mute);
+    }
+
+
+    /**
+     * 播放状态
+     */
+    enum PlayState {
+        STARTED,
+        PLAYING,
+        PAUSED,
+        STOPPED,
     }
 
 }

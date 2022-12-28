@@ -7,8 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -16,11 +20,12 @@ import com.simley.ndk_day78.player.YEPlayer;
 import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MusicService extends Service implements MediaPlayer.OnCompletionListener, IPlayerListener {
     private static final String TAG = "David";
     private YEPlayer yePlayer;
+
+//    private final Handler handler = new Handler(Looper.getMainLooper());
     /*操作指令*/
     public static final String ACTION_OPT_MUSIC_PLAY = "ACTION_OPT_MUSIC_PLAY";
     public static final String ACTION_OPT_MUSIC_PAUSE = "ACTION_OPT_MUSIC_PAUSE";
@@ -102,7 +107,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     private void play(final int index) {
 //        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
         String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
-        yePlayer.setSource(mp3File);
+        yePlayer.setDataSource(mp3File);
         yePlayer.prepare();
     }
 
@@ -125,7 +130,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private void seekTo(int position) {
-        yePlayer.seek(position);
+        yePlayer.seekTo(position);
     }
 
     @Override
@@ -147,7 +152,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onError(int code, String msg) {
-
+        Log.e(this.getClass().getSimpleName(), "code: " + code + "msg: " + msg);
     }
 
     @Override

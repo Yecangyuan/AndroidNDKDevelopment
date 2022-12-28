@@ -50,11 +50,12 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetection(JNIEnv *env, jobject
     faceCascadeClassifier.detectMultiScale(grayMat, faces, 1.1, 5, 0 | CASCADE_SCALE_IMAGE,
                                            Size(30, 30));
     LOGE("人脸size = %lu", faces.size());
-//    faceCascadeClassifier.detectMultiScale(grayMat, faces, 1.1, 3, 0, Size(width / 4, height / 4));
+    // faceCascadeClassifier.detectMultiScale(grayMat, faces, 1.1, 3, 0, Size(width / 4, height / 4));
 
     // 没有人脸 或者 有多张人脸
     if (faces.size() != 1) {
-//        mosaicFace(*src);
+        // 打上马赛克
+        // mosaicFace(*src);
         return;
     }
 

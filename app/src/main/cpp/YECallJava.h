@@ -23,6 +23,9 @@ public:
 
     jmethodID jmid_prepared;
     jmethodID jmid_time_info;
+    jmethodID jmid_load;
+    jmethodID jmid_render_yuv;
+    jmethodID jmid_on_error;
 
 public:
     YECallJava(_JavaVM *java_vm, JNIEnv *jni_env, jobject *jobj);
@@ -44,6 +47,25 @@ public:
      * @param total_time  总时间
      */
     void on_call_time_info(int type, int cur_time, int total_time);
+
+    void on_call_load(int type, bool load);
+
+    /**
+     * 渲染yuv
+     * @param width
+     * @param height
+     * @param fy
+     * @param fu
+     * @param fv
+     */
+    void on_call_render_yuv(int width, int height, uint8_t *fy, uint8_t *fu, uint8_t *fv);
+
+    /**
+     * 出现错误的回调java层方法
+     * @param code
+     * @param msg
+     */
+    void on_call_error(int type, int code, const char *msg);
 };
 
 

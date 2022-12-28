@@ -3,7 +3,6 @@
 //
 
 #include "YEAudio.h"
-#include "ye_log.h"
 
 YEAudio::YEAudio(YEPlayStatus *play_status, int sample_rate, YECallJava *call_java) {
     this->play_status = play_status;
@@ -27,7 +26,7 @@ void YEAudio::init_soundtouch() {
 }
 
 void *decode_play(void *data) {
-    auto *wl_audio = (YEAudio *) (data);
+    YEAudio *wl_audio = (YEAudio *) (data);
     wl_audio->init_opensles();
     pthread_exit(&wl_audio->pthread_play);
 }
@@ -45,7 +44,7 @@ int YEAudio::resample_audio(void **pcmbuf) {
             av_packet = NULL;
             continue;
         }
-        ret = avcodec_send_packet(av_codec_context, av_packet);
+        ret = avcodec_send_packet(avcodec_context, av_packet);
         if (ret != 0) {
             av_packet_free(&av_packet);
             av_free(av_packet);
@@ -53,7 +52,7 @@ int YEAudio::resample_audio(void **pcmbuf) {
             continue;
         }
         av_frame = av_frame_alloc();
-        ret = avcodec_receive_frame(av_codec_context, av_frame);
+        ret = avcodec_receive_frame(avcodec_context, av_frame);
         if (ret == 0) {
             if (av_frame->channels && av_frame->channel_layout == 0) {
                 av_frame->channel_layout = av_get_default_channel_layout(av_frame->channels);
@@ -82,7 +81,7 @@ int YEAudio::resample_audio(void **pcmbuf) {
                 continue;
             }
 
-            int nb = swr_convert(
+            nb = swr_convert(
                     swr_context,
                     &buffer,
                     av_frame->nb_samples,
@@ -102,6 +101,7 @@ int YEAudio::resample_audio(void **pcmbuf) {
             clock = now_time;
 
             *pcmbuf = buffer;
+            LOGI("data size is %d", data_size);
 
             av_packet_free(&av_packet);
             av_free(av_packet);
@@ -126,7 +126,7 @@ int YEAudio::resample_audio(void **pcmbuf) {
 
 void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
     LOGI("pcm_buffer_callback被调用");
-    auto *wl_audio = (YEAudio *) context;
+    YEAudio *wl_audio = (YEAudio *) context;
 
     if (wl_audio != NULL) {
         // int buffer_size = wl_audio->resample_audio();
@@ -137,14 +137,15 @@ void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
 
             // 由于pcm_buffer_callback调用频率高，而且通过反射的方式调用java层的onCallTimeInfo方法会比较损耗性能
             // 所以每隔一秒才调用一次
-            if (wl_audio->clock - wl_audio->last_time >= 1) {
+            if (wl_audio->clock - wl_audio->last_time >= 0.1) {
                 wl_audio->last_time = wl_audio->clock;
                 wl_audio->call_java->on_call_time_info(CHILD_THREAD, (int) wl_audio->clock,
                                                        wl_audio->duration);
             }
 
             (*wl_audio->pcm_buffer_queue)->Enqueue(wl_audio->pcm_buffer_queue,
-                                                   (char *) wl_audio->sample_buffer, buffer_size);
+                                                   (char *) wl_audio->sample_buffer,
+                                                   buffer_size * 2 * 2);
         }
     }
 }
@@ -186,7 +187,7 @@ void YEAudio::init_opensles() {
             SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT, // 立体声（前左前右）
             SL_BYTEORDER_LITTLEENDIAN       // 结束标志
     };
-    SLDataSource_ sl_datasource = {&android_queue, &pcm};
+    SLDataSource sl_datasource = {&android_queue, &pcm};
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
@@ -336,7 +337,7 @@ void YEAudio::set_pitch(float pitch) {
 void YEAudio::release() {
 
     if (queue != NULL) {
-        delete (queue);
+        delete queue;
         queue = NULL;
     }
 
@@ -364,10 +365,10 @@ void YEAudio::release() {
         buffer = NULL;
     }
 
-    if (av_codec_context != NULL) {
-        avcodec_close(av_codec_context);
-        avcodec_free_context(&av_codec_context);
-        av_codec_context = NULL;
+    if (avcodec_context != NULL) {
+        avcodec_close(avcodec_context);
+        avcodec_free_context(&avcodec_context);
+        avcodec_context = NULL;
     }
 
     if (play_status != NULL) {
