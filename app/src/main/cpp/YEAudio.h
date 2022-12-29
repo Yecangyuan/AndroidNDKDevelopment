@@ -59,9 +59,9 @@ public:
     AVRational time_base;
     // 当前av_frame的时间
     double now_time;
-    // 当前播放的时间准确时间
+    // 当前播放的时间 准确时间
     double clock;
-    //新的缓冲区
+    // 新的缓冲区
     SAMPLETYPE *sample_buffer = NULL;
     uint8_t *out_buffer = NULL;
     // 音高

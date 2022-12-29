@@ -12,25 +12,27 @@ YEVideo::YEVideo(YEPlayStatus *play_status, YECallJava *ye_call_java) {
     pthread_mutex_init(&pthread_mutex, NULL);
 }
 
-YEVideo::~YEVideo() {
-
-}
+YEVideo::~YEVideo() {}
 
 double YEVideo::get_frame_diff_time(AVFrame *av_frame) {
     // 先获取视频时间戳
-//    double pts = av_frame_get_best_effort_timestamp(av_frame);
-//    if (pts == AV_NOPTS_VALUE) {
-//        pts = 0;
-//    }
-//    pts *= av_q2d(time_base);
-//    if (pts > 0) {
-//        clock = pts;
-//    }
+    double pts = av_frame->best_effort_timestamp;
+    if (pts == AV_NOPTS_VALUE) {
+        pts = 0;
+    }
+    pts *= av_q2d(time_base);
+    if (pts > 0) {
+        clock = pts;
+    }
+    // diff = 音频的当前时间 - 视频的当前时间
     double diff = audio->clock - clock;
+    // diff > 0 表示 音频超前
     return diff;
 }
 
 double YEVideo::get_delay_time(double diff) {
+    // 音频和视频之差大于 3ms到500ms，则进行干预
+    // 音频和视频之间的差距大于 3ms 所以进行干预，小于3ms则不进行干预
     if (diff > 0.003) {
         // 视频休眠时间
         delay_time = delay_time * 2 / 3;
@@ -40,7 +42,9 @@ double YEVideo::get_delay_time(double diff) {
         } else if (delay_time > default_delay_time * 2) {
             delay_time = default_delay_time * 2;
         }
-    } else if (diff < -0.003) {
+    }
+    // 视频比较快，加大视频休眠时间， 让音频赶上来
+    else if (diff < -0.003) {
         delay_time = delay_time * 3 / 2;
         if (delay_time < default_delay_time / 2) {
             delay_time = default_delay_time * 2 / 3;
@@ -55,6 +59,7 @@ double YEVideo::get_delay_time(double diff) {
         delay_time = default_delay_time * 2;
     }
 
+    // 音频和视频之差 大于10s，则直接让视频跳到音频播放的位置
     if (diff >= 10) {
         queue->clear_av_packet();
         delay_time = default_delay_time;
@@ -120,8 +125,10 @@ void *play_video(void *data) {
         // 解码成功
         if (av_frame->format == AV_PIX_FMT_YUV420P) {
             double diff = video->get_frame_diff_time(av_frame);
+
             // 通过diff计算休眠时间
             av_usleep(video->get_delay_time(diff) * 1000000);
+
             video->ye_call_java->on_call_render_yuv(
                     video->avcodec_context->width,
                     video->avcodec_context->height,

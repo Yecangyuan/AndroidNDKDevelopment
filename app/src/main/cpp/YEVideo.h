@@ -33,7 +33,7 @@ public:
     double delay_time = 0;
     // 默认休眠时间 40ms 0.04s 帧率 25帧
     double default_delay_time = 0.04;
-    YEVideo *audio = NULL;
+    YEAudio *audio = NULL;
     AVRational time_base;
 
 public:
