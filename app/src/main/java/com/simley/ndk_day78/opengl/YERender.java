@@ -15,6 +15,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class YERender implements GLSurfaceView.Renderer {
 
+    private Context context;
+
     private final float[] vertexData = {
 
             -1f, -1f,
@@ -50,7 +52,8 @@ public class YERender implements GLSurfaceView.Renderer {
     private ByteBuffer u;
     private ByteBuffer v;
 
-    public YERender() {
+    public YERender(Context context) {
+        this.context = context;
         vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
@@ -65,8 +68,8 @@ public class YERender implements GLSurfaceView.Renderer {
     }
 
     private void initRenderYUV() {
-        String vertexSource = YEShaderUtil.readRawTxt(R.raw.vertex_shader);
-        String fragmentSource = YEShaderUtil.readRawTxt(R.raw.fragment_shader);
+        String vertexSource = YEShaderUtil.readRawTxt(context, R.raw.vertex_shader);
+        String fragmentSource = YEShaderUtil.readRawTxt(context, R.raw.fragment_shader);
         program_yuv = YEShaderUtil.createProgram(vertexSource, fragmentSource);
 
         avPosition_yuv = GLES20.glGetAttribLocation(program_yuv, "av_Position");

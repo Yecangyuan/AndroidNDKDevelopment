@@ -129,7 +129,6 @@ int YEAudio::resample_audio(void **pcmbuf) {
 void pcm_buffer_callback(SLAndroidSimpleBufferQueueItf bf, void *context) {
     LOGI("pcm_buffer_callback被调用");
     YEAudio *wl_audio = (YEAudio *) context;
-
     if (wl_audio != NULL) {
         int buffer_size = wl_audio->get_sound_touch_data();
 

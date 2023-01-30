@@ -14,6 +14,7 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -24,6 +25,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:extractNativeLibs="true"
         android:theme="@style/Theme.NDK_Day78"
         tools:targetApi="31">
         <activity
@@ -32,7 +34,11 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".player.video.VideoPlayerActivity"
-            android:exported="false" />
+            android:exported="true" />
+
+        <activity
+            android:name=".player.video.VideoPlayerActivity2"
+            android:exported="true" />
         <activity
             android:name=".player.PlayerActivity"
             android:exported="true" />

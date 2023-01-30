@@ -15,7 +15,7 @@ public class YEGLSurfaceView extends GLSurfaceView {
     public YEGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setEGLContextClientVersion(2);
-        mYERender = new YERender();
+        mYERender = new YERender(context);
         setRenderer(mYERender);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }

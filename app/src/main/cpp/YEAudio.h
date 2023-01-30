@@ -32,7 +32,7 @@ public:
     AVPacket *av_packet = NULL;
     AVFrame *av_frame = NULL;
     int ret = 0;
-    uint8_t *buffer = 0;
+    uint8_t *buffer = NULL;
     int data_size = 0;
     int sample_rate = 0;
 

@@ -33,42 +33,6 @@ void YEFFmpeg::prepared() {
     pthread_create(&decode_thread, NULL, on_decode_ffmpeg, this);
 }
 
-//int YEFFmpeg::get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context) {
-//    const AVCodec *dec = avcodec_find_decoder(codecpar->codec_id);
-//    if (!dec) {
-//        LOGE("can not find decoder");
-//        exit = true;
-//        pthread_mutex_unlock(&init_mutex);
-//        return -1;
-//    }
-//
-//    *av_codec_context = avcodec_alloc_context3(dec);
-//    if (!audio->avcodec_context) {
-//
-//        LOGE("------------------can not alloc new decodecctx");
-//        exit = true;
-//        pthread_mutex_unlock(&init_mutex);
-//        return -1;
-//    }
-//
-//    if (avcodec_parameters_to_context(*av_codec_context, codecpar) < 0) {
-//
-//        LOGE("can not fill decodecctx");
-//        exit = true;
-//        pthread_mutex_unlock(&init_mutex);
-//        return -1;
-//    }
-//
-//    if (avcodec_open2(*av_codec_context, dec, 0) != 0) {
-//
-//        LOGE("cant not open audio strames");
-//        exit = true;
-//        pthread_mutex_unlock(&init_mutex);
-//        return -1;
-//    }
-//    return 0;
-//}
-
 int YEFFmpeg::get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context) {
     int ret;
     const AVCodec *avcodec = avcodec_find_decoder(codecpar->codec_id);

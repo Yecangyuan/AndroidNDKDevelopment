@@ -440,6 +440,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
                 Log.e(TAG, "Utils.matToBitmap() throws an exception: " + e.getMessage());
                 bmpValid = false;
                 // 此处修改如果不对的话释放图片再重新根据大小进行创建
+                // catch代码块中的代码可能不会执行，因为当native层报错，catch代码块可能捕获不到这个异常
 //                if (mCacheBitmap != null) {
 //                    mCacheBitmap.recycle();
 //                    mCacheBitmap = Bitmap.createBitmap(modified.width(), modified.height(), mCacheBitmap.getConfig());

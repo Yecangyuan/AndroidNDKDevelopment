@@ -7,12 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -25,7 +21,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     private static final String TAG = "David";
     private YEPlayer yePlayer;
 
-//    private final Handler handler = new Handler(Looper.getMainLooper());
+    //    private final Handler handler = new Handler(Looper.getMainLooper());
     /*操作指令*/
     public static final String ACTION_OPT_MUSIC_PLAY = "ACTION_OPT_MUSIC_PLAY";
     public static final String ACTION_OPT_MUSIC_PAUSE = "ACTION_OPT_MUSIC_PAUSE";
@@ -37,10 +33,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String ACTION_OPT_MUSIC_RIGHT = "ACTION_OPT_MUSIC_RIGHT";
     public static final String ACTION_OPT_MUSIC_CENTER = "ACTION_OPT_MUSIC_CENTER";
     public static final String ACTION_OPT_MUSIC_VOLUME = "ACTION_OPT_MUSIC_VOLUME";
+
     public static final String ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH = "ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH";
     public static final String ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH = "ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH";
     public static final String ACTION_OPT_MUSIC_SPEED_AN_PITCH = "ACTION_OPT_MUSIC_SPEED_AN_PITCH";
-    public static final String ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL = "ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL";
+    public static final String ACTION_OPT_MUSIC_SPEED_PITCH_NORMAL = "ACTION_OPT_MUSIC_SPEED_PITCH_NORMAL";
 
     /*状态指令*/
     public static final String ACTION_STATUS_MUSIC_PLAY = "ACTION_STATUS_MUSIC_PLAY";
@@ -48,6 +45,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String ACTION_STATUS_MUSIC_COMPLETE = "ACTION_STATUS_MUSIC_COMPLETE";
     public static final String ACTION_STATUS_MUSIC_DURATION = "ACTION_STATUS_MUSIC_DURATION";
     public static final String ACTION_STATUS_MUSIC_PLAYER_TIME = "ACTION_STATUS_MUSIC_PLAYER_TIME";
+
     public static final String PARAM_MUSIC_DURATION = "PARAM_MUSIC_DURATION";
     public static final String PARAM_MUSIC_SEEK_TO = "PARAM_MUSIC_SEEK_TO";
     public static final String PARAM_MUSIC_CURRENT_POSITION = "PARAM_MUSIC_CURRENT_POSITION";
@@ -90,10 +88,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         intentFilter.addAction(ACTION_OPT_MUSIC_RIGHT);
         intentFilter.addAction(ACTION_OPT_MUSIC_VOLUME);
         intentFilter.addAction(ACTION_OPT_MUSIC_CENTER);
+
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH);
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH);
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_PITCH);
-        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL);
+        intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_PITCH_NORMAL);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMusicReceiver, intentFilter);
     }
 
@@ -105,8 +104,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     //监听
     private void play(final int index) {
-        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
-//        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
+//        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
+        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
         yePlayer.setDataSource(mp3File);
         yePlayer.prepare();
     }
@@ -225,7 +224,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     yePlayer.setSpeed(1.5f);
                     yePlayer.setPitch(1.5f);
                     break;
-                case ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL:
+                case ACTION_OPT_MUSIC_SPEED_PITCH_NORMAL:
 //                yePlayer.setSpeed(1.0f);
 //                yePlayer.setPitch(1.0f);
                     yePlayer.stop();

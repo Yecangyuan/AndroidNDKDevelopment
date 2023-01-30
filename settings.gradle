@@ -22,4 +22,3 @@ include ':app'
 // the usage of settings.gradle file
 // It specifies, amongst other things,
 // the project name and any subprojects to be added to your build.
-include ':numeric_keyboard'

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.simley.ndk_day78.databinding.ActivityPlayerBinding;
 import com.simley.ndk_day78.player.audio.AudioPlayerActivity;
 import com.simley.ndk_day78.player.video.VideoPlayerActivity;
+import com.simley.ndk_day78.player.video.VideoPlayerActivity2;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
 public class PlayerActivity extends AppCompatActivity {
@@ -21,11 +22,9 @@ public class PlayerActivity extends AppCompatActivity {
         binding = ActivityPlayerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.gotoAudioInterface.setOnClickListener(v -> startActivity(new Intent(this, AudioPlayerActivity.class)));
-        binding.gotoVideoInterface.setOnClickListener(v -> startActivity(new Intent(this, VideoPlayerActivity.class)));
+//        binding.gotoVideoInterface.setOnClickListener(v -> startActivity(new Intent(this, VideoPlayerActivity.class)));
+        binding.gotoVideoInterface.setOnClickListener(v -> startActivity(new Intent(this, VideoPlayerActivity2.class)));
     }
-
-
-
 
 
 }

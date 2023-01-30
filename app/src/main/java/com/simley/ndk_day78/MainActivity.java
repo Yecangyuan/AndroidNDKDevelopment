@@ -2,6 +2,7 @@ package com.simley.ndk_day78;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFaceDetection.setOnClickListener(v -> startActivity(new Intent(this, FaceDetectionActivity.class)));
         // 银行卡识别
         binding.btnBankCardOrganize.setOnClickListener(v -> startActivity(new Intent(this, BankCardRecognitionActivity.class)));
+        // 文本识别
         binding.btnTextRecognition.setOnClickListener(v -> startActivity(new Intent(this, TextRecognitionActivity.class)));
+        // 音视频播放器
         binding.btnPlayInterface.setOnClickListener(v -> startActivity(new Intent(this, PlayerActivity.class)));
     }
 

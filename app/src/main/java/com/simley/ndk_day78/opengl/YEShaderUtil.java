@@ -1,5 +1,6 @@
 package com.simley.ndk_day78.opengl;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -10,8 +11,8 @@ import java.io.InputStreamReader;
 
 public class YEShaderUtil {
 
-    public static String readRawTxt(int rawId) {
-        InputStream inputStream = Resources.getSystem().openRawResource(rawId);
+    public static String readRawTxt(Context context, int rawId) {
+        InputStream inputStream = context.getResources().openRawResource(rawId);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder sb = new StringBuilder();
         String line;
@@ -28,6 +29,7 @@ public class YEShaderUtil {
 
     /**
      * 加载着色器
+     *
      * @param shaderType
      * @param source
      * @return

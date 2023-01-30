@@ -7,17 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.nfc.cardemulation.HostNfcFService;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -290,7 +284,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void normalspeedpitch(View view) {
-        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_PITCH_NOMAORL);
+        optMusic(MusicService.ACTION_OPT_MUSIC_SPEED_PITCH_NORMAL);
     }
 
     private void play() {

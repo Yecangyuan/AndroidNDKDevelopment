@@ -17,14 +17,36 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
+                /*
+                cppFlags
+
+                 */
                 cppFlags '-std=c++11'
-                // Gradle从远端下载libc++-shared.so库
+                /*
+                arguments
+                    Gradle从远端下载libc++-shared.so库
+                 */
                 arguments '-DANDROID_STL=c++_static'
+                /*
+                abiFilters：指定CPU架构，cmake的本地库，例如：native-lib
+                    如果是abiFilters ''，则默认生成所有CPU架构的文件
+                 */
                 abiFilters 'arm64-v8a'
             }
         }
+
+        // 指定CPU架构，指定了之后才真正将lib/CPU架构(arm64-v8a) 打包进APK包
         ndk {
-            // 设置支持的SO库架构
+            /*
+                设置支持的SO库架构
+                目前手机支持的主流的CPU架构就是arm64-v8a
+                armeabi-v7a出现在一些老的设备机型，或者是一些IOT设备中，在目前智能手机产品中，这种CPU架构已逐渐被淘汰
+                x86和x86_64一般是模拟器所使用的CPU架构，或者当年的微软的Windows Phone
+                x86和arm的区别：
+                    x86是复杂指令集
+                    arm是简单指令集
+                    x86相对于arm来说性能更好，但是更耗电，arm则相反
+             */
             abiFilters 'arm64-v8a'//, 'x86', 'armeabi-v7a', 'x86_64'
         }
     }
@@ -54,6 +76,62 @@ android {
         }
     }
 }
+//
+//project.afterEvaluate {
+//    project.plugins.withId("com.android.application") { AppPlugin p ->
+//        p.getVariantManager().getVariantScopes().each { VariantScope scope ->
+//
+//            // 1. 寻找 packageTask
+//            def packageTask = project.tasks.findByName("package${scope.fullVariantName.capitalize()}")
+//
+//            if (packageTask != null) {
+//                // 在 packageTask 之前执行 so 的压缩
+//                packageTask.doFirst {
+//                    // 获取 jni 目录中的 so文件
+//                    FileCollection soFiles = scope
+//                            .getTransformManager()
+//                            .getPipelineOutputAsFileCollection(StreamFilter.NATIVE_LIBS)
+//                    // 获取 assets 文件，用来存放压缩后的 so
+//                    File assetsFile = scope
+//                            .getArtifacts()
+//                            .getFinalArtifactFiles(InternalArtifactType.MERGED_ASSETS)
+//                            .getFiles().iterator().next();
+//
+//                    //2. 压缩 so
+//                    doSoCompress(soFiles, assetsFile)
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//private void doSoCompress(Set<File> soFiles, File assetsFile) {
+//    // 遍历 jni 文件中的 so ，并进行压缩和删除处理
+//    try {
+//        for (File f : soFiles) {
+//            FileInputStream input = new FileInputStream(f);
+//            // 压缩成 .so 后缀结尾的文件，并放在 asset目录下
+//            FileOutputStream outputStream = new FileOutputStream(assetsFile.getAbsolutePath() +
+//                    File.separator + f.getName().substring(0, filename.indexOf('.')) + ".so");
+//
+//            // 调用 zstd 的 api 进行压缩。
+//            ZstdOutputStream output = new ZstdOutputStream(outputStream, 19);
+//            IOUtils.copy(input, output);
+//
+//            output.flush();
+//            output.close();
+//            outputStream.close();
+//            input.close();
+//        }
+//    } catch (FileNotFoundException e) {
+//        e.printStackTrace();
+//    } catch (IOException e) {
+//        e.printStackTrace();
+//    }
+//
+//    // 删除原 so 文件
+//    Arrays.asList(soFiles).stream().forEach(File::delete);
+//}
 
 dependencies {
 
