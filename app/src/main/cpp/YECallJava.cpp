@@ -9,6 +9,8 @@ YECallJava::YECallJava(_JavaVM *java_vm, JNIEnv *jni_env, jobject *jobj) {
     this->java_vm = java_vm;
     this->jni_env = jni_env;
     this->jobj = *jobj;
+    // 在这里将jobj（YEPlayer）对象提升为全局变量（默认是局部变量）
+    // 因为这个变量将跨线程传递，所以必须这样做，否则会程序崩溃
     this->jobj = jni_env->NewGlobalRef(*jobj);
 
     jclass jlz = jni_env->GetObjectClass(*jobj);
@@ -21,35 +23,38 @@ YECallJava::YECallJava(_JavaVM *java_vm, JNIEnv *jni_env, jobject *jobj) {
     jmid_on_error = jni_env->GetMethodID(jlz, "onError", "(ILjava/lang/String;)V");
 }
 
-YECallJava::~YECallJava() {}
+YECallJava::~YECallJava() = default;
 
 void YECallJava::on_call_prepared(int type) {
+    // 该段代码放在主线程中执行
     if (type == MAIN_THREAD) {
         jni_env->CallVoidMethod(jobj, jmid_prepared);
-    } else if (type == CHILD_THREAD) {
-
-        JNIEnv *jni_env;
-        if (java_vm->AttachCurrentThread(&jni_env, 0) != JNI_OK) {
-            LOGE("get child thread jnienv wrong.");
+    }
+        // 该段代码在C++ 中放在子线程中执行
+    else if (type == CHILD_THREAD) {
+        JNIEnv *jniEnv;
+        result = java_vm->AttachCurrentThread(&jniEnv, 0);
+        if (result != JNI_OK) {
+            LOGE("调用Java层的onCallPrepared()方法错误，错误码：%d", result);
             return;
         }
 
-        jni_env->CallVoidMethod(jobj, jmid_prepared);
+        jniEnv->CallVoidMethod(jobj, jmid_prepared);
         java_vm->DetachCurrentThread();
     }
-
 }
 
 void YECallJava::on_call_time_info(int type, int cur_time, int total_time) {
     if (type == MAIN_THREAD) {
         jni_env->CallVoidMethod(jobj, jmid_time_info);
     } else if (type == CHILD_THREAD) {
-        JNIEnv *jni_env;
-        if (java_vm->AttachCurrentThread(&jni_env, NULL) != JNI_OK) {
-            LOGE("call java layer method ${onCallTimeInfo} wrong.");
+        JNIEnv *jniEnv;
+        result = java_vm->AttachCurrentThread(&jniEnv, NULL);
+        if (result != JNI_OK) {
+            LOGE("调用Java层的onCallTimeInfo()方法错误，错误码：%d", result);
             return;
         }
-        jni_env->CallVoidMethod(jobj, jmid_time_info, cur_time, total_time);
+        jniEnv->CallVoidMethod(jobj, jmid_time_info, cur_time, total_time);
         java_vm->DetachCurrentThread();
     }
 
@@ -60,8 +65,9 @@ void YECallJava::on_call_load(int type, bool load) {
         jni_env->CallVoidMethod(jobj, jmid_load, load);
     } else if (type == CHILD_THREAD) {
         JNIEnv *jniEnv;
-        if (java_vm->AttachCurrentThread(&jniEnv, NULL) != JNI_OK) {
-            LOGE("call onCallLoad wrong");
+        result = java_vm->AttachCurrentThread(&jniEnv, NULL);
+        if (result != JNI_OK) {
+            LOGE("调用Java层的onCallLoad()方法错误，错误码：%d", result);
             return;
         }
         jniEnv->CallVoidMethod(jobj, jmid_load, load);
@@ -71,8 +77,9 @@ void YECallJava::on_call_load(int type, bool load) {
 
 void YECallJava::on_call_render_yuv(int width, int height, uint8_t *fy, uint8_t *fu, uint8_t *fv) {
     JNIEnv *jniEnv;
-    if (java_vm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
-        LOGE("call onCallComplete wrong");
+    result = java_vm->AttachCurrentThread(&jniEnv, NULL);
+    if (result != JNI_OK) {
+        LOGE("调用Java层的onCallComplete()方法错误，错误码：%d", result);
         return;
     }
 
@@ -95,13 +102,14 @@ void YECallJava::on_call_render_yuv(int width, int height, uint8_t *fy, uint8_t 
 
 void YECallJava::on_call_error(int type, int code, const char *msg) {
     if (type == MAIN_THREAD) {
-        jstring errorMsg = jni_env->NewStringUTF(msg);
-        jni_env->CallVoidMethod(jobj, jmid_on_error, code, errorMsg);
-        jni_env->DeleteLocalRef(errorMsg);
+        jstring err_msg = jni_env->NewStringUTF(msg);
+        jni_env->CallVoidMethod(jobj, jmid_on_error, code, err_msg);
+        jni_env->DeleteLocalRef(err_msg);
     } else if (type == CHILD_THREAD) {
         JNIEnv *jniEnv;
-        if (java_vm->AttachCurrentThread(&jniEnv, NULL) != JNI_OK) {
-            LOGE("call onCallError wrong");
+        result = java_vm->AttachCurrentThread(&jniEnv, NULL);
+        if (result != JNI_OK) {
+            LOGE("调用Java层的onCallError()方法错误，错误码：%d", result);
             return;
         }
         jstring errorMsg = jniEnv->NewStringUTF(msg);
@@ -109,5 +117,4 @@ void YECallJava::on_call_error(int type, int code, const char *msg) {
         jniEnv->DeleteLocalRef(errorMsg);
         java_vm->DetachCurrentThread();
     }
-
 }

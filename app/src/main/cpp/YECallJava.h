@@ -20,6 +20,7 @@ public:
     _JavaVM *java_vm = NULL;
     JNIEnv *jni_env = NULL;
     jobject jobj;
+    int result = -1;
 
     jmethodID jmid_prepared;
     jmethodID jmid_time_info;

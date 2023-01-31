@@ -457,9 +457,12 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
 
         if (call_java == NULL) {
             /*
-             * JNIEnv *env：env传递不能跨越线程，否则崩溃。可以跨越函数
-             * jobject thiz: thiz传递不能跨越线程，不能跨越函数，否则崩溃
-             * _JavaVM *java_vm：java_vm传递可以跨线程和函数
+             * JNIEnv *env：env传递不能跨越线程，否则崩溃。可以跨越函数，该env对象是绑定于线程的，所以只能在当前线程中使用
+             *      【解决方法】：在子线程中创建一个新的JNIEnv *jniEnv，并调用JavaVM的AttachCurrentThread()方法
+             *              将这个jniEnv绑定到当前的线程
+             * jobject thiz: thiz传递不能跨越线程，不能跨越函数，否则崩溃。
+             *      【解决方法】：该变量默认是局部变量，将其提升为全局变量即可解决问题
+             * _JavaVM *java_vm：java_vm传递可以跨线程和函数，因为JavaVM是Java虚拟机，是全局的，一个进程（应用）只有一个JavaVM对象
              */
             call_java = new YECallJava(java_vm, env, &thiz);
         }
