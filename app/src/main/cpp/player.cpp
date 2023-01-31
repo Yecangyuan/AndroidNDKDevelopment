@@ -430,17 +430,22 @@ YECallJava *call_java = NULL;
 YEFFmpeg *ffmpeg = NULL;
 YEPlayStatus *play_status = NULL;
 
+/*
+ * 这个JNI_OnLoad()函数就相当于Java层的构造方法，会在Java层调用loadLibrary()方法的时候被调用
+ * 如果不重写JNI_OnLoad()方法，则
+ */
 extern "C"
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    jint result = -1;
-    java_vm = vm;
-    JNIEnv *env;
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
+    ::java_vm = javaVm;
 
-    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+    JNIEnv *env = NULL;
+    jint result = ::java_vm->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (result != JNI_OK) {
+        LOGD("加载JNIEnv失败");
         return result;
     }
-
-    return JNI_VERSION_1_6;
+    LOGD("加载JNIEnv成功");
+    return JNI_VERSION_1_6; // 在AS的JDK在JNI默认最高是1.6    在Java的JDK在JNI可以是1.8或者更高
 }
 
 extern "C"
@@ -451,6 +456,11 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
     if (ffmpeg == NULL) {
 
         if (call_java == NULL) {
+            /*
+             * JNIEnv *env：env传递不能跨越线程，否则崩溃。可以跨越函数
+             * jobject thiz: thiz传递不能跨越线程，不能跨越函数，否则崩溃
+             * _JavaVM *java_vm：java_vm传递可以跨线程和函数
+             */
             call_java = new YECallJava(java_vm, env, &thiz);
         }
 

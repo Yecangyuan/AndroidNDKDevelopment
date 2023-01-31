@@ -85,8 +85,8 @@ target_link_libraries( ndk_day78
         # opensles
         OpenSLES
         # fmod
-        fmod
-        fmodL
+        fmod # 具体的库 链接到libfmod.so
+        fmodL # 具体的库 链接到libfmodL.so
         # opencv
         libopencv_java4
         # log

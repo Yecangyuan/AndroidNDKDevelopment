@@ -4,6 +4,7 @@
 
 #include "YECallJava.h"
 
+
 YECallJava::YECallJava(_JavaVM *java_vm, JNIEnv *jni_env, jobject *jobj) {
     this->java_vm = java_vm;
     this->jni_env = jni_env;

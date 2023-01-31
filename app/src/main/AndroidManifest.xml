@@ -2,32 +2,51 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+        uses-feature配置用来声明一个app在运行时所依赖的外部的硬件或软件特征（feature），
+        uses-feature还提供了一个required属性配置，表示此项依赖的软硬件特征是否是必须的，
+        当它设置为true表示此app运行时必须使用此项特征，
+        如果没有则无法工作，如果它设置为false，表示应用在运行时需要用到这些特征，
+        但如果没有，应用可能会有一部分功能会受到影响，但大部分功能还是可以正常工作。
+    -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Android 11 申请访问所有文件 -->
+
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS" />
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:extractNativeLibs="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:extractNativeLibs="true"
         android:theme="@style/Theme.NDK_Day78"
         tools:targetApi="31">
+        <activity
+            android:name=".fmod.FmodActivity"
+            android:exported="false" />
         <activity
             android:name=".player.audio.AudioPlayerActivity"
             android:exported="false"
@@ -35,7 +54,6 @@
         <activity
             android:name=".player.video.VideoPlayerActivity"
             android:exported="true" />
-
         <activity
             android:name=".player.video.VideoPlayerActivity2"
             android:exported="true" />

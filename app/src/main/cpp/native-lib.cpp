@@ -172,8 +172,6 @@ Java_com_simley_ndk_1day78_face_FaceDetection_trainingPattern(JNIEnv *env, jobje
     LOGE("样本训练成功");
 }
 
-
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_face_FaceDetection_loadPattern(JNIEnv *env, jobject thiz,

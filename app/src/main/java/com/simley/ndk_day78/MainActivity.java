@@ -1,5 +1,6 @@
 package com.simley.ndk_day78;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.HandlerThread;
@@ -10,9 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.simley.ndk_day78.bandcard.BankCardRecognitionActivity;
 import com.simley.ndk_day78.databinding.ActivityMainBinding;
 import com.simley.ndk_day78.face.FaceDetectionActivity;
+import com.simley.ndk_day78.fmod.FmodActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
 import com.tbruyelle.rxpermissions3.RxPermissions;
+
+import org.fmod.FMOD;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -26,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
             android.Manifest.permission.MOUNT_FORMAT_FILESYSTEMS,
             android.Manifest.permission.INTERNET,
             android.Manifest.permission.ACCESS_NETWORK_STATE,
-            android.Manifest.permission.ACCESS_WIFI_STATE
+            android.Manifest.permission.ACCESS_WIFI_STATE,
+            android.Manifest.permission.READ_PHONE_STATE
     };
 
     @Override
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         binding.btnTextRecognition.setOnClickListener(v -> startActivity(new Intent(this, TextRecognitionActivity.class)));
         // 音视频播放器
         binding.btnPlayInterface.setOnClickListener(v -> startActivity(new Intent(this, PlayerActivity.class)));
+        // fmod
+        binding.btnFmodInterface.setOnClickListener(v -> startActivity(new Intent(this, FmodActivity.class)));
     }
 
     /**

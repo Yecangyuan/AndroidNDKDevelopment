@@ -8,6 +8,12 @@ import com.tencent.bugly.crashreport.CrashReport;
 public class App extends Application {
 
     static {
+        /*
+            extern "C"
+            JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) { }
+
+            当在Java层调用loadLibrary()方法的时候会调用到JNI层的JNI_OnLoad()函数
+         */
         System.loadLibrary("ndk_day78");
     }
 

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.IBinder;
@@ -18,7 +19,7 @@ import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
 import java.io.File;
 
 public class MusicService extends Service implements MediaPlayer.OnCompletionListener, IPlayerListener {
-    private static final String TAG = "David";
+    private static final String TAG = "MusicService";
     private YEPlayer yePlayer;
 
     //    private final Handler handler = new Handler(Looper.getMainLooper());
