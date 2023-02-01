@@ -71,8 +71,9 @@ find_library( # Sets the name of the path variable.
         log-lib
         log)
 
-target_link_libraries( ndk_day78
+target_link_libraries(ndk_day78
         -ljnigraphics
+        # GLESv3 android自带的native层的opengl es .so库
         # ffmpeg
         avfilter
         avcodec

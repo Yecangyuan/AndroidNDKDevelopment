@@ -41,7 +41,15 @@
         android:id="@+id/btn_fmod_interface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="FMOD" />
+        android:text="FMOD"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_opengl_interface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OpenGL"
+        android:textAllCaps="false" />
 
 
 </LinearLayout>

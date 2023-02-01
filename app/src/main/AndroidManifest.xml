@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!--
         uses-feature配置用来声明一个app在运行时所依赖的外部的硬件或软件特征（feature），
         uses-feature还提供了一个required属性配置，表示此项依赖的软硬件特征是否是必须的，
@@ -9,9 +8,13 @@
         如果没有则无法工作，如果它设置为false，表示应用在运行时需要用到这些特征，
         但如果没有，应用可能会有一部分功能会受到影响，但大部分功能还是可以正常工作。
     -->
+    <!-- 指定需要使用摄像头，false则表示没有摄像头，应用某些功能可能会受限，为true，则表示设备必须要有摄像头 -->
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false" /> <!-- OpenGL ES（opengl embedded system ）SL（shading language）的版本是2.0 -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,7 +22,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Android 11 申请访问所有文件 -->
-
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -44,6 +46,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NDK_Day78"
         tools:targetApi="31">
+        <activity
+            android:name=".opengl2.MyGLSurfaceViewActivity"
+            android:exported="false" />
         <activity
             android:name=".fmod.FmodActivity"
             android:exported="false" />

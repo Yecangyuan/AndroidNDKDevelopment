@@ -458,6 +458,8 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
         if (call_java == NULL) {
             /*
              * JNIEnv *env：env传递不能跨越线程，否则崩溃。可以跨越函数，该env对象是绑定于线程的，所以只能在当前线程中使用
+             *       主线程的都是共用同一个env，无论是native还是java层。
+             *       如果新开子线程，其env都不是同一个对象
              *      【解决方法】：在子线程中创建一个新的JNIEnv *jniEnv，并调用JavaVM的AttachCurrentThread()方法
              *              将这个jniEnv绑定到当前的线程
              * jobject thiz: thiz传递不能跨越线程，不能跨越函数，否则崩溃。
