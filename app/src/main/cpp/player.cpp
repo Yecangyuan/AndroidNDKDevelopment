@@ -3,13 +3,14 @@
 // Created by Simle Y on 2022/12/8.
 //
 
-#include <jni.h>
+#include "jni.h"
 #include "ye_log.h"
 #include <android/native_window_jni.h>
 #include <unistd.h>
 #include "YECallJava.h"
 #include "YEPlayStatus.h"
 #include "YEFFmpeg.h"
+#include "JavaVMInit.cpp"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -19,6 +20,7 @@ extern "C" {
 #include "libavutil/time.h"
 #include "libswresample/swresample.h"
 }
+
 
 #define AUDIO_SAMPLE_RATE 44100 // 采样率
 
@@ -425,10 +427,12 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
 //    }
 //}
 
-_JavaVM *java_vm = NULL;
 YECallJava *call_java = NULL;
 YEFFmpeg *ffmpeg = NULL;
 YEPlayStatus *play_status = NULL;
+
+
+_JavaVM *java_vm;
 
 /*
  * 这个JNI_OnLoad()函数就相当于Java层的构造方法，会在Java层调用loadLibrary()方法的时候被调用

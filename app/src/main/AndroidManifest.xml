@@ -47,6 +47,9 @@
         android:theme="@style/Theme.NDK_Day78"
         tools:targetApi="31">
         <activity
+            android:name=".idcard.IDCardRecognitionActivity"
+            android:exported="false" />
+        <activity
             android:name=".opengl2.MyGLSurfaceViewActivity"
             android:exported="false" />
         <activity

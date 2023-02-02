@@ -1,9 +1,7 @@
 package com.simley.ndk_day78;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.HandlerThread;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,12 +10,11 @@ import com.simley.ndk_day78.bandcard.BankCardRecognitionActivity;
 import com.simley.ndk_day78.databinding.ActivityMainBinding;
 import com.simley.ndk_day78.face.FaceDetectionActivity;
 import com.simley.ndk_day78.fmod.FmodActivity;
+import com.simley.ndk_day78.idcard.IDCardRecognitionActivity;
 import com.simley.ndk_day78.opengl2.MyGLSurfaceViewActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
 import com.tbruyelle.rxpermissions3.RxPermissions;
-
-import org.fmod.FMOD;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -52,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFaceDetection.setOnClickListener(v -> startActivity(new Intent(this, FaceDetectionActivity.class)));
         // 银行卡识别
         binding.btnBankCardOrganize.setOnClickListener(v -> startActivity(new Intent(this, BankCardRecognitionActivity.class)));
+        // 身份证识别
+        binding.btnIdcardReconition.setOnClickListener(v -> startActivity(new Intent(this, IDCardRecognitionActivity.class)));
         // 文本识别
         binding.btnTextRecognition.setOnClickListener(v -> startActivity(new Intent(this, TextRecognitionActivity.class)));
         // 音视频播放器

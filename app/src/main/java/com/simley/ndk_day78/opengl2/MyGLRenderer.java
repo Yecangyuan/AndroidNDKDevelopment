@@ -10,6 +10,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 
+import com.simley.ndk_day78.opengl2.filter.CameraFilter;
 import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
 
@@ -26,6 +27,7 @@ public class MyGLRenderer implements
     private SurfaceTexture mSurfaceTexture;
     private ScreenFilter mScreenFilter;
     float[] mtx = new float[16]; // 矩阵数据，变换矩阵
+    private CameraFilter mCameraFilter;
 
     public MyGLRenderer(MyGLSurfaceView myGLSurfaceView) {
         this.myGLSurfaceView = myGLSurfaceView;
@@ -54,7 +56,8 @@ public class MyGLRenderer implements
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);// 实例化纹理对象
         mSurfaceTexture.setOnFrameAvailableListener(this); // 绑定好此监听 SurfaceTexture.OnFrameAvailableListener
 
-        mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext());
+        mCameraFilter = new CameraFilter(myGLSurfaceView.getContext()); // 首先 FBO
+        mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext()); // 其次 渲染屏幕
     }
 
     /**
@@ -67,6 +70,7 @@ public class MyGLRenderer implements
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         mCameraHelper.startPreview(mSurfaceTexture); // 开始预览
+        mCameraFilter.onReady(width, height);
         mScreenFilter.onReady(width, height);
     }
 
@@ -91,7 +95,16 @@ public class MyGLRenderer implements
         // 画布，矩阵数据
         mSurfaceTexture.getTransformMatrix(mtx);
 
-        mScreenFilter.onDrawFrame(mTextureID[0], mtx);
+        mCameraFilter.setMatrix(mtx);
+        int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);// 摄像头，矩阵，都已经做了
+
+        /*textureId = 美白.onDrawFrame(textureId);
+        textureId = 大眼.onDrawFrame(textureId);
+        textureId = xxx.onDrawFrame(textureId);*/
+
+        // 最终直接显示的，他是调用了 BaseFilter的onDrawFrame渲染的（简单的显示就行了）
+        // 核心在这里：1：画布==纹理ID，  2：mtx矩阵数据
+        mScreenFilter.onDrawFrame(textureId);
     }
 
     // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
