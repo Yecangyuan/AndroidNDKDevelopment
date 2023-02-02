@@ -40,7 +40,7 @@ public class ShaderHelper {
      */
     private static int compileShader(int type, String shaderCode) {
         // 创建着色器
-        int shaderObjectId = glCreateShader(type);
+        final int shaderObjectId = glCreateShader(type);
         if (shaderObjectId == 0) {
             if (DEBUG) {
                 Log.w(TAG, "创建着色器失败");
@@ -51,8 +51,8 @@ public class ShaderHelper {
         glShaderSource(shaderObjectId, shaderCode);
         // 编译着色器代码
         glCompileShader(shaderObjectId);
-        int[] compileStatus = new int[1];
         // 获取编译状态
+        int[] compileStatus = new int[1];
         glGetShaderiv(shaderObjectId, GL_COMPILE_STATUS, compileStatus, 0);
         if (DEBUG) Log.v(TAG, "编译着色器代码:" + "\n");
         if (DEBUG) Log.i(TAG, shaderCode);
@@ -95,6 +95,7 @@ public class ShaderHelper {
      * @return OpenGL 程序id（返回0表示链接失败）
      */
     public static int linkProgram(int vertexShaderId, int fragmentShaderId) {
+        // 创建一个新的OpenGL程序对象
         final int programObjectId = glCreateProgram();
         if (programObjectId == 0) {
             if (DEBUG) Log.e(TAG, "创建程序失败");
@@ -102,12 +103,12 @@ public class ShaderHelper {
         }
         // Attach 顶点着色器
         glAttachShader(programObjectId, vertexShaderId);
-        // attach 片元着色器
+        // Attach 片元着色器
         glAttachShader(programObjectId, fragmentShaderId);
         // 将两个着色器一起链接到OpenGL程序
         glLinkProgram(programObjectId);
-        int[] linkStatus = new int[1];
         // 获取链接状态
+        final int[] linkStatus = new int[1];
         glGetProgramiv(programObjectId, GL_LINK_STATUS, linkStatus, 0);
         // 判断链接状态
         if (linkStatus[0] == GL_FALSE) {
@@ -125,7 +126,7 @@ public class ShaderHelper {
      */
     public static boolean validateProgram(int programObjectId) {
         glValidateProgram(programObjectId);
-        int[] validateStatus = new int[1];
+        final int[] validateStatus = new int[1];
         glGetProgramiv(programObjectId, GL_VALIDATE_STATUS, validateStatus, 0);
         if (DEBUG) {
             Log.d(TAG, "程序验证状态: " + validateStatus[0] + "\n程序日志信息:" + glGetProgramInfoLog(

@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * 加载 着色器程序的代码 字符串
+ */
 public class TextResourceReader {
 
     private static final String TAG = "TextResourceReader";

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".serialport.SelectSerialPortActivity">
+
+    <!-- Android系统设备端 输入波特率 与 硬件工程师的波特率 频率对接 -->
+    <EditText
+        android:id="@+id/btlv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请你输入波特率" />
+
+    <!-- 同学们：列出所有的串口 -->
+    <ListView
+        android:id="@+id/lv_devices"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btlv" />
+
+    <!-- 同学们：如果每一可用的串口，就会显示下面的UI -->
+    <TextView
+        android:id="@+id/tv_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="没有可用串口"
+        android:textColor="#FF000000"
+        android:textSize="30sp" />
+
+</RelativeLayout>

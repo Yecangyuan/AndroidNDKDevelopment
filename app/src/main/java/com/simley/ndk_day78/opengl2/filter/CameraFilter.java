@@ -125,7 +125,7 @@ public class CameraFilter extends BaseFilter {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // FBO的纹理ID，返回了
-        return mFrameBufferTextures[0]; // 你没有学过C，你就不明白，如果你学过，无需多言
+        return mFrameBufferTextures[0];
     }
 
     // 接收外界传递进来的 变换矩阵
