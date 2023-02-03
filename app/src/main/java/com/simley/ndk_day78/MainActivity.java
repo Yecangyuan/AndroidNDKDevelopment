@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.simley.ndk_day78.bandcard.BankCardRecognitionActivity;
@@ -13,7 +14,9 @@ import com.simley.ndk_day78.fmod.FmodActivity;
 import com.simley.ndk_day78.idcard.IDCardRecognitionActivity;
 import com.simley.ndk_day78.opengl2.MyGLSurfaceViewActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
+import com.simley.ndk_day78.serialport.SelectSerialPortActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
+import com.simley.ndk_day78.utils.RootUtil;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -59,6 +62,22 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFmodInterface.setOnClickListener(v -> startActivity(new Intent(this, FmodActivity.class)));
         // opengl
         binding.btnOpenglInterface.setOnClickListener(v -> startActivity(new Intent(this, MyGLSurfaceViewActivity.class)));
+        // 串口（serial port）
+        binding.btnSerialportInterface.setOnClickListener(v -> {
+            if (!RootUtil.isDeviceRooted()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("提示")
+                        .setMessage("该设备无root权限，无法打开串口")
+                        .setPositiveButton("了解", (dialog, id) -> {
+                            dialog.dismiss();
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+            } else {
+                startActivity(new Intent(this, SelectSerialPortActivity.class));
+            }
+        });
     }
 
     /**

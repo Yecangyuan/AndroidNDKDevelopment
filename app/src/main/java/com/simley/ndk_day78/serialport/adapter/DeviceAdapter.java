@@ -25,7 +25,7 @@ public class DeviceAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
     private final List<Device> devices;
 
-    public DeviceAdapter(Context context, ArrayList<Device> devices) {
+    public DeviceAdapter(Context context, List<Device> devices) {
         this.mInflater = LayoutInflater.from(context);
         this.devices = devices;
     }

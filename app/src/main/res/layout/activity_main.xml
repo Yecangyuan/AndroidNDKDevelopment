@@ -57,5 +57,13 @@
         android:text="OpenGL"
         android:textAllCaps="false" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_serialport_interface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="串口"
+        android:textAllCaps="false" />
+
+
 
 </LinearLayout>

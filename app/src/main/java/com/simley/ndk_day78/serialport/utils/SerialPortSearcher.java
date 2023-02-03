@@ -82,7 +82,7 @@ public class SerialPortSearcher {
         try {
             for (Driver driver : getDrivers()) {
                 String driverName = driver.getName();
-                ArrayList<File> driverDevices = driver.getDevices();
+                List<File> driverDevices = driver.getDevices();
                 for (File file : driverDevices) {
                     String devicesName = file.getName();
                     devices.add(new Device(devicesName, driverName, file));

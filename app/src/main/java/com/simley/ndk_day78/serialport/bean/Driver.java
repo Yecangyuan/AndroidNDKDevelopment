@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 同学们：获取Android系统设备中的Driver集，getDevices ArrayList<File>
@@ -30,8 +31,8 @@ public class Driver {
         mDeviceRoot = root;
     }
 
-    public ArrayList<File> getDevices() {
-        ArrayList<File> devices = new ArrayList<>();
+    public List<File> getDevices() {
+        List<File> devices = new ArrayList<>();
         File dev = new File("/dev");
 
         if (!dev.exists()) {
