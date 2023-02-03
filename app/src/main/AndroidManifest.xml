@@ -47,6 +47,9 @@
         android:theme="@style/Theme.NDK_Day78"
         tools:targetApi="31">
         <activity
+            android:name=".opengl2.TiktokVideoFastSlowActivity"
+            android:exported="false" />
+        <activity
             android:name=".serialport.SelectSerialPortActivity"
             android:exported="false" />
         <activity

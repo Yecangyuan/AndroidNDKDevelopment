@@ -58,6 +58,13 @@
         android:textAllCaps="false" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_opengl_tiktokfastslow_interface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="抖音快慢特效"
+        android:textAllCaps="false" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_serialport_interface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

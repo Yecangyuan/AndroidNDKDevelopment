@@ -8,11 +8,20 @@ import static android.opengl.GLES10.glGenTextures;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
+import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.simley.ndk_day78.opengl2.filter.CameraFilter;
 import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
+import com.simley.ndk_day78.opengl2.record.MyMediaRecorder;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
+
+import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,6 +37,7 @@ public class MyGLRenderer implements
     private ScreenFilter mScreenFilter;
     float[] mtx = new float[16]; // 矩阵数据，变换矩阵
     private CameraFilter mCameraFilter;
+    private MyMediaRecorder mMediaRecorder; // TODO 第三节课 新增点
 
     public MyGLRenderer(MyGLSurfaceView myGLSurfaceView) {
         this.myGLSurfaceView = myGLSurfaceView;
@@ -58,6 +68,12 @@ public class MyGLRenderer implements
 
         mCameraFilter = new CameraFilter(myGLSurfaceView.getContext()); // 首先 FBO
         mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext()); // 其次 渲染屏幕
+
+        // 初始化录制工具类
+        EGLContext eglContext = EGL14.eglGetCurrentContext();
+        mMediaRecorder = new MyMediaRecorder(480, 800,
+                "/sdcard/Movies" + System.currentTimeMillis() + ".mp4", eglContext,
+                myGLSurfaceView.getContext());
     }
 
     /**
@@ -105,6 +121,36 @@ public class MyGLRenderer implements
         // 最终直接显示的，他是调用了 BaseFilter的onDrawFrame渲染的（简单的显示就行了）
         // 核心在这里：1：画布==纹理ID，  2：mtx矩阵数据
         mScreenFilter.onDrawFrame(textureId);
+
+        // 录制
+        mMediaRecorder.encodeFrame(textureId, mSurfaceTexture.getTimestamp());
+    }
+
+
+    public void surfaceDestroyed() {
+        mCameraHelper.stopPreview();
+    }
+
+    /**
+     * 圆形红色按钮的 按住拍 开始录制
+     * @param speed 录制的：极慢 慢 标准 快 极快
+     */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public void startRecording(float speed) {
+        Log.e("MyGLRender", "startRecording speed:" + speed);
+        try {
+            mMediaRecorder.start(speed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 圆形红色按钮的 按住拍 的 录制完成
+     */
+    public void stopRecording() {
+        Log.e("MyGLRender", "stopRecording");
+        mMediaRecorder.stop();
     }
 
     // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行

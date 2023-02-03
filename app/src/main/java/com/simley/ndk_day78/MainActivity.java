@@ -13,6 +13,7 @@ import com.simley.ndk_day78.face.FaceDetectionActivity;
 import com.simley.ndk_day78.fmod.FmodActivity;
 import com.simley.ndk_day78.idcard.IDCardRecognitionActivity;
 import com.simley.ndk_day78.opengl2.MyGLSurfaceViewActivity;
+import com.simley.ndk_day78.opengl2.TiktokVideoFastSlowActivity;
 import com.simley.ndk_day78.player.PlayerActivity;
 import com.simley.ndk_day78.serialport.SelectSerialPortActivity;
 import com.simley.ndk_day78.textrecognition.TextRecognitionActivity;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFmodInterface.setOnClickListener(v -> startActivity(new Intent(this, FmodActivity.class)));
         // opengl
         binding.btnOpenglInterface.setOnClickListener(v -> startActivity(new Intent(this, MyGLSurfaceViewActivity.class)));
+        // opengl 抖音快慢特效
+        binding.btnOpenglTiktokfastslowInterface.setOnClickListener(v -> startActivity(new Intent(this, TiktokVideoFastSlowActivity.class)));
         // 串口（serial port）
         binding.btnSerialportInterface.setOnClickListener(v -> {
             if (!RootUtil.isDeviceRooted()) {

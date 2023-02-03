@@ -1,8 +1,5 @@
 package com.simley.ndk_day78.serialport;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,14 +9,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.serialport.adapter.DeviceAdapter;
 import com.simley.ndk_day78.serialport.bean.Device;
 import com.simley.ndk_day78.serialport.bean.T;
 import com.simley.ndk_day78.serialport.utils.SerialPortSearcher;
-import com.simley.ndk_day78.utils.RootUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // 这个Activity要展示，所有可能打开的串口设备列表
