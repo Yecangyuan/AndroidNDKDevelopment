@@ -41,20 +41,20 @@ public class CameraFilter extends BaseFilter {
     public void onReady(int width, int height) {
        super.onReady(width,height);
 
-        // TODO 准备工作
-        // TODO 第一步：创建 FBO （看不见的离屏的屏幕）
+        // 准备工作
+        // 第一步：创建 FBO （看不见的离屏的屏幕）
         mFrameBuffers = new int[1];
         // 参数1：int n, fbo 个数
         // 参数2：int[] framebuffers, 用来保存 fbo id 的数组
         // 参数3：int offset 从数组中第几个id来保存,从零下标开始
         glGenFramebuffers(mFrameBuffers.length, mFrameBuffers, 0); // 实例化创建帧缓冲区，FBO缓冲区
 
-        // TODO 第二步：创建属于 fbo 纹理(第一节课是没有配置的，但是这个是FOB纹理，所以需要配置纹理)
+        // 第二步：创建属于 fbo 纹理(第一节课是没有配置的，但是这个是FOB纹理，所以需要配置纹理)
         // 既然上面的 FBO（看不见的离屏的屏幕），下面的目的就是要把画面显示到FBO中
         mFrameBufferTextures = new int[1]; // 记录FBO纹理的ID
         TextureHelper.genTextures(mFrameBufferTextures); // 生成并配置纹理
 
-        // TODO 第三步：上面的 FBO缓冲区 与 FBO纹理 还没有任何关系，现在要让他们绑定起来
+        // 第三步：上面的 FBO缓冲区 与 FBO纹理 还没有任何关系，现在要让他们绑定起来
         glBindTexture(GL_TEXTURE_2D, mFrameBufferTextures[0]);
 
         // 生产2D纹理图像
@@ -81,7 +81,7 @@ public class CameraFilter extends BaseFilter {
          */
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFrameBufferTextures[0], 0);
 
-        // TODO 第四步：解绑操作
+        // 第四步：解绑操作
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -93,7 +93,7 @@ public class CameraFilter extends BaseFilter {
         // super.onDrawFrame(textureId);
         glViewport(0, 0, mWidth, mHeight);  // 设置视窗大小
 
-        // TODO 渲染到 FBO离线缓存中
+        // 渲染到 FBO离线缓存中
 
         // 绑定FBO缓存（否则会绘制到屏幕上） 我们最终的效果是 离屏渲染
         glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffers[0]);
@@ -110,7 +110,7 @@ public class CameraFilter extends BaseFilter {
         glVertexAttribPointer(vCoord, 2, GL_FLOAT, false, 0, mTextureBuffer); // 传值
         glEnableVertexAttribArray(vCoord); // 激活
 
-        // TODO 变换矩阵，在我们CameraFilter这里就需要处理了，后面的BaseFilter就不需要了
+        // 变换矩阵，在我们CameraFilter这里就需要处理了，后面的BaseFilter就不需要了
         glUniformMatrix4fv(vMatrix, 1, false, matrix, 0);
 
         // 片元 vTexture

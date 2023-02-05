@@ -22,7 +22,7 @@ public class MyEGL {
     private EGLDisplay mEGLDisplay; // EGL显示链接
     private EGLConfig mEGLConfig; // EGL最终选择配置的成果
     private EGLContext mEGLContext; // EGL的上下文
-    private EGLSurface mEGLSurface; // EGL的独有画布【重要】
+    private final EGLSurface mEGLSurface; // EGL的独有画布【重要】
 
     private final ScreenFilter mScreenFilter; // 最终显示的过滤器
 
@@ -31,7 +31,7 @@ public class MyEGL {
      *
      * @param share_eglContext EGL共享上下文， 绘制线程 GLThread 中 EGL上下文，达到资源共享 【重要】
      */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createEGL(EGLContext share_eglContext) {
         // 1.获取EGL显示设备: EGL_DEFAULT_DISPLAY(代表 默认的设备 手机屏幕)
         mEGLDisplay = eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
@@ -96,30 +96,26 @@ public class MyEGL {
      */
     public MyEGL(EGLContext eglContext, Surface surface, Context context, int width, int height) {
         // 第一大步：创建EGL环境
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            createEGL(eglContext);
-        }
+        createEGL(eglContext);
 
         // 第二大步：创建窗口（画布），绘制线程中的图像，直接往这里创建的mEGLSurface上面画
         int[] attrib_list = {EGL_NONE}; // 一定要有结尾符
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            mEGLSurface = eglCreateWindowSurface(mEGLDisplay, // EGL显示链接
-                    mEGLConfig,  // EGL最终选择配置的成果
-                    surface,     // MediaCodec的输入Surface画布
-                    attrib_list, // 无任何配置，但也必须要传递 结尾符，否则人家没法玩
-                    0           // attrib_list的零下标开始读取
-            ); // 【关联的关键操作，关联（EGL显示链接）（EGL配置）（MediaCodec的输入Surface画布）】
-        }
+        mEGLSurface = eglCreateWindowSurface(
+                mEGLDisplay, // EGL显示链接
+                mEGLConfig,  // EGL最终选择配置的成果
+                surface,     // MediaCodec的输入Surface画布
+                attrib_list, // 无任何配置，但也必须要传递 结尾符，否则人家没法玩
+                0           // attrib_list的零下标开始读取
+        ); // 【关联的关键操作，关联（EGL显示链接）（EGL配置）（MediaCodec的输入Surface画布）】
 
         // 第三大步：让 画布 盖住屏幕( 让 mEGLDisplay(EGL显示链接) 和 mEGLSurface(EGL的独有画布) 发生绑定关系)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            if (!eglMakeCurrent(mEGLDisplay, // EGL显示链接
-                    mEGLSurface, // EGL的独有画布 用来画
-                    mEGLSurface, // EGL的独有画布 用来读
-                    mEGLContext  // EGL的上下文
-            )) {
-                throw new RuntimeException("eglMakeCurrent fail");
-            }
+        if (!eglMakeCurrent(
+                mEGLDisplay, // EGL显示链接
+                mEGLSurface, // EGL的独有画布 用来画
+                mEGLSurface, // EGL的独有画布 用来读
+                mEGLContext  // EGL的上下文
+        )) {
+            throw new RuntimeException("eglMakeCurrent fail");
         }
 
         // 4，往虚拟屏幕上画画
@@ -138,34 +134,20 @@ public class MyEGL {
         mScreenFilter.onDrawFrame(textureId);
 
         // 刷新时间戳(如果设置不合理，编码时会采取丢帧或降低视频质量方式进行编码)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, timestamp);
-        }
+        EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, timestamp);
 
         // 交换缓冲区数据
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglSwapBuffers(mEGLDisplay, mEGLSurface); // 绘制操作
-        }
+        eglSwapBuffers(mEGLDisplay, mEGLSurface); // 绘制操作
     }
 
     /**
      * 释放资源
      */
     public void release() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglMakeCurrent(mEGLDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglDestroySurface(mEGLDisplay, mEGLSurface);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglDestroyContext(mEGLDisplay, mEGLContext);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglReleaseThread();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            eglTerminate(mEGLDisplay);
-        }
+        eglMakeCurrent(mEGLDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        eglDestroySurface(mEGLDisplay, mEGLSurface);
+        eglDestroyContext(mEGLDisplay, mEGLContext);
+        eglReleaseThread();
+        eglTerminate(mEGLDisplay);
     }
 }

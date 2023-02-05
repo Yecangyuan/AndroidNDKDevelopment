@@ -27,8 +27,8 @@ import java.nio.FloatBuffer;
 // Filter的基类 -- 简单的OpenGL绘制即可
 public class BaseFilter {
 
-    private int mVertexSourceId; // 子类传递过来的顶点着色器代码ID
-    private int mFragmentSourceId; // 子类传递过来的片元着色器代码ID
+    private final int mVertexSourceId; // 子类传递过来的顶点着色器代码ID
+    private final int mFragmentSourceId; // 子类传递过来的片元着色器代码ID
 
     protected FloatBuffer mVertexBuffer; // 顶点坐标数据缓冲区
     protected FloatBuffer mTextureBuffer; // 纹理坐标数据缓冲区

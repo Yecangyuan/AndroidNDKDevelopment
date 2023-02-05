@@ -21,7 +21,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
     private byte[] cameraBuffer; // 数据
     private byte[] cameraBuffer_; // 数据 操作旋转 // TODO 新增点 音视频推流 旋转作业
 
-    private Activity mActivity; // 此Camera需要用到Activity
+    private final Activity mActivity; // 此Camera需要用到Activity
     private SurfaceHolder mSurfaceHolder; // Surface画面的帮助
     private Camera mCamera; // Camera 1 预览采集图像数据
 

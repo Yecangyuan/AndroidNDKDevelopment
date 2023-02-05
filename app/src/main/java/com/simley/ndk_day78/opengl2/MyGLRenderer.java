@@ -135,7 +135,6 @@ public class MyGLRenderer implements
      * 圆形红色按钮的 按住拍 开始录制
      * @param speed 录制的：极慢 慢 标准 快 极快
      */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void startRecording(float speed) {
         Log.e("MyGLRender", "startRecording speed:" + speed);
         try {
