@@ -91,4 +91,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
         mSpeed = modeExtraSlow;
     }
 
+    /**
+     * 开启大眼特效
+     *
+     * @param isChecked
+     */
+    public void enableBigEye(boolean isChecked) {
+        mRenderer.enableBigEye(isChecked);
+    }
 }

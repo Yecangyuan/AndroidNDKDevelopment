@@ -6,7 +6,8 @@
 #define NDK_DAY78_FACETRACK_H
 
 #include <jni.h>
-
+#include <string>
+#include <opencv2/imgproc/types_c.h>
 #include <opencv2/opencv.hpp> // OpenCV人脸框框检测用的
 #include <opencv2/objdetect.hpp>  // OpenCV人脸框框检测用的
 #include "FaceAlignment/include/face_alignment.h" // 人脸5关键点定位用的
@@ -14,8 +15,7 @@
 
 using namespace std; // C++标准STD的命名空间
 using namespace cv; // OpenCV提供的命名空间
-
-
+//using namespace seeta; // 中科院人脸识别关键点的命令空间
 
 extern "C"
 JNIEXPORT jlong JNICALL

@@ -221,15 +221,17 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
         // TODO 作业：data没有做旋转处理
         // 这个只是画面的旋转，但是数据不会旋转，你还需要额外处理
         // TODO 新增点 下面就是作业的完成：旋转数据90度
-        switch (mRotation) {
-            case Surface.ROTATION_0:
-                rotation90(data);
-                break;
-            case Surface.ROTATION_90: // 横屏 左边是头部(home键在右边)
-                break;
-            case Surface.ROTATION_270:// 横屏 头部在右边
-                break;
-        }
+//        switch (mRotation) {
+//            case Surface.ROTATION_0:
+//                rotation90(data);
+//                break;
+//            case Surface.ROTATION_90: // 横屏 左边是头部(home键在右边)
+//                break;
+//            case Surface.ROTATION_270:// 横屏 头部在右边
+//                break;
+//        }
+
+        // TODO 注意：你把上面的代码给注释掉了，意味着：data数据依然是颠倒的，再把颠倒的数据交给OpenCV内置函数旋转更简单
         if (mPreviewCallback != null) {
             // mPreviewCallback.onPreviewFrame(data, camera); // 以前的代码：byte[] data == nv21 ===> C++层 ---> 流媒体服务器
             mPreviewCallback.onPreviewFrame(cameraBuffer_, camera); // 现在的代码
@@ -287,6 +289,10 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     public void setOnChangedSizeListener(OnChangedSizeListener listener) { // 此函数没有外界调用，代表外界没有用到发生改变后的宽和高处理
         mOnChangedSizeListener = listener;
+    }
+
+    public int getCameraID() {
+        return 0;
     }
 
     public interface OnChangedSizeListener { // 发生改变后的宽和高处理 专用接口

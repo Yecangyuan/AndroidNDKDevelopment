@@ -12,7 +12,7 @@ import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
+import com.simley.ndk_day78.opengl2.filter.effects.ScreenFilter;
 
 import static android.opengl.EGL14.*; // 静态导入一次就行了，方便些
 

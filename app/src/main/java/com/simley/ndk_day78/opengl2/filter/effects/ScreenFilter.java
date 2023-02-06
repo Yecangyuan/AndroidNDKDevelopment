@@ -1,8 +1,9 @@
-package com.simley.ndk_day78.opengl2.filter;
+package com.simley.ndk_day78.opengl2.filter.effects;
 
 import android.content.Context;
 
 import com.simley.ndk_day78.R;
+import com.simley.ndk_day78.opengl2.filter.BaseFilter;
 
 // 显示到 GLSurfaceView 屏幕   === 着色器语言打交道
 public class ScreenFilter extends BaseFilter {

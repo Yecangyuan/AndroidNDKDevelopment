@@ -14,7 +14,7 @@ varying vec2 aCoord;// 把这个最终的计算成果，给片元着色器，拿
 
 void main() {
     // texture2D (采样器, 坐标)
-    // gl_FragColor = texture2D(vTexture, aCoord);
+    gl_FragColor = texture2D(vTexture, aCoord);
 
     // 305911公式：黑白电视效果，其实原理就是提取出Y分量
     /*vec4 rgba =texture2D(vTexture, aCoord);
@@ -22,7 +22,7 @@ void main() {
     gl_FragColor = vec4(gray, gray, gray, 1.0);*/
 
     // 在网上Copy的公式：底片效果
-    vec4 rgba = texture2D(vTexture, aCoord);// rgba
-    gl_FragColor = vec4(1.-rgba.r, 1.-rgba.g, 1.-rgba.b, rgba.a);
+    // vec4 rgba = texture2D(vTexture, aCoord);// rgba
+    // gl_FragColor = vec4(1.-rgba.r, 1.-rgba.g, 1.-rgba.b, rgba.a);
 }
 

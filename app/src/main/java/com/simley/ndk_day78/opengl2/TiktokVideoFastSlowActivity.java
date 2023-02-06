@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -68,5 +70,6 @@ public class TiktokVideoFastSlowActivity extends AppCompatActivity {
                     }
                 });
 
+        ((CheckBox)findViewById(R.id.chk_bigeye)).setOnCheckedChangeListener((buttonView, isChecked) -> mGLSurfaceView.enableBigEye(isChecked));
     }
 }

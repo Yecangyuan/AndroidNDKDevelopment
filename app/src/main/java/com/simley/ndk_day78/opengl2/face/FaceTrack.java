@@ -12,9 +12,9 @@ import com.simley.ndk_day78.opengl2.utils.CameraHelper;
 public class FaceTrack {
 
 
-    private CameraHelper mCameraHelper; // 手机相机预览工具类（之前的内容）
-    private Handler mHandler; // 此Handler方便开启一个线程
-    private HandlerThread mHandlerThread; // 此HandlerThread方便开启一个线程
+    private final CameraHelper mCameraHelper; // 手机相机预览工具类（之前的内容）
+    private final Handler mHandler; // 此Handler方便开启一个线程
+    private final HandlerThread mHandlerThread; // 此HandlerThread方便开启一个线程
 
     private long self; // FaceTrack.cpp对象的地址指向long值
     private Face mFace; // 最终人脸跟踪的结果
@@ -75,6 +75,7 @@ public class FaceTrack {
             self = 0;
         }
     }
+
     // byte[] data == NV21 Camera的数据 byte[]
     public void detector(byte[] data) { // 要把相机的数据，给C++层做人脸追踪
         // 把积压的 11号任务移除掉
@@ -84,11 +85,14 @@ public class FaceTrack {
         message.obj = data;
         mHandler.sendMessage(message);
     }
+
     public Face getFace() { // 这个函数很重要
         return mFace; // 如果能拿到mFace，就证明 有人脸最终信息 和 5个关键点信息
     }
+
     /**
      * 传入人脸检测模型到C++层处理
+     *
      * @param model OpenCV人脸模型
      * @param seeta Seeta中科院的人脸关键点模型
      * @return FaceTrack.cpp地址指向long值
@@ -101,12 +105,13 @@ public class FaceTrack {
 
     /**
      * 执行真正的人脸探测工作
+     *
      * @param self     Face.java对象的地址指向long值
      * @param data     Camera相机 byte[] data NV21摄像头的数据
      * @param cameraId Camera相机ID，前置摄像头，后置摄像头
      * @param width    宽度
      * @param height   高度
-     * @return         若Face==null：代表没有人脸信息+人脸5特征，  若Face有值：人脸框x/y，+ 5个特侦点（本次只需要 人脸框x/y + 双眼关键点）
+     * @return 若Face==null：代表没有人脸信息+人脸5特征，  若Face有值：人脸框x/y，+ 5个特侦点（本次只需要 人脸框x/y + 双眼关键点）
      */
     private native Face native_detector(long self, byte[] data, int cameraId, int width, int height);
 }

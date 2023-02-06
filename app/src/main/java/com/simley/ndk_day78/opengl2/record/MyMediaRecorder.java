@@ -56,17 +56,14 @@ public class MyMediaRecorder {
             return;
         }
         if (mHandler != null) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    // 画到 虚拟屏幕上
-                    if (null != mEGL) {
-                        mEGL.draw(textureId, timestamp);
-                    }
-
-                    // 从编码器中去除数据 编码 封装成derry_xxxx.mp4文件成果
-                    getEncodedData(false);
+            mHandler.post(() -> {
+                // 画到 虚拟屏幕上
+                if (null != mEGL) {
+                    mEGL.draw(textureId, timestamp);
                 }
+
+                // 从编码器中去除数据 编码 封装成derry_xxxx.mp4文件成果
+                getEncodedData(false);
             });
         }
     }

@@ -11,24 +11,26 @@ import android.hardware.Camera;
 import android.opengl.EGL14;
 import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-
-import com.simley.ndk_day78.opengl2.filter.CameraFilter;
-import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
+import com.simley.ndk_day78.opengl2.face.FaceTrack;
+import com.simley.ndk_day78.opengl2.filter.effects.BigEyeFilter;
+import com.simley.ndk_day78.opengl2.filter.effects.CameraFilter;
+import com.simley.ndk_day78.opengl2.filter.effects.ScreenFilter;
 import com.simley.ndk_day78.opengl2.record.MyMediaRecorder;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
+import com.simley.ndk_day78.utils.FileUtil;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MyGLRenderer implements
         GLSurfaceView.Renderer,  // 渲染器的三个函数 onSurfaceCreated onSurfaceChanged onDrawFrame
-        SurfaceTexture.OnFrameAvailableListener // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
+        SurfaceTexture.OnFrameAvailableListener, // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
+        Camera.PreviewCallback
 {
     private final MyGLSurfaceView myGLSurfaceView;
     private CameraHelper mCameraHelper;
@@ -37,10 +39,22 @@ public class MyGLRenderer implements
     private ScreenFilter mScreenFilter;
     float[] mtx = new float[16]; // 矩阵数据，变换矩阵
     private CameraFilter mCameraFilter;
-    private MyMediaRecorder mMediaRecorder; // TODO 第三节课 新增点
+    private MyMediaRecorder mMediaRecorder;
+
+    private int mWidth;
+    private int mHeight;
+
+    private BigEyeFilter mBigEyeFilter;
+    private FaceTrack mFaceTrack;
 
     public MyGLRenderer(MyGLSurfaceView myGLSurfaceView) {
         this.myGLSurfaceView = myGLSurfaceView;
+        // 大眼相关代码】  assets Copy到SD卡
+        FileUtil.copyAssets2SDCard(myGLSurfaceView.getContext(), "lbpcascade_frontalface.xml",
+                "/sdcard/lbpcascade_frontalface.xml"); // OpenCV的模型
+        FileUtil.copyAssets2SDCard(myGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
+                "/sdcard/seeta_fa_v1.1.bin"); // 中科院的模型
+
     }
 
     /**
@@ -55,12 +69,14 @@ public class MyGLRenderer implements
                 Camera.CameraInfo.CAMERA_FACING_FRONT,
                 800, 480); // 前置摄像头
 
+        mCameraHelper.setPreviewCallback(this);
+
         // 获取纹理ID【先理解成画布】
         mTextureID = new int[1];
-        /**
-         * 1.长度 只有一个 1
-         * 2.纹理ID，是一个数组
-         * 3.offset:0 使用数组的0下标
+        /*
+          1.长度 只有一个 1
+          2.纹理ID，是一个数组
+          3.offset:0 使用数组的0下标
          */
         glGenTextures(mTextureID.length, mTextureID, 0);
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);// 实例化纹理对象
@@ -85,6 +101,14 @@ public class MyGLRenderer implements
      */
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        mWidth = width;
+        mHeight = height;
+
+        // 创建人脸检测跟踪器
+        mFaceTrack = new FaceTrack("/sdcard/lbpcascade_frontalface.xml", "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
+        mFaceTrack.startTrack(); // 启动跟踪器
+
+
         mCameraHelper.startPreview(mSurfaceTexture); // 开始预览
         mCameraFilter.onReady(width, height);
         mScreenFilter.onReady(width, height);
@@ -114,6 +138,12 @@ public class MyGLRenderer implements
         mCameraFilter.setMatrix(mtx);
         int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);// 摄像头，矩阵，都已经做了
 
+        // textureId = 大眼Filter.onDrawFrame(textureId);
+        if (null != mBigEyeFilter) {
+            mBigEyeFilter.setFace(mFaceTrack.getFace());
+            textureId = mBigEyeFilter.onDrawFrame(textureId);
+        }
+
         /*textureId = 美白.onDrawFrame(textureId);
         textureId = 大眼.onDrawFrame(textureId);
         textureId = xxx.onDrawFrame(textureId);*/
@@ -129,10 +159,12 @@ public class MyGLRenderer implements
 
     public void surfaceDestroyed() {
         mCameraHelper.stopPreview();
+        mFaceTrack.stopTrack(); // 停止跟踪器
     }
 
     /**
      * 圆形红色按钮的 按住拍 开始录制
+     *
      * @param speed 录制的：极慢 慢 标准 快 极快
      */
     public void startRecording(float speed) {
@@ -142,6 +174,34 @@ public class MyGLRenderer implements
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 开启大眼特效
+     *
+     * @param isChecked
+     */
+    public void enableBigEye(final boolean isChecked) {
+        // BigEyeFilter bigEyeFilter = new BigEyeFilter(); // 这样可以吗  不行，必须在EGL线程里面绘制
+
+        // 把大眼渲染代码，加入到， GLSurfaceView 的 内置EGL 的 GLTHread里面
+        myGLSurfaceView.queueEvent(() -> {
+            if (isChecked) {
+                mBigEyeFilter = new BigEyeFilter(myGLSurfaceView.getContext());
+                mBigEyeFilter.onReady(mWidth, mHeight);
+            } else {
+                mBigEyeFilter.release();
+                mBigEyeFilter = null;
+            }
+        });
+    }
+
+
+    // Camera画面只有有数据，就会回调此函数
+    @Override // 要把相机的数据，给C++层做人脸追踪
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        Log.d(this.getClass().getSimpleName(), "onPreviewFrame : " + Arrays.toString(data));
+        mFaceTrack.detector(data);
     }
 
     /**

@@ -29,6 +29,7 @@ add_library(ndk_day78  # Sets the name of the library.
         # text_recognize.cpp
         # player.cpp
         # native-lib.cpp
+        FaceTrack.cpp
         ${SRC_LIST}
         ${SOUND_TOUCH})
 
@@ -62,6 +63,8 @@ set_target_properties(
 #        PROPERTIES IMPORTED_LOCATION
 #        ../../main/cpp/libs/arm64-v8a/libopencv_java3.so)
 
+# 导入中科院人脸检测关键点库
+add_subdirectory(FaceAlignment)
 
 # # 自动去这个路径下面找到这个so文件
 # /Users/simley/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/liblog.so
@@ -90,5 +93,7 @@ target_link_libraries(ndk_day78
         fmodL # 具体的库 链接到libfmodL.so
         # opencv
         libopencv_java4
+        # 人脸关键点库
+        seeta_fa_lib
         # log
         ${log-lib})

@@ -6,6 +6,7 @@ import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
 import static android.opengl.GLES20.glActiveTexture;
 import static android.opengl.GLES20.glBindTexture;
+import static android.opengl.GLES20.glDeleteProgram;
 import static android.opengl.GLES20.glDeleteShader;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
@@ -62,9 +63,17 @@ public class BaseFilter {
                 1.0f, 0.0f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,};
-        mTextureBuffer = BufferHelper.getFloatBuffer(TEXTURE); // 保存到 纹理坐标数据缓冲区
 
+        mTextureBuffer = BufferHelper.getFloatBuffer(TEXTURE); // 保存到 纹理坐标数据缓冲区
         init(context);
+        changeTextureData();
+    }
+
+    /**
+     * 修改纹理坐标 textureData（有需求可以重写该方法）
+     */
+    protected void changeTextureData(){
+
     }
 
     private void init(Context context) {
@@ -139,4 +148,7 @@ public class BaseFilter {
         return textureId; // 返回纹理ID，可以告诉下一个过滤器
     }
 
+    public void release(){
+        glDeleteProgram(mProgramId);
+    }
 }

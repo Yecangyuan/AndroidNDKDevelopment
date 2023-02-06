@@ -43,7 +43,7 @@ public class ShaderHelper {
         final int shaderObjectId = glCreateShader(type);
         if (shaderObjectId == 0) {
             if (DEBUG) {
-                Log.w(TAG, "创建着色器失败");
+                Log.e(TAG, "创建着色器失败");
                 return 0;
             }
         }
@@ -58,7 +58,7 @@ public class ShaderHelper {
         if (DEBUG) Log.i(TAG, shaderCode);
         // 判断编译状态
         if (compileStatus[0] == GL_FALSE) {
-            if (DEBUG) Log.w(TAG, "着色器编译失败:" + "\n");
+            if (DEBUG) Log.e(TAG, "着色器编译失败:" + "\n");
             if (DEBUG) Log.e(TAG, glGetShaderInfoLog(shaderObjectId));
             // 如果失败，删除着色器对象
             glDeleteShader(shaderObjectId);
