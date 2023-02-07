@@ -14,9 +14,11 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.simley.ndk_day78.opengl2.face.FaceTrack;
+import com.simley.ndk_day78.opengl2.filter.effects.BeautyFilter;
 import com.simley.ndk_day78.opengl2.filter.effects.BigEyeFilter;
 import com.simley.ndk_day78.opengl2.filter.effects.CameraFilter;
 import com.simley.ndk_day78.opengl2.filter.effects.ScreenFilter;
+import com.simley.ndk_day78.opengl2.filter.effects.StickFilter;
 import com.simley.ndk_day78.opengl2.record.MyMediaRecorder;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
 import com.simley.ndk_day78.utils.FileUtil;
@@ -30,9 +32,8 @@ import javax.microedition.khronos.opengles.GL10;
 public class MyGLRenderer implements
         GLSurfaceView.Renderer,  // 渲染器的三个函数 onSurfaceCreated onSurfaceChanged onDrawFrame
         SurfaceTexture.OnFrameAvailableListener, // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
-        Camera.PreviewCallback
-{
-    private final MyGLSurfaceView myGLSurfaceView;
+        Camera.PreviewCallback {
+    private final MyGLSurfaceView mGLSurfaceView;
     private CameraHelper mCameraHelper;
     private int[] mTextureID;
     private SurfaceTexture mSurfaceTexture;
@@ -46,13 +47,16 @@ public class MyGLRenderer implements
 
     private BigEyeFilter mBigEyeFilter;
     private FaceTrack mFaceTrack;
+    private StickFilter mStickFilter;
+    private BeautyFilter mBeautyFilter;
 
-    public MyGLRenderer(MyGLSurfaceView myGLSurfaceView) {
-        this.myGLSurfaceView = myGLSurfaceView;
+
+    public MyGLRenderer(MyGLSurfaceView mGLSurfaceView) {
+        this.mGLSurfaceView = mGLSurfaceView;
         // 大眼相关代码】  assets Copy到SD卡
-        FileUtil.copyAssets2SDCard(myGLSurfaceView.getContext(), "lbpcascade_frontalface.xml",
+        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "lbpcascade_frontalface.xml",
                 "/sdcard/lbpcascade_frontalface.xml"); // OpenCV的模型
-        FileUtil.copyAssets2SDCard(myGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
+        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
                 "/sdcard/seeta_fa_v1.1.bin"); // 中科院的模型
 
     }
@@ -65,7 +69,7 @@ public class MyGLRenderer implements
      */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        mCameraHelper = new CameraHelper((Activity) myGLSurfaceView.getContext(),
+        mCameraHelper = new CameraHelper((Activity) mGLSurfaceView.getContext(),
                 Camera.CameraInfo.CAMERA_FACING_FRONT,
                 800, 480); // 前置摄像头
 
@@ -82,14 +86,14 @@ public class MyGLRenderer implements
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);// 实例化纹理对象
         mSurfaceTexture.setOnFrameAvailableListener(this); // 绑定好此监听 SurfaceTexture.OnFrameAvailableListener
 
-        mCameraFilter = new CameraFilter(myGLSurfaceView.getContext()); // 首先 FBO
-        mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext()); // 其次 渲染屏幕
+        mCameraFilter = new CameraFilter(mGLSurfaceView.getContext()); // 首先 FBO
+        mScreenFilter = new ScreenFilter(mGLSurfaceView.getContext()); // 其次 渲染屏幕
 
         // 初始化录制工具类
         EGLContext eglContext = EGL14.eglGetCurrentContext();
         mMediaRecorder = new MyMediaRecorder(480, 800,
                 "/sdcard/Movies" + System.currentTimeMillis() + ".mp4", eglContext,
-                myGLSurfaceView.getContext());
+                mGLSurfaceView.getContext());
     }
 
     /**
@@ -107,7 +111,6 @@ public class MyGLRenderer implements
         // 创建人脸检测跟踪器
         mFaceTrack = new FaceTrack("/sdcard/lbpcascade_frontalface.xml", "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
         mFaceTrack.startTrack(); // 启动跟踪器
-
 
         mCameraHelper.startPreview(mSurfaceTexture); // 开始预览
         mCameraFilter.onReady(width, height);
@@ -128,32 +131,48 @@ public class MyGLRenderer implements
         // GL_DEPTH_BUFFER_BIT 深度缓冲区
         // GL_STENCIL_BUFFER_BIT 模型缓冲区
         glClear(GL_COLOR_BUFFER_BIT);
-
         // 绘制摄像头数据
         mSurfaceTexture.updateTexImage(); // 将纹理图像更新为图像流中最新的帧数据【刷新一下】
-
         // 画布，矩阵数据
         mSurfaceTexture.getTransformMatrix(mtx);
-
         mCameraFilter.setMatrix(mtx);
-        int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);// 摄像头，矩阵，都已经做了
 
+        int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);// 摄像头，矩阵，都已经做了
+        textureId = getTextureId(textureId);
+
+        // 最终直接显示的，他是调用了 BaseFilter的onDrawFrame渲染的（简单的显示就行了）
+        // 核心在这里：1：画布==纹理ID，  2：mtx矩阵数据
+        mScreenFilter.onDrawFrame(textureId);
+        // 录制
+        mMediaRecorder.encodeFrame(textureId, mSurfaceTexture.getTimestamp());
+    }
+
+    /**
+     * 获取最终叠加了所有 filter之后的纹理id
+     *
+     * @param textureId 纹理id
+     * @return textureId
+     */
+    private int getTextureId(int textureId) {
         // textureId = 大眼Filter.onDrawFrame(textureId);
+        // 贴纸
         if (null != mBigEyeFilter) {
             mBigEyeFilter.setFace(mFaceTrack.getFace());
             textureId = mBigEyeFilter.onDrawFrame(textureId);
         }
 
-        /*textureId = 美白.onDrawFrame(textureId);
-        textureId = 大眼.onDrawFrame(textureId);
-        textureId = xxx.onDrawFrame(textureId);*/
+        // 贴纸
+        if (null != mStickFilter) {
+            mStickFilter.setFace(mFaceTrack.getFace()); // 需要定位人脸，所以需要 JavaBean
+            textureId = mStickFilter.onDrawFrame(textureId);
+        }
 
-        // 最终直接显示的，他是调用了 BaseFilter的onDrawFrame渲染的（简单的显示就行了）
-        // 核心在这里：1：画布==纹理ID，  2：mtx矩阵数据
-        mScreenFilter.onDrawFrame(textureId);
+        // 美颜
+        if (null != mBeautyFilter) { // 没有不需要 人脸追踪/人脸关键点，整个屏幕美颜
+            textureId = mBeautyFilter.onDrawFrame(textureId);
+        }
 
-        // 录制
-        mMediaRecorder.encodeFrame(textureId, mSurfaceTexture.getTimestamp());
+        return textureId;
     }
 
 
@@ -185,9 +204,9 @@ public class MyGLRenderer implements
         // BigEyeFilter bigEyeFilter = new BigEyeFilter(); // 这样可以吗  不行，必须在EGL线程里面绘制
 
         // 把大眼渲染代码，加入到， GLSurfaceView 的 内置EGL 的 GLTHread里面
-        myGLSurfaceView.queueEvent(() -> {
+        mGLSurfaceView.queueEvent(() -> {
             if (isChecked) {
-                mBigEyeFilter = new BigEyeFilter(myGLSurfaceView.getContext());
+                mBigEyeFilter = new BigEyeFilter(mGLSurfaceView.getContext());
                 mBigEyeFilter.onReady(mWidth, mHeight);
             } else {
                 mBigEyeFilter.release();
@@ -215,6 +234,42 @@ public class MyGLRenderer implements
     // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        myGLSurfaceView.requestRender(); // setRenderMode(RENDERMODE_WHEN_DIRTY); 配合用
+        mGLSurfaceView.requestRender(); // setRenderMode(RENDERMODE_WHEN_DIRTY); 配合用
+    }
+
+
+    /**
+     * 开启贴纸
+     *
+     * @param isChecked checkbox复选框是否勾上了
+     */
+    public void enableStick(final boolean isChecked) {
+        // 在EGL线程里面绘制 贴纸工作
+        mGLSurfaceView.queueEvent(() -> {
+            if (isChecked) {
+                mStickFilter = new StickFilter(mGLSurfaceView.getContext());
+                mStickFilter.onReady(mWidth, mHeight);
+            } else {
+                mStickFilter.release();
+                mStickFilter = null;
+            }
+        });
+    }
+
+    /**
+     * 开启美颜
+     *
+     * @param isChecked checkbox复选框是否勾上了
+     */
+    public void enableBeauty(final boolean isChecked) {
+        mGLSurfaceView.queueEvent(() -> {
+            if (isChecked) {
+                mBeautyFilter = new BeautyFilter(mGLSurfaceView.getContext());
+                mBeautyFilter.onReady(mWidth, mHeight);
+            } else {
+                mBeautyFilter.release();
+                mBeautyFilter = null;
+            }
+        });
     }
 }

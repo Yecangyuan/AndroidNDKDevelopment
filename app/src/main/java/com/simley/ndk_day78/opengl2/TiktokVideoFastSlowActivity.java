@@ -70,6 +70,8 @@ public class TiktokVideoFastSlowActivity extends AppCompatActivity {
                     }
                 });
 
-        ((CheckBox)findViewById(R.id.chk_bigeye)).setOnCheckedChangeListener((buttonView, isChecked) -> mGLSurfaceView.enableBigEye(isChecked));
+        ((CheckBox) findViewById(R.id.chk_bigeye)).setOnCheckedChangeListener((buttonView, isChecked) -> mGLSurfaceView.enableBigEye(isChecked));
+        ((CheckBox) findViewById(R.id.chk_stick)).setOnCheckedChangeListener((buttonView, isChecked) -> mGLSurfaceView.enableStick(isChecked));
+        ((CheckBox) findViewById(R.id.chk_beauty)).setOnCheckedChangeListener((buttonView, isChecked) -> mGLSurfaceView.enableBeauty(isChecked));
     }
 }

@@ -45,6 +45,21 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     private Speed mSpeed = Speed.MODE_NORMAL;
 
+    /**
+     * TODO 开启贴纸
+     * @param isChecked
+     */
+    public void enableStick(boolean isChecked) {
+        mRenderer.enableStick(isChecked);
+    }
+
+    /**
+     * TODO 开启美颜
+     * @param isChecked
+     */
+    public void enableBeauty(boolean isChecked) {
+        mRenderer.enableBeauty(isChecked);
+    }
     public enum Speed {
         MODE_EXTRA_SLOW, MODE_SLOW, MODE_NORMAL, MODE_FAST, MODE_EXTRA_FAST
     }
