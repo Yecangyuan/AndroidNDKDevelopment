@@ -44,10 +44,10 @@ public class DiscView extends RelativeLayout {
     private ViewPagerAdapter mViewPagerAdapter;
     private ObjectAnimator mNeedleAnimator;
 
-    private List<View> mDiscLayouts = new ArrayList<>();
+    private final List<View> mDiscLayouts = new ArrayList<>();
 
-    private List<MusicData> mMusicDatas = new ArrayList<>();
-    private List<ObjectAnimator> mDiscAnimators = new ArrayList<>();
+    private final List<MusicData> mMusicDatas = new ArrayList<>();
+    private final List<ObjectAnimator> mDiscAnimators = new ArrayList<>();
     /*标记ViewPager是否处于偏移的状态*/
     private boolean mViewPagerIsOffset = false;
 
@@ -60,7 +60,8 @@ public class DiscView extends RelativeLayout {
 
     private IPlayInfo mIPlayInfo;
 
-    private int mScreenWidth, mScreenHeight;
+    private final int mScreenWidth;
+    private final int mScreenHeight;
 
     /*唱针当前所处的状态*/
     private enum NeedleAnimatorStatus {
@@ -86,13 +87,13 @@ public class DiscView extends RelativeLayout {
 
     public interface IPlayInfo {
         /*用于更新标题栏变化*/
-        public void onMusicInfoChanged(String musicName, String musicAuthor);
+        void onMusicInfoChanged(String musicName, String musicAuthor);
 
         /*用于更新背景图片*/
-        public void onMusicPicChanged(int musicPicRes);
+        void onMusicPicChanged(int musicPicRes);
 
         /*用于更新音乐播放状态*/
-        public void onMusicChanged(MusicChangedStatus musicChangedStatus);
+        void onMusicChanged(MusicChangedStatus musicChangedStatus);
     }
 
     public DiscView(Context context) {

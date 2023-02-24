@@ -255,7 +255,7 @@ typedef struct AVIOContext {
      */
     int (*read_pause)(void *opaque, int pause);
     /**
-     * Seek to a given timestamp in stream with the specified stream_index.
+     * Seek to a given timestamp in stream with the specified streamIndex.
      * Needed for some network streaming protocols which don't support seeking
      * to byte position.
      */
@@ -788,11 +788,11 @@ int     avio_pause(AVIOContext *h, int pause);
  *
  * @param h IO context from which to call the seek function pointers
  * @param stream_index The stream index that the timestamp is relative to.
- *        If stream_index is (-1) the timestamp should be in AV_TIME_BASE
+ *        If streamIndex is (-1) the timestamp should be in AV_TIME_BASE
  *        units from the beginning of the presentation.
- *        If a stream_index >= 0 is used and the protocol does not support
+ *        If a streamIndex >= 0 is used and the protocol does not support
  *        seeking based on component streams, the call will fail.
- * @param timestamp timestamp in AVStream.time_base units
+ * @param timestamp timestamp in AVStream.timeBase units
  *        or if there is no stream specified then in AV_TIME_BASE units.
  * @param flags Optional combination of AVSEEK_FLAG_BACKWARD, AVSEEK_FLAG_BYTE
  *        and AVSEEK_FLAG_ANY. The protocol may silently ignore

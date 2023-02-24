@@ -44,7 +44,7 @@ Java_com_simley_ndk_1day78_textrecognition_TextRecognition_recognize(JNIEnv *env
 //    if (result) {
 //        LOGE("写入成功");
 //    }
-//    jobject bitmap = bitmap_util::create_bitmap(env, mat.cols, mat.cols, CV_8UC4);
+//    jobject bitmap = bitmap_util::createBitmap(env, mat.cols, mat.cols, CV_8UC4);
 //    cv_helper::mat2bitmap(env, mat, bitmap);
 //    return nullptr;
 }

@@ -4,62 +4,62 @@
 
 #include "YEQueue.h"
 
-YEQueue::YEQueue(YEPlayStatus *play_status) {
-    this->play_status = play_status;
-    pthread_mutex_init(&pthread_mutex, NULL);
-    pthread_cond_init(&pthread_cond, NULL);
+YEQueue::YEQueue(YEPlayStatus *playStatus) {
+    this->playStatus = playStatus;
+    pthread_mutex_init(&pthreadMutex, NULL);
+    pthread_cond_init(&pthreadCond, NULL);
 }
 
-int YEQueue::put_av_packet(AVPacket *packet) {
-    pthread_mutex_lock(&pthread_mutex);
+int YEQueue::putAvPacket(AVPacket *packet) {
+    pthread_mutex_lock(&pthreadMutex);
 
-    packets_queue.push(packet);
-    pthread_cond_signal(&pthread_cond);
-    pthread_mutex_unlock(&pthread_mutex);
+    packetsQueue.push(packet);
+    pthread_cond_signal(&pthreadCond);
+    pthread_mutex_unlock(&pthreadMutex);
     return 0;
 }
 
-int YEQueue::get_av_packet(AVPacket *packet) {
-    pthread_mutex_lock(&pthread_mutex);
-    while (play_status != NULL && !play_status->exit) {
-        if (!packets_queue.empty()) {
-            AVPacket *av_packet = packets_queue.front();
+int YEQueue::getAvPacket(AVPacket *packet) {
+    pthread_mutex_lock(&pthreadMutex);
+    while (playStatus != NULL && !playStatus->exit) {
+        if (!packetsQueue.empty()) {
+            AVPacket *av_packet = packetsQueue.front();
             if (av_packet_ref(packet, av_packet) == 0) {
-                packets_queue.pop();
+                packetsQueue.pop();
             }
             av_packet_free(&av_packet);
             av_free(av_packet);
             av_packet = NULL;
             break;
         } else {
-            pthread_cond_wait(&pthread_cond, &pthread_mutex);
+            pthread_cond_wait(&pthreadCond, &pthreadMutex);
         }
     }
-    pthread_mutex_unlock(&pthread_mutex);
+    pthread_mutex_unlock(&pthreadMutex);
     return 0;
 }
 
-int YEQueue::get_queue_size() {
-    int size;
-    pthread_mutex_lock(&pthread_mutex);
-    size = packets_queue.size();
-    pthread_mutex_unlock(&pthread_mutex);
+size_t YEQueue::getQueueSize() {
+    size_t size;
+    pthread_mutex_lock(&pthreadMutex);
+    size = packetsQueue.size();
+    pthread_mutex_unlock(&pthreadMutex);
     return size;
 }
 
 YEQueue::~YEQueue() {
-    clear_av_packet();
+    clearAvPacket();
 }
 
-void YEQueue::clear_av_packet() {
-    pthread_cond_signal(&pthread_cond);
-    pthread_mutex_lock(&pthread_mutex);
-    while (!packets_queue.empty()) {
-        AVPacket *packet = packets_queue.front();
-        packets_queue.pop();
+void YEQueue::clearAvPacket() {
+    pthread_cond_signal(&pthreadCond);
+    pthread_mutex_lock(&pthreadMutex);
+    while (!packetsQueue.empty()) {
+        AVPacket *packet = packetsQueue.front();
+        packetsQueue.pop();
         av_packet_free(&packet);
         av_free(packet);
         packet = NULL;
     }
-    pthread_mutex_unlock(&pthread_mutex);
+    pthread_mutex_unlock(&pthreadMutex);
 }

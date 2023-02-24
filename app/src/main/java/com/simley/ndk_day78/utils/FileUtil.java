@@ -23,6 +23,7 @@ public class FileUtil {
         try {
             File file = new File(dst);
             if (!file.exists()) {
+//                boolean mkdirs = file.mkdirs();
                 InputStream is = context.getAssets().open(src);
                 FileOutputStream fos = new FileOutputStream(file);
                 int len;

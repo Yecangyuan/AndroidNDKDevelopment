@@ -11,7 +11,7 @@
 using namespace std;
 
 // 语法基础
-int co1::find_card_area(const Mat &mat, Rect &area) {
+int co1::findCardArea(const Mat &mat, Rect &area) {
     // 首先降噪
     Mat blur;
     GaussianBlur(mat, blur, Size(5, 5), BORDER_DEFAULT, BORDER_DEFAULT);
@@ -61,7 +61,7 @@ int co1::find_card_area(const Mat &mat, Rect &area) {
     return 0;
 }
 
-int co1::find_card_number_area(const Mat &mat, Rect &area) {
+int co1::findCardNumberArea(const Mat &mat, Rect &area) {
     // 有两种方式，一种是精确截取，找到银联区域通过大小比例精确的截取 （70%）
     // 粗略的截取，截取高度 1/2 - 3/4 ， 宽度 1/12  11/12    90%  （采用）
     // 万一找不到 ，可以手动的输入和修改
@@ -72,7 +72,7 @@ int co1::find_card_number_area(const Mat &mat, Rect &area) {
     return 0;
 }
 
-int co1::find_card_numbers(const Mat &src_img, std::vector<Mat> &ret) {
+int co1::findCardNumbers(const Mat &src_img, std::vector<Mat> &ret) {
     Mat gray_img;
     // 转成灰度图
     cvtColor(src_img, gray_img, COLOR_BGRA2GRAY);
@@ -149,7 +149,7 @@ int co1::find_card_numbers(const Mat &src_img, std::vector<Mat> &ret) {
         if (rects[i].width >= min_h * 2) {
             // 处理粘连字符
             Mat _mat(contours_mat, rects[i]);
-            int cols_pos = co1::find_split_cols_pos(_mat);
+            int cols_pos = co1::findSplitColsPos(_mat);
             // 左右两个数字都存进去
             Rect rect_left(0, 0, cols_pos - 1, _mat.rows);
             ret.emplace_back(_mat, rect_left);
@@ -174,7 +174,7 @@ int co1::find_card_numbers(const Mat &src_img, std::vector<Mat> &ret) {
 }
 
 // 反复看一看敲一敲
-int co1::find_split_cols_pos(Mat mat) {
+int co1::findSplitColsPos(Mat mat) {
     // 怎么处理粘连 ，对中心位置的左右 1/4 扫描，记录最少的黑色像素点的这一列的位置，
     // 就当做我们的字符串的粘连位置
     int mx = mat.cols / 2;

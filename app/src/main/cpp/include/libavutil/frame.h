@@ -427,7 +427,7 @@ typedef struct AVFrame {
     AVRational sample_aspect_ratio;
 
     /**
-     * Presentation timestamp in time_base units (time when frame should be shown to user).
+     * Presentation timestamp in timeBase units (time when frame should be shown to user).
      */
     int64_t pts;
 
@@ -607,7 +607,7 @@ typedef struct AVFrame {
 #if FF_API_PKT_DURATION
     /**
      * duration of the corresponding packet, expressed in
-     * AVStream->time_base units, 0 if unknown.
+     * AVStream->timeBase units, 0 if unknown.
      * - encoding: unused
      * - decoding: Read by user.
      *

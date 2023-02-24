@@ -28,7 +28,7 @@ public class BackgroundAnimationRelativeLayout extends RelativeLayout {
      */
     private LayerDrawable layerDrawable;
     private ObjectAnimator objectAnimator;
-    private int musicPicRes = -1;
+    private final int musicPicRes = -1;
 
     public BackgroundAnimationRelativeLayout(Context context) {
         this(context, null);
@@ -107,9 +107,6 @@ public class BackgroundAnimationRelativeLayout extends RelativeLayout {
 
     public boolean isNeed2UpdateBackground(int musicPicRes) {
         if (this.musicPicRes == -1) return true;
-        if (musicPicRes != this.musicPicRes) {
-            return true;
-        }
-        return false;
+        return musicPicRes != this.musicPicRes;
     }
 }

@@ -7,6 +7,7 @@ pluginManagement {
 
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -22,3 +23,9 @@ include ':app'
 // the usage of settings.gradle file
 // It specifies, amongst other things,
 // the project name and any subprojects to be added to your build.
+include ':lib_network'
+include ':lib_layout'
+include ':lib_ext'
+include ':lib_base'
+include ':lib_serialport'
+include ':lib_mvp'

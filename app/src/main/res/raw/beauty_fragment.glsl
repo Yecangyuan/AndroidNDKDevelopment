@@ -21,7 +21,7 @@ vec2 blurCoordinates[20];
 
 void main() {
     // TODO 1: 高斯模糊处理（参考代码是对绿色通道做了高斯模糊， 而我们这里对所有通道做了高斯模糊）
-    vec2 singleStepOffset = vec2(1.0/float(width), 1.0/float(height));
+    vec2 singleStepOffset = vec2(1.0 / float(width), 1.0 / float(height));
 
     /*
     高斯模糊原理：所谓"模糊"，可以理解成每一个像素都取周边像素的平均值

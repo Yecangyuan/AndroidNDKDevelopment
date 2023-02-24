@@ -4,7 +4,7 @@
 //
 
 #include "jni.h"
-#include "ye_log.h"
+#include "YeLog.h"
 #include <android/native_window_jni.h>
 #include <unistd.h>
 #include "YECallJava.h"
@@ -83,7 +83,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
     }
 
     AVFrame *av_frame = av_frame_alloc();
-    // AVPacket *av_packet = static_cast<AVPacket *>(malloc(sizeof(AVPacket)));
+    // AVPacket *avPacket = static_cast<AVPacket *>(malloc(sizeof(AVPacket)));
     AVPacket *av_packet = av_packet_alloc();
 
     AVFrame *rgb_frame = av_frame_alloc();
@@ -144,7 +144,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
             } else {
                 // 将图像绘制到屏幕上，注意这里的rgb_frame一行的像素可能和windowBuffer的像素不一样
                 // 需要转换好，否则可能花屏
-                uint8_t *dst = static_cast<uint8_t *>(windowBuffer.bits);
+                auto *dst = static_cast<uint8_t *>(windowBuffer.bits);
                 for (int i = 0; i < height; ++i) {
                     memcpy(dst + i * windowBuffer.stride * 4,
                            out_buffer + i * rgb_frame->linesize[0],
@@ -172,7 +172,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_play(JNIEnv *env, jobject thiz, jstri
     ANativeWindow_release(native_window);
     av_free(out_buffer);
     av_frame_free(&rgb_frame);
-    // free(av_packet);
+    // free(avPacket);
     av_packet_free(&av_packet);
     av_frame_free(&av_frame);
     // 释放编解码上下文对象
@@ -318,8 +318,8 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
 ////    in_channel_layout->nb_channels = c->ch_layout->nb_channels;
 //
 //    if (swr_alloc_set_opts2(&swr_context, out_channel_layout, AV_SAMPLE_FMT_S16, out_sample_rate,
-//                            in_channel_layout, avcodec_context->sample_fmt,
-//                            avcodec_context->sample_rate, 0, NULL) != 0) {
+//                            in_channel_layout, avCodecContext->sample_fmt,
+//                            avCodecContext->sampleRate, 0, NULL) != 0) {
 //        LOGE("swr_alloc_set_opts2 failed.");
 //        return;
 //    }
@@ -360,20 +360,18 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
                             (const uint8_t **) (av_frame->data), av_frame->nb_samples);
 
                 // 1s的pcm个数
-                // jbyte *out_buffer = env->GetByteArrayElements(audio_sample_array, NULL);
-                // memcpy(out_buffer, av_frame->data, size);
+                // jbyte *outputBuffer = env->GetByteArrayElements(audio_sample_array, NULL);
+                // memcpy(outputBuffer, avFrame->data, size);
                 env->SetByteArrayRegion(audio_sample_array, 0, size,
                                         reinterpret_cast<const jbyte *>(out_buffer));
 
 //                env->ReleaseByteArrayElements(audio_sample_array,
-//                                              reinterpret_cast<jbyte *>(out_buffer), JNI_COMMIT);
+//                                              reinterpret_cast<jbyte *>(outputBuffer), JNI_COMMIT);
 
                 env->CallIntMethod(audio_track, audio_track_write, audio_sample_array, 0, size);
                 usleep(1000 * 16);
             }
-        }
-            // TODO 视频
-        else if (av_packet->stream_index == video_index) {
+        } else if (av_packet->stream_index == video_index) {
 
         }
         // 解引用
@@ -395,7 +393,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_playSound(JNIEnv *env, jobject thiz, 
     }
 
     if (av_packet != NULL) {
-        // 1.解引用data   2.销毁av_packet结构体 3.av_packet = NULL
+        // 1.解引用data   2.销毁av_packet结构体 3.avPacket = NULL
         av_packet_free(&av_packet);
     }
 
@@ -468,7 +466,7 @@ Java_com_simley_ndk_1day78_player_YEPlayer_n_1prepared(JNIEnv *env, jobject thiz
              *              将这个jniEnv绑定到当前的线程
              * jobject thiz: thiz传递不能跨越线程，不能跨越函数，否则崩溃。
              *      【解决方法】：该变量默认是局部变量，将其提升为全局变量即可解决问题
-             * _JavaVM *java_vm：java_vm传递可以跨线程和函数，因为JavaVM是Java虚拟机，是全局的，一个进程（应用）只有一个JavaVM对象
+             * _JavaVM *javaVm：java_vm传递可以跨线程和函数，因为JavaVM是Java虚拟机，是全局的，一个进程（应用）只有一个JavaVM对象
              */
             call_java = new YECallJava(java_vm, env, &thiz);
         }
@@ -489,14 +487,14 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1volume(JNIEnv *env, jobject thiz, jint percent) {
     if (ffmpeg != NULL) {
-        ffmpeg->set_volume(percent);
+        ffmpeg->setVolume(percent);
     }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1mute(JNIEnv *env, jobject thiz, jint mute) {
     if (ffmpeg != NULL) {
-        ffmpeg->set_mute(mute);
+        ffmpeg->setMute(mute);
     }
 }
 extern "C"
@@ -524,14 +522,14 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1speed(JNIEnv *env, jobject thiz, jfloat speed) {
     if (ffmpeg != NULL) {
-        ffmpeg->set_speed(speed);
+        ffmpeg->setSpeed(speed);
     }
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_n_1pitch(JNIEnv *env, jobject thiz, jfloat pitch) {
     if (ffmpeg != NULL) {
-        ffmpeg->set_pitch(pitch);
+        ffmpeg->setPitch(pitch);
     }
 }
 

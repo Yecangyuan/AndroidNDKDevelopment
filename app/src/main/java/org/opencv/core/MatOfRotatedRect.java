@@ -49,10 +49,10 @@ public class MatOfRotatedRect extends Mat {
             return;
         int num = a.length;
         alloc(num);
-        float buff[] = new float[num * _channels];
+        float[] buff = new float[num * _channels];
         for(int i=0; i<num; i++) {
             RotatedRect r = a[i];
-            buff[_channels*i+0] = (float) r.center.x;
+            buff[_channels * i] = (float) r.center.x;
             buff[_channels*i+1] = (float) r.center.y;
             buff[_channels*i+2] = (float) r.size.width;
             buff[_channels*i+3] = (float) r.size.height;
@@ -66,7 +66,7 @@ public class MatOfRotatedRect extends Mat {
         RotatedRect[] a = new RotatedRect[num];
         if(num == 0)
             return a;
-        float buff[] = new float[_channels];
+        float[] buff = new float[_channels];
         for(int i=0; i<num; i++) {
             get(i, 0, buff); //TODO: check ret val!
             a[i] = new RotatedRect(new Point(buff[0],buff[1]),new Size(buff[2],buff[3]),buff[4]);
@@ -75,7 +75,7 @@ public class MatOfRotatedRect extends Mat {
     }
 
     public void fromList(List<RotatedRect> lr) {
-        RotatedRect ap[] = lr.toArray(new RotatedRect[0]);
+        RotatedRect[] ap = lr.toArray(new RotatedRect[0]);
         fromArray(ap);
     }
 

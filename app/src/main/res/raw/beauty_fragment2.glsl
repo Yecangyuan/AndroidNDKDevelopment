@@ -14,7 +14,7 @@ float hardLight(float color)
     if (color <= 0.5)
     color = color * color * 2.0;
     else
-    color = 1.0 - ((1.0 - color)*(1.0 - color) * 2.0);
+    color = 1.0 - ((1.0 - color) * (1.0 - color) * 2.0);
     return color;
 }
 

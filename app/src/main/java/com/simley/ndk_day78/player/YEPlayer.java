@@ -27,7 +27,7 @@ public class YEPlayer {
 
     private YEGLSurfaceView yeglSurfaceView;
 
-    private PlayState playState = PlayState.STARTED;
+    private final PlayState playState = PlayState.STARTED;
     private int duration;
 
     public native void play(String url, Surface surface);

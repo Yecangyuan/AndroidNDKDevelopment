@@ -124,7 +124,6 @@ Java_com_simley_ndk_1day78_opengl2_face_FaceTrack_native_1detector(JNIEnv *env, 
     jbyte *data = env->GetByteArrayElements(data_, 0);
     auto *faceTrack = reinterpret_cast<FaceTrack *>(self);  // 通过地址反转CPP对象
 
-
     // OpenCV旋转数据操作
     Mat src(height + height / 2, width, CV_8UC1, data); // 摄像头数据data 转成 OpenCv的 Mat
     imwrite("/sdcard/camera.jpg", src); // 做调试的时候用的（方便查看：有没有摆正，有没有灰度化 等）

@@ -96,7 +96,7 @@ public class DisplayUtil {
     private Drawable getForegroundDrawable(Context context, int musicPicRes) {
         /*得到屏幕的宽高比，以便按比例切割图片一部分*/
         final float widthHeightSize = (float) (DisplayUtil.getScreenWidth(context)
-                * 1.0 / DisplayUtil.getScreenHeight(context) * 1.0);
+                * 1.0 / DisplayUtil.getScreenHeight(context));
 
         Bitmap bitmap = getForegroundBitmap(context, musicPicRes);
         int cropBitmapWidth = (int) (widthHeightSize * bitmap.getHeight());

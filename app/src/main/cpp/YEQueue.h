@@ -18,23 +18,23 @@ using namespace std;
 
 class YEQueue {
 public:
-    queue<AVPacket *> packets_queue;
-    pthread_mutex_t pthread_mutex;
-    pthread_cond_t pthread_cond;
-    YEPlayStatus *play_status = NULL;
+    queue<AVPacket *> packetsQueue;
+    pthread_mutex_t pthreadMutex;
+    pthread_cond_t pthreadCond;
+    YEPlayStatus *playStatus = NULL;
 
 public:
-    YEQueue(YEPlayStatus *play_status);
+    YEQueue(YEPlayStatus *playStatus);
 
     ~YEQueue();
 
-    int put_av_packet(AVPacket *packet);
+    int putAvPacket(AVPacket *packet);
 
-    int get_av_packet(AVPacket *packet);
+    int getAvPacket(AVPacket *packet);
 
-    int get_queue_size();
+    size_t getQueueSize();
 
-    void clear_av_packet();
+    void clearAvPacket();
 };
 
 

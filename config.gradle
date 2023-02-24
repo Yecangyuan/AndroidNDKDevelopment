@@ -1,0 +1,83 @@
+ext {
+    android = [
+            compileSdk       : 33,
+            buildToolsVersion: "29.0.3",
+            applicationId    : "com.simley.ndk_day78",
+            minSdk           : 19,
+            targetSdk        : 33,
+            versionCode      : 1,
+            versionName      : "1.0",
+    ]
+
+    projectsPath = ["lib_network", "lib_layout", "lib_base", "lib_ext", "lib_serialport", "lib_mvp"]
+
+    abiFilters = [
+            'arm64-v8a',
+    ]
+
+    baseDeps = [
+            AppCompat       : 'androidx.appcompat:appcompat:1.4.1',
+            AndroidMaterial : 'com.google.android.material:material:1.5.0',
+            CoreKtx         : 'androidx.core:core-ktx:1.8.0',
+            ConstraintLayout: 'androidx.constraintlayout:constraintlayout:2.1.3'
+    ]
+
+    deps = [
+            Tesseract4Android: 'cz.adaptech.tesseract4android:tesseract4android:4.3.0',
+            hilt_android     : 'com.google.dagger:hilt-android:2.41',
+            rxpermission     : 'com.github.tbruyelle:rxpermissions:0.12',
+            rxjava           : 'io.reactivex.rxjava3:rxjava:3.0.4',
+            rxandroid        : 'io.reactivex.rxjava3:rxandroid:3.0.0',
+            bugly            : 'com.tencent.bugly:crashreport:4.1.9',
+            camera_core      : 'androidx.camera:camera-core:1.1.0',
+            camera_camera2   : 'androidx.camera:camera-camera2:1.1.0'
+//            appcompat                : 'androidx.appcompat:appcompat:1.2.0-beta01',
+//            constrainlayout          : 'androidx.constraintlayout:constraintlayout:1.1.3',
+//            recyclerview             : 'androidx.recyclerview:recyclerview:1.1.0',
+//            legacysupport            : 'androidx.legacy:legacy-support-v4:1.0.0',
+//            material                 : 'com.google.android.material:material:1.2.1',
+//            circleimageview          : 'de.hdodenhof:circleimageview:3.1.0',
+//            okhttp3                  : 'com.squareup.okhttp3:okhttp:4.5.0',
+//            okhttp3logginginterceptor: 'com.squareup.okhttp3:logging-interceptor:4.2.2',
+//            butterknife              : 'com.jakewharton:butterknife:10.2.1',
+//            gson                     : 'com.google.code.gson:gson:2.8.6',
+//            navigationfragment       : 'androidx.navigation:navigation-fragment:2.3.0',
+//            navigationui             : 'androidx.navigation:navigation-ui:2.3.0',
+//            retrofit2                : 'com.squareup.retrofit2:retrofit:2.9.0',
+//            retrofit2converter       : 'com.squareup.retrofit2:converter-gson:2.6.2',
+//            rxjava2                  : 'io.reactivex.rxjava2:rxjava:2.2.2',
+//            rxandroid                : 'io.reactivex.rxjava2:rxandroid:2.1.1',
+//            rxadapter                : 'com.squareup.retrofit2:adapter-rxjava2:2.4.0',
+//            roomruntime              : "androidx.room:room-runtime:2.2.5",
+//            fastjson                 : 'com.alibaba:fastjson:1.2.68',
+//            switchbutton             : 'com.github.zcweng:switch-button:0.0.3@aar',
+//            eventbus                 : 'org.greenrobot:eventbus:3.2.0',
+//            glide                    : 'com.github.bumptech.glide:glide:4.11.0',
+//            bugly                    : 'com.tencent.bugly:crashreport:3.2.3',
+//            greendao                 : 'org.greenrobot:greendao:3.3.0',
+//            refresh_layout_kernel    : 'com.scwang.smart:refresh-layout-kernel:2.0.1',     // 核心必须依赖
+//            refresh_header_classics  : 'com.scwang.smart:refresh-header-classics:2.0.1',   // 经典刷新头
+//            refresh_header_radar     : 'com.scwang.smart:refresh-header-radar:2.0.1',      // 雷达刷新头
+//            refresh_header_falsify   : 'com.scwang.smart:refresh-header-falsify:2.0.1',    // 虚拟刷新头
+//            refresh_header_material  : 'com.scwang.smart:refresh-header-material:2.0.1',   // 谷歌刷新头
+//            refresh_header_two_level : 'com.scwang.smart:refresh-header-two-level:2.0.1',  // 二级刷新头
+//            refresh_footer_ball      : 'com.scwang.smart:refresh-footer-ball:2.0.1',       // 球脉冲加载
+//            refresh_footer_classics  : 'com.scwang.smart:refresh-footer-classics:2.0.1',   // 经典加载
+//            recyclerview_animators   : 'jp.wasabeef:recyclerview-animators:4.0.1',
+//            logger                   : 'com.orhanobut:logger:2.2.0',                       // logger
+//            leakcanary               : 'com.squareup.leakcanary:leakcanary-android:2.5',   // 内存漏洞检测
+//            search_view              : 'com.miguelcatalan:materialsearchview:1.4.0',
+//            photo_view               : 'com.github.chrisbanes:PhotoView:2.0.0',
+//            sweet_alert_dialog       : 'com.github.f0ris.sweetalert:library:1.6.2',
+//            immersionbar             : 'com.gyf.immersionbar:immersionbar:3.0.0',
+//            lottie                   : 'com.airbnb.android:lottie:3.6.0',
+//            rxpermissions            : 'com.github.tbruyelle:rxpermissions:0.12',
+//            mmkv                     : 'com.tencent:mmkv-static:1.2.7',
+//            kitReflect               : 'net.qiujuer.genius:kit-reflect:2.0.0',
+//            kitHandler               : 'net.qiujuer.genius:kit-handler:2.0.0',
+//            geniusUi                 : 'net.qiujuer.genius:ui:2.0.0',
+//            geniusRes                : 'net.qiujuer.genius:res:2.0.0',
+//            geniusLame               : 'net.qiujuer.lame:lame:1.0.0',
+//            airpannel                : 'net.qiujuer.widget:airpanel:1.1.0'
+    ]
+}

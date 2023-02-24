@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">NDK_Day78</string>
+    <string name="face_recognition">人脸识别</string>
+    <string name="bankcard_recognition">银行卡识别</string>
+    <string name="id_card_recognition">身份证识别</string>
+    <string name="car_number_recognition">车牌号识别</string>
+    <string name="text_recognition">文本识别</string>
 </resources>

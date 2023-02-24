@@ -6,7 +6,7 @@
 //#include "ye_log.h"
 //
 //
-////_JavaVM *java_vm;
+////_JavaVM *javaVm;
 //
 ///*
 // * 这个JNI_OnLoad()函数就相当于Java层的构造方法，会在Java层调用loadLibrary()方法的时候被调用
@@ -14,10 +14,10 @@
 // */
 //extern "C"
 //JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
-//    ::java_vm = javaVm;
+//    ::javaVm = javaVm;
 //
 //    JNIEnv *env = NULL;
-//    jint result = ::java_vm->GetEnv((void **) &env, JNI_VERSION_1_6);
+//    jint result = ::javaVm->GetEnv((void **) &env, JNI_VERSION_1_6);
 //    if (result != JNI_OK) {
 //        LOGD("加载JNIEnv失败");
 //        return result;
@@ -27,5 +27,5 @@
 //}
 //
 //static _JavaVM *getJavaVm() {
-//    return java_vm;
+//    return javaVm;
 //}

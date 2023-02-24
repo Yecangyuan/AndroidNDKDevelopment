@@ -52,8 +52,8 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String PARAM_MUSIC_CURRENT_POSITION = "PARAM_MUSIC_CURRENT_POSITION";
     public static final String PARAM_MUSIC_IS_OVER = "PARAM_MUSIC_IS_OVER";
 
-    private int mCurrentMusicIndex = 0;
-    private MusicReceiver mMusicReceiver = new MusicReceiver();
+    private final int mCurrentMusicIndex = 0;
+    private final MusicReceiver mMusicReceiver = new MusicReceiver();
 
     @Override
     public IBinder onBind(Intent intent) {

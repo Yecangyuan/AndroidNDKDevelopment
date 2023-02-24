@@ -342,7 +342,7 @@ int avdevice_dev_to_app_control_message(struct AVFormatContext *s,
  *  - Capabilities valid for audio devices:
  *    - sample_format:  supported sample formats.
  *                      type: AV_OPT_TYPE_INT (AVSampleFormat value)
- *    - sample_rate:    supported sample rates.
+ *    - sampleRate:    supported sample rates.
  *                      type: AV_OPT_TYPE_INT
  *    - channels:       supported number of channels.
  *                      type: AV_OPT_TYPE_INT

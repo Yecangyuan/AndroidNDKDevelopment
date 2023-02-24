@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <string>
-#include "ye_log.h"
+#include "YeLog.h"
 #include <vector>
 #include "opencv2/opencv.hpp"
 #include "opencv2/face.hpp"
@@ -11,7 +11,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "cv_helper.h"
 #include "cardocr.h"
-
 
 using namespace cv;
 using namespace std;
@@ -214,17 +213,17 @@ Java_com_simley_ndk_1day78_bandcard_BankCardRecognition_cardOcr(JNIEnv *env, job
 
     //  轮廓增强（梯度增强）
 //     Rect card_area;
-//     co1::find_card_area(mat,card_area);
+//     co1::findCardArea(mat,card_area);
     // 对我们过滤到的银行卡区域进行裁剪
     // Mat card_mat(mat,card_area);
     // imwrite("/storage/emulated/0/ocr/card_n.jpg",card_mat);
 
     // 截取到卡号区域
 //    Rect bank_card_area;
-//    co1::find_card_area(mat, bank_card_area);
+//    co1::findCardArea(mat, bank_card_area);
 //    imwrite("/storage/emulated/0/ocr/bank_card_area.jpg", mat(bank_card_area));
     Rect card_number_area;
-    co1::find_card_number_area(mat, card_number_area);
+    co1::findCardNumberArea(mat, card_number_area);
     imwrite("/storage/emulated/0/ocr/slice_card_number.jpg", mat(card_number_area));
     Mat card_number_mat(mat, card_number_area);
     bool ret = imwrite("/storage/emulated/0/ocr/card_number_n.jpg", card_number_mat);
@@ -236,7 +235,7 @@ Java_com_simley_ndk_1day78_bandcard_BankCardRecognition_cardOcr(JNIEnv *env, job
     vector<Mat> numbers;
     // 获取银行卡卡号
     // 识别到部分银行卡卡号
-    co1::find_card_numbers(card_number_mat, numbers);
+    co1::findCardNumbers(card_number_mat, numbers);
     int i = 1;
     for (const auto &item: numbers) {
         imwrite(format("/storage/emulated/0/mat%d.jpg", i), item);

@@ -11,11 +11,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.simley.lib_serialport.bean.Device;
+import com.simley.lib_serialport.bean.T;
 import com.simley.ndk_day78.R;
-import com.simley.ndk_day78.serialport.adapter.DeviceAdapter;
-import com.simley.ndk_day78.serialport.bean.Device;
-import com.simley.ndk_day78.serialport.bean.T;
-import com.simley.ndk_day78.serialport.utils.SerialPortSearcher;
+import com.simley.lib_serialport.adapter.DeviceAdapter;
+import com.simley.lib_serialport.utils.SerialPortSearcher;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class SelectSerialPortActivity extends AppCompatActivity implements Adapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_serial_port);
 
-        ListView listView = (ListView) findViewById(R.id.lv_devices); // 同学们：列出所有的串口
+        ListView listView = findViewById(R.id.lv_devices); // 同学们：列出所有的串口
         List<Device> devices = new SerialPortSearcher().getDevices(); // 获取所有的串口
         if (listView != null) {
             listView.setEmptyView(findViewById(R.id.tv_empty)); // 若没有串口，就显示tv_empty控件
@@ -41,7 +41,7 @@ public class SelectSerialPortActivity extends AppCompatActivity implements Adapt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        EditText btlv = (EditText) findViewById(R.id.btlv); // 波特率
+        EditText btlv = findViewById(R.id.btlv); // 波特率
         Device device = mDeviceAdapter.getItem(position); // 获取具体的
         Log.d(T.TAG, "SelectSerialPortActivity onItemClick: " + device.toString());
         // Device{name='ttyS3', root='serial', file=/dev/ttyS3} 这个串口文件 不可用

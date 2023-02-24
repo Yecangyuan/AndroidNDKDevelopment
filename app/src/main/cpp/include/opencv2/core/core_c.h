@@ -2291,14 +2291,14 @@ CVAPI(CvStringHashNode*) cvGetHashedKey( CvFileStorage* fs, const char* name,
 The function returns one of the top-level file nodes. The top-level nodes do not have a name, they
 correspond to the streams that are stored one after another in the file storage. If the index is out
 of range, the function returns a NULL pointer, so all the top-level nodes can be iterated by
-subsequent calls to the function with stream_index=0,1,..., until the NULL pointer is returned.
+subsequent calls to the function with streamIndex=0,1,..., until the NULL pointer is returned.
 This function can be used as a base for recursive traversal of the file storage.
 @param fs File storage
-@param stream_index Zero-based index of the stream. See cvStartNextStream . In most cases,
+@param streamIndex Zero-based index of the stream. See cvStartNextStream . In most cases,
 there is only one stream in the file; however, there can be several.
  */
 CVAPI(CvFileNode*) cvGetRootFileNode( const CvFileStorage* fs,
-                                     int stream_index CV_DEFAULT(0) );
+                                     int streamIndex CV_DEFAULT(0) );
 
 /** @brief Finds a node in a map or file storage.
 

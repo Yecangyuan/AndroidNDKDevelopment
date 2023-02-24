@@ -2,6 +2,7 @@ package org.opencv.android;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import android.annotation.TargetApi;
@@ -89,7 +90,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
         Log.i(LOGTAG, "initializeCamera");
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            String camList[] = manager.getCameraIdList();
+            String[] camList = manager.getCameraIdList();
             if (camList.length == 0) {
                 Log.e(LOGTAG, "Error: camera isn't detected.");
                 return false;
@@ -194,7 +195,7 @@ public class JavaCamera2View extends CameraBridgeViewBase {
             mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
 
-            mCameraDevice.createCaptureSession(Arrays.asList(surface),
+            mCameraDevice.createCaptureSession(Collections.singletonList(surface),
                 new CameraCaptureSession.StateCallback() {
                     @Override
                     public void onConfigured(CameraCaptureSession cameraCaptureSession) {
@@ -440,8 +441,8 @@ public class JavaCamera2View extends CameraBridgeViewBase {
             mGray.release();
         }
 
-        private Image mImage;
-        private Mat mRgba;
+        private final Image mImage;
+        private final Mat mRgba;
         private Mat mGray;
-    };
+    }
 }

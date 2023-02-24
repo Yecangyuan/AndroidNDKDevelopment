@@ -63,7 +63,7 @@ public class Imgcodecs {
             IMWRITE_PNG_STRATEGY = 17,
             IMWRITE_PNG_BILEVEL = 18,
             IMWRITE_PXM_BINARY = 32,
-            IMWRITE_EXR_TYPE = (3 << 4) + 0,
+            IMWRITE_EXR_TYPE = (3 << 4),
             IMWRITE_EXR_COMPRESSION = (3 << 4) + 1,
             IMWRITE_WEBP_QUALITY = 64,
             IMWRITE_PAM_TUPLETYPE = 128,

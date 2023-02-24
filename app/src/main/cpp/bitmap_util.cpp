@@ -6,7 +6,7 @@
 #include "opencv2/opencv.hpp"
 #include <android/log.h>
 
-jobject bitmap_util::create_bitmap(JNIEnv *env, int width, int height, int type) {
+jobject bitmap_util::createBitmap(JNIEnv *env, int width, int height, int type) {
     // 根据 type 来获取 Config
     // Bitmap.Config.valueOf("ARGB_8888");
     char *config_name;

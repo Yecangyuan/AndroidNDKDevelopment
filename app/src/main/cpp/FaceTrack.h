@@ -82,9 +82,16 @@ public:
      */
     void detector(Mat src, vector<Rect2f> &rects);
 
-    void startTracking(); // 开始跟踪 OpenCV
 
-    void stopTracking(); // 停止跟踪 OpenCV
+    /**
+     * 开始跟踪
+     */
+    void startTracking();
+
+    /**
+     *  停止跟踪 OpenCV
+     */
+    void stopTracking();
 
 private:
     Ptr<DetectionBasedTracker> tracker; // OpenCV的人脸追踪器

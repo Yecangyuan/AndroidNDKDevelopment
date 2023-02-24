@@ -18,7 +18,7 @@ namespace co1 {
      * @param area 卡号区域
      * @return 是否成功 0 成功，其他失败
      */
-    int find_card_area(const Mat &mat, Rect &area);
+    int findCardArea(const Mat &mat, Rect &area);
 
     /**
      * 通过银行卡区域截取到卡号区域
@@ -26,7 +26,7 @@ namespace co1 {
      * @param area 存放截取区域
      * @return 是否成功
      */
-    int find_card_number_area(const Mat &mat, Rect &area);
+    int findCardNumberArea(const Mat &mat, Rect &area);
 
     /**
      * 找到所有的数字
@@ -34,14 +34,14 @@ namespace co1 {
      * @param ret 存放所有数字
      * @return 是否成功
      */
-    int find_card_numbers(const Mat &src_img, std::vector<Mat> &ret);
+    int findCardNumbers(const Mat &src_img, std::vector<Mat> &ret);
 
     /**
      * 字符串进行粘连处理
      * @param mat
      * @return 粘连的那一列
      */
-    int find_split_cols_pos(Mat mat);
+    int findSplitColsPos(Mat mat);
 }
 
 /**

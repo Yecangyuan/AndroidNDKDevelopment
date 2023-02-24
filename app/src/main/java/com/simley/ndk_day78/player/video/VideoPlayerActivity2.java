@@ -156,7 +156,6 @@ public class VideoPlayerActivity2 extends AppCompatActivity {
         yePlayer.resume();
     }
 
-
     public void stop(View view) {
         yePlayer.stop();
     }

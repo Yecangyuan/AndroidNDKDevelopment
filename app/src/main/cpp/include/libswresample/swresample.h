@@ -592,7 +592,7 @@ const char *swresample_license(void);
 /**
  * Convert the samples in the input AVFrame and write them to the output AVFrame.
  *
- * Input and output AVFrames must have channel_layout, sample_rate and format set.
+ * Input and output AVFrames must have channel_layout, sampleRate and format set.
  *
  * If the output AVFrame does not have the data pointers allocated the nb_samples
  * field will be set using av_frame_get_buffer()

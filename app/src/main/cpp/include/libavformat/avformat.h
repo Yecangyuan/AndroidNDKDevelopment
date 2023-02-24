@@ -160,14 +160,14 @@
  * Reading data from an opened AVFormatContext is done by repeatedly calling
  * av_read_frame() on it. Each call, if successful, will return an AVPacket
  * containing encoded data for one AVStream, identified by
- * AVPacket.stream_index. This packet may be passed straight into the libavcodec
+ * AVPacket.streamIndex. This packet may be passed straight into the libavcodec
  * decoding functions avcodec_send_packet() or avcodec_decode_subtitle2() if the
  * caller wishes to decode the data.
  *
  * AVPacket.pts, AVPacket.dts and AVPacket.duration timing information will be
  * set if known. They may also be unset (i.e. AV_NOPTS_VALUE for
  * pts/dts, 0 for duration) if the stream does not provide them. The timing
- * information will be in AVStream.time_base units, i.e. it has to be
+ * information will be in AVStream.timeBase units, i.e. it has to be
  * multiplied by the timebase to convert them to seconds.
  *
  * A packet returned by av_read_frame() is always reference-counted,
@@ -198,10 +198,10 @@
  *   avio_open2() or a custom one.
  * - Unless the format is of the AVFMT_NOSTREAMS type, at least one stream must
  *   be created with the avformat_new_stream() function. The caller should fill
- *   the @ref AVStream.codecpar "stream codec parameters" information, such as the
+ *   the @ref AVStream.codecParameters "stream codec parameters" information, such as the
  *   codec @ref AVCodecParameters.codec_type "type", @ref AVCodecParameters.codec_id
  *   "id" and other parameters (e.g. width / height, the pixel or sample format,
- *   etc.) as known. The @ref AVStream.time_base "stream timebase" should
+ *   etc.) as known. The @ref AVStream.timeBase "stream timebase" should
  *   be set to the timebase that the caller desires to use for this stream (note
  *   that the timebase actually used by the muxer can be different, as will be
  *   described later).
@@ -639,7 +639,7 @@ typedef struct AVOutputFormat {
      * for the global header.
      *
      * @note pkt might have been directly forwarded by a meta-muxer; therefore
-     *       pkt->stream_index as well as the pkt's timebase might be invalid.
+     *       pkt->streamIndex as well as the pkt's timebase might be invalid.
      * Return 0 if more packets from this stream must be checked; 1 if not.
      */
     int (*check_bitstream)(struct AVFormatContext *s, struct AVStream *st,
@@ -746,7 +746,7 @@ typedef struct AVInputFormat {
 
     /**
      * Seek to a given timestamp relative to the frames in
-     * stream component stream_index.
+     * stream component streamIndex.
      * @param stream_index Must not be -1.
      * @param flags Selects which direction should be preferred if no exact
      *              match is available.
@@ -756,7 +756,7 @@ typedef struct AVInputFormat {
                      int stream_index, int64_t timestamp, int flags);
 
     /**
-     * Get the next timestamp in stream[stream_index].time_base units.
+     * Get the next timestamp in stream[streamIndex].timeBase units.
      * @return the timestamp or AV_NOPTS_VALUE if an error occurred
      */
     int64_t (*read_timestamp)(struct AVFormatContext *s, int stream_index,
@@ -807,7 +807,7 @@ enum AVStreamParseType {
 typedef struct AVIndexEntry {
     int64_t pos;
     int64_t timestamp;        /**<
-                               * Timestamp in AVStream.time_base units, preferably the time from which on correctly decoded frames are available
+                               * Timestamp in AVStream.timeBase units, preferably the time from which on correctly decoded frames are available
                                * when seeking to this entry. That means preferable PTS on keyframe based formats.
                                * But demuxers can choose to store a different timestamp, if it is more convenient for the implementation or nothing better
                                * is known
@@ -1177,7 +1177,7 @@ typedef struct AVProgram {
 typedef struct AVChapter {
     int64_t id;             ///< unique ID to identify the chapter
     AVRational time_base;   ///< time base in which the start/end timestamps are specified
-    int64_t start, end;     ///< chapter start/end time in time_base units
+    int64_t start, end;     ///< chapter start/end time in timeBase units
     AVDictionary *metadata;
 } AVChapter;
 
@@ -2205,7 +2205,7 @@ int av_find_best_stream(AVFormatContext *ic,
  * a variable size (e.g. MPEG audio), then it contains one frame.
  *
  * pkt->pts, pkt->dts and pkt->duration are always set to correct
- * values in AVStream.time_base units (and guessed if the format cannot
+ * values in AVStream.timeBase units (and guessed if the format cannot
  * provide them). pkt->pts can be AV_NOPTS_VALUE if the video format
  * has B-frames, so it is better to rely on pkt->dts if you do not
  * decompress the payload.
@@ -2220,13 +2220,13 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt);
 
 /**
  * Seek to the keyframe at timestamp.
- * 'timestamp' in 'stream_index'.
+ * 'timestamp' in 'streamIndex'.
  *
  * @param s            media file handle
- * @param stream_index If stream_index is (-1), a default stream is selected,
+ * @param stream_index If streamIndex is (-1), a default stream is selected,
  *                     and timestamp is automatically converted from
- *                     AV_TIME_BASE units to the stream specific time_base.
- * @param timestamp    Timestamp in AVStream.time_base units or, if no stream
+ *                     AV_TIME_BASE units to the stream specific timeBase.
+ * @param timestamp    Timestamp in AVStream.timeBase units or, if no stream
  *                     is specified, in AV_TIME_BASE units.
  * @param flags        flags which select direction and seeking mode
  *
@@ -2244,9 +2244,9 @@ int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp,
  * If flags contain AVSEEK_FLAG_BYTE, then all timestamps are in bytes and
  * are the file position (this may not be supported by all demuxers).
  * If flags contain AVSEEK_FLAG_FRAME, then all timestamps are in frames
- * in the stream with stream_index (this may not be supported by all demuxers).
- * Otherwise all timestamps are in units of the stream selected by stream_index
- * or if stream_index is -1, in AV_TIME_BASE units.
+ * in the stream with streamIndex (this may not be supported by all demuxers).
+ * Otherwise all timestamps are in units of the stream selected by streamIndex
+ * or if streamIndex is -1, in AV_TIME_BASE units.
  * If flags contain AVSEEK_FLAG_ANY, then non-keyframes are treated as
  * keyframes (this may not be supported by all demuxers).
  * If flags contain AVSEEK_FLAG_BACKWARD, it is ignored.
@@ -2390,7 +2390,7 @@ int avformat_init_output(AVFormatContext *s, AVDictionary **options);
  *            muxers that buffer up data internally before writing it to the
  *            output.
  *            <br>
- *            Packet's @ref AVPacket.stream_index "stream_index" field must be
+ *            Packet's @ref AVPacket.streamIndex "streamIndex" field must be
  *            set to the index of the corresponding stream in @ref
  *            AVFormatContext.streams "s->streams".
  *            <br>
@@ -2434,7 +2434,7 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt);
  *            This parameter can be NULL (at any time, not just at the end), to
  *            flush the interleaving queues.
  *            <br>
- *            Packet's @ref AVPacket.stream_index "stream_index" field must be
+ *            Packet's @ref AVPacket.streamIndex "streamIndex" field must be
  *            set to the index of the corresponding stream in @ref
  *            AVFormatContext.streams "s->streams".
  *            <br>
@@ -2533,7 +2533,7 @@ enum AVCodecID av_guess_codec(const AVOutputFormat *fmt, const char *short_name,
  * @param s          media file handle
  * @param stream     stream in the media file
  * @param[out] dts   DTS of the last packet output for the stream, in stream
- *                   time_base units
+ *                   timeBase units
  * @param[out] wall  absolute time when that packet whas output,
  *                   in microsecond
  * @retval  0               Success

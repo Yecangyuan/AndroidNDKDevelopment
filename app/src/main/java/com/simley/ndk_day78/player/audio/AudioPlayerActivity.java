@@ -33,9 +33,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     public static final String PARAM_MUSIC_LIST = "PARAM_MUSIC_LIST";
 
     private DiscView mDisc;
-    private MusicReceiver mMusicReceiver = new MusicReceiver();
+    private final MusicReceiver mMusicReceiver = new MusicReceiver();
     DisplayUtil displayUtil = new DisplayUtil();
-    private List<MusicData> mMusicDatas = new ArrayList<>();
+    private final List<MusicData> mMusicDatas = new ArrayList<>();
     public static final int MUSIC_MESSAGE = 0;
     private int position;
     private boolean playState = false;

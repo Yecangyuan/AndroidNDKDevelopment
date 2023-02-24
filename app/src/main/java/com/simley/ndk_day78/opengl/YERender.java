@@ -15,7 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class YERender implements GLSurfaceView.Renderer {
 
-    private Context context;
+    private final Context context;
 
     private final float[] vertexData = {
 
@@ -34,8 +34,8 @@ public class YERender implements GLSurfaceView.Renderer {
     };
 
 
-    private FloatBuffer vertexBuffer;
-    private FloatBuffer textureBuffer;
+    private final FloatBuffer vertexBuffer;
+    private final FloatBuffer textureBuffer;
     private int program_yuv;
     private int avPosition_yuv;
     private int afPosition_yuv;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_recognition">人脸识别</string>
+    <string name="car_number_recognition">车牌号识别</string>
+    <string name="text_recognition">文本识别\t\t\t</string>
+</resources>

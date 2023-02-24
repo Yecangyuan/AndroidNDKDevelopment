@@ -10,7 +10,7 @@
 
 class bitmap_util {
 public:
-    static jobject create_bitmap(JNIEnv *env, int width, int height, int type);
+    static jobject createBitmap(JNIEnv *env, int width, int height, int type);
 };
 
 

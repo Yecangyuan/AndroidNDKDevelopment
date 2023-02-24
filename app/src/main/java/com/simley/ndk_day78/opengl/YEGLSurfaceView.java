@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 
 public class YEGLSurfaceView extends GLSurfaceView {
 
-    private YERender mYERender;
+    private final YERender mYERender;
 
     public YEGLSurfaceView(Context context) {
         this(context, null);

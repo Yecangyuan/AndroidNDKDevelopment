@@ -1,6 +1,7 @@
 package org.opencv.android;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import android.annotation.TargetApi;
@@ -31,7 +32,7 @@ public class Camera2Renderer extends CameraGLRendererBase {
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
-    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
+    private final Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
     Camera2Renderer(CameraGLSurfaceView view) {
         super(view);
@@ -101,7 +102,7 @@ public class Camera2Renderer extends CameraGLRendererBase {
         Log.i(LOGTAG, "openCamera");
         CameraManager manager = (CameraManager) mView.getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            String camList[] = manager.getCameraIdList();
+            String[] camList = manager.getCameraIdList();
             if(camList.length == 0) {
                 Log.e(LOGTAG, "Error: camera isn't detected.");
                 return;
@@ -214,7 +215,7 @@ public class Camera2Renderer extends CameraGLRendererBase {
                     .createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
 
-            mCameraDevice.createCaptureSession(Arrays.asList(surface),
+            mCameraDevice.createCaptureSession(Collections.singletonList(surface),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured( CameraCaptureSession cameraCaptureSession) {
@@ -243,9 +244,6 @@ public class Camera2Renderer extends CameraGLRendererBase {
         } catch (InterruptedException e) {
             throw new RuntimeException(
                     "Interrupted while createCameraPreviewSession", e);
-        }
-        finally {
-            //mCameraOpenCloseLock.release();
         }
     }
 

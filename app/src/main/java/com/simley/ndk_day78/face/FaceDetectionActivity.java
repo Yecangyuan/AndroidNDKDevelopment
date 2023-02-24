@@ -168,19 +168,15 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
-            case REQUEST_CODE_ADDRESS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission Granted 授予权限
-                    //处理授权之后逻辑
-                    activateOpenCVCameraView();
-                } else {
-                    // Permission Denied 权限被拒绝
-                    Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            default:
-                break;
+        if (requestCode == REQUEST_CODE_ADDRESS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                // Permission Granted 授予权限
+                //处理授权之后逻辑
+                activateOpenCVCameraView();
+            } else {
+                // Permission Denied 权限被拒绝
+                Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show();
+            }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -251,14 +247,11 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
             numberOfCameras = Camera.getNumberOfCameras();
         }
         // 2个及以上摄像头
-        if (1 < numberOfCameras) {
-            // 设备没有摄像头
-//            int index = ++mCameraSwitchCount % numberOfCameras;
-//            disableView();
-//            setCameraIndex(index);
-//            enableView();
-            return true;
-        }
-        return false;
+        // 设备没有摄像头
+        //            int index = ++mCameraSwitchCount % numberOfCameras;
+        //            disableView();
+        //            setCameraIndex(index);
+        //            enableView();
+        return 1 < numberOfCameras;
     }
 }

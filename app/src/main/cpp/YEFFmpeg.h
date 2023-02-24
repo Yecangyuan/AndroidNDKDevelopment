@@ -17,27 +17,27 @@ extern "C" {
 
 class YEFFmpeg {
 public:
-    YECallJava *call_java = NULL;
+    YECallJava *callJava = NULL;
     const char *url = NULL;
-    pthread_t decode_thread;
-    AVFormatContext *av_format_context = NULL;
+    pthread_t decodeThread;
+    AVFormatContext *avFormatContext = NULL;
     YEAudio *audio = NULL;
     YEVideo *video = NULL;
-    YEPlayStatus *play_status = NULL;
+    YEPlayStatus *playStatus = NULL;
 
     int duration = 0;
-    pthread_mutex_t seek_mutex;
-    pthread_mutex_t init_mutex;
+    pthread_mutex_t seekMutex;
+    pthread_mutex_t initMutex;
     bool exit = false;
 
 public:
-    YEFFmpeg(YEPlayStatus *play_status, YECallJava *call_java, const char *url);
+    YEFFmpeg(YEPlayStatus *playStatus, YECallJava *callJava, const char *url);
 
     ~YEFFmpeg();
 
     void prepared();
 
-    void decode_ffmepg_thread();
+    void decodeFfmepgThread();
 
     void start();
 
@@ -47,23 +47,23 @@ public:
 
     void pause();
 
-    void set_mute(int mute);
+    void setMute(int mute);
 
-    void set_volume(int percent);
+    void setVolume(int percent);
 
-    void set_speed(float speed);
+    void setSpeed(float speed);
 
-    void set_pitch(float pitch);
+    void setPitch(float pitch);
 
     void release();
 
     /**
      * 获取音视频编解码器的上下文对象
-     * @param codecpar
-     * @param av_codec_context
+     * @param codecParameters
+     * @param avCodecContext
      * @return
      */
-    int get_avcodec_context(AVCodecParameters *codecpar, AVCodecContext **av_codec_context);
+    int getAvcodecContext(AVCodecParameters *codecParameters, AVCodecContext **avCodecContext);
 };
 
 

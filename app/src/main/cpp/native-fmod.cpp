@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 #include "com_simley_ndk_day78_fmod_FmodActivity.h"
-#include "ye_log.h"
+#include "YeLog.h"
 
 using namespace FMOD;
 
@@ -20,13 +20,13 @@ Java_com_simley_ndk_1day78_fmod_FmodActivity_voiceChangeNative(JNIEnv *env, jobj
     // Linux 文件
 
     // 音效引擎系统 指针
-    System *system = 0;
+    System *system = NULL;
     // 声音 指针
-    Sound *sound = 0;
+    Sound *sound = NULL;
     // 通道，音轨，声音在上面跑 跑道 指针
-    Channel *channel = 0;
+    Channel *channel = NULL;
     // DSP：digital signal process  == 数字信号处理  指针
-    DSP *dsp = 0;
+    DSP *dsp = NULL;
 
     // 第一步 创建系统
     System_Create(&system);
@@ -129,14 +129,14 @@ Java_com_simley_ndk_1day78_fmod_FmodActivity_voiceChangeNative(JNIEnv *env, jobj
     LOGD("播放完毕");
 
 
-//    JNIEnv *jni_env;
-//    if (java_vm->AttachCurrentThread(&jni_env, 0) != JNI_OK) {
+//    JNIEnv *jniEnv;
+//    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
 //        LOGE("get child thread jnienv wrong.");
 //        return;
 //    }
 //    jclass fmodclass = env->GetObjectClass(thiz);
 //    jmethodID endMethod = env->GetMethodID(fmodclass, "playerEnd", "(Ljava/lang/String;)V");
 //    jstring value = env->NewStringUTF(content_);
-//    jni_env->CallVoidMethod(thiz, endMethod, value);
-//    java_vm->DetachCurrentThread();
+//    jniEnv->CallVoidMethod(thiz, endMethod, value);
+//    javaVm->DetachCurrentThread();
 }

@@ -20,32 +20,32 @@ extern "C" {
 class YEVideo {
 public:
     YEQueue *queue = NULL;
-    int stream_index = -1;
-    AVCodecContext *avcodec_context = NULL;
-    AVCodecParameters *codecpar = NULL;
-    YEPlayStatus *play_status = NULL;
-    YECallJava *ye_call_java = NULL;
-    pthread_mutex_t pthread_mutex;
-    pthread_t pthread_play;
+    int streamIndex = -1;
+    AVCodecContext *avCodecContext = NULL;
+    AVCodecParameters *codecParameters = NULL;
+    YEPlayStatus *playStatus = NULL;
+    YECallJava *callJava = NULL;
+    pthread_mutex_t pthreadMutex;
+    pthread_t pthreadPlay;
 
     double clock = 0;
     // 主要与音频的差值
-    double delay_time = 0;
+    double delayTime = 0;
     // 默认休眠时间 40ms 0.04s 帧率 25帧
-    double default_delay_time = 0.04;
+    double defaultDelayTime = 0.04;
     YEAudio *audio = NULL;
-    AVRational time_base;
+    AVRational timeBase;
 
 public:
-    YEVideo(YEPlayStatus *play_status, YECallJava *ye_call_java);
+    YEVideo(YEPlayStatus *playStatus, YECallJava *callJava);
 
     ~YEVideo();
 
     void play();
 
-    double get_delay_time(double diff);
+    double getDelayTime(double diff);
 
-    double get_frame_diff_time(AVFrame *av_frame);
+    double getFrameDiffTime(AVFrame *avFrame);
 };
 
 

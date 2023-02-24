@@ -3,7 +3,6 @@ package com.simley.ndk_day78.serialport;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,12 +10,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.simley.lib_serialport.bean.Device;
+import com.simley.lib_serialport.bean.T;
 import com.simley.ndk_day78.R;
-import com.simley.ndk_day78.serialport.bean.Device;
-import com.simley.ndk_day78.serialport.bean.T;
-import com.simley.ndk_day78.serialport.handler.SerialPortManager;
-import com.simley.ndk_day78.serialport.listener.OnOpenSerialPortListener;
-import com.simley.ndk_day78.serialport.listener.OnSerialPortDataListener;
+import com.simley.lib_serialport.handler.SerialPortManager;
+import com.simley.lib_serialport.listener.OnOpenSerialPortListener;
+import com.simley.lib_serialport.listener.OnSerialPortDataListener;
 
 import java.io.File;
 import java.util.Arrays;

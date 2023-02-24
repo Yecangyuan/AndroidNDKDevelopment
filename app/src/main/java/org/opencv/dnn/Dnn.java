@@ -24,13 +24,13 @@ public class Dnn {
     // C++: enum Backend (cv.dnn.Backend)
     public static final int
             DNN_BACKEND_DEFAULT = 0,
-            DNN_BACKEND_HALIDE = 0+1,
-            DNN_BACKEND_INFERENCE_ENGINE = 0+2,
-            DNN_BACKEND_OPENCV = 0+3,
-            DNN_BACKEND_VKCOM = 0+4,
-            DNN_BACKEND_CUDA = 0+5,
-            DNN_BACKEND_WEBNN = 0+6,
-            DNN_BACKEND_TIMVX = 0+7;
+            DNN_BACKEND_HALIDE = 1,
+            DNN_BACKEND_INFERENCE_ENGINE = 2,
+            DNN_BACKEND_OPENCV = 3,
+            DNN_BACKEND_VKCOM = 4,
+            DNN_BACKEND_CUDA = 5,
+            DNN_BACKEND_WEBNN = 6,
+            DNN_BACKEND_TIMVX = 7;
 
 
     // C++: enum SoftNMSMethod (cv.dnn.SoftNMSMethod)
@@ -42,15 +42,15 @@ public class Dnn {
     // C++: enum Target (cv.dnn.Target)
     public static final int
             DNN_TARGET_CPU = 0,
-            DNN_TARGET_OPENCL = 0+1,
-            DNN_TARGET_OPENCL_FP16 = 0+2,
-            DNN_TARGET_MYRIAD = 0+3,
-            DNN_TARGET_VULKAN = 0+4,
-            DNN_TARGET_FPGA = 0+5,
-            DNN_TARGET_CUDA = 0+6,
-            DNN_TARGET_CUDA_FP16 = 0+7,
-            DNN_TARGET_HDDL = 0+8,
-            DNN_TARGET_NPU = 0+9;
+            DNN_TARGET_OPENCL = 1,
+            DNN_TARGET_OPENCL_FP16 = 2,
+            DNN_TARGET_MYRIAD = 3,
+            DNN_TARGET_VULKAN = 4,
+            DNN_TARGET_FPGA = 5,
+            DNN_TARGET_CUDA = 6,
+            DNN_TARGET_CUDA_FP16 = 7,
+            DNN_TARGET_HDDL = 8,
+            DNN_TARGET_NPU = 9;
 
 
     //
