@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.IBinder;
@@ -14,11 +13,10 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.simley.ndk_day78.player.YEPlayer;
-import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
 
 import java.io.File;
 
-public class MusicService extends Service implements MediaPlayer.OnCompletionListener, IPlayerListener {
+public class MusicService extends Service implements MediaPlayer.OnCompletionListener, YEPlayer.IPlayerListener {
     private static final String TAG = "MusicService";
     private YEPlayer yePlayer;
 
@@ -233,6 +231,4 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             }
         }
     }
-
-//    int i = 0;
 }

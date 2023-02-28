@@ -33,11 +33,7 @@ android {
                 abiFilters：指定CPU架构，cmake的本地库，例如：native-lib
                     如果是abiFilters ''，则默认生成所有CPU架构的文件
                  */
-                rootProject.abiFilters.each { abi ->
-                    {
-                        abiFilters abi
-                    }
-                }
+                rootProject.abiFilters.each { abi -> abiFilters abi }
             }
         }
 
@@ -65,11 +61,7 @@ android {
                 ===================================================================================================
              */
             // abiFilters 'arm64-v8a'//, 'x86', 'armeabi-v7a', 'x86_64'
-            rootProject.abiFilters.each { abi ->
-                {
-                    abiFilters abi
-                }
-            }
+            rootProject.abiFilters.each { abi -> abiFilters abi }
         }
     }
 

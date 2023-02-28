@@ -15,8 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.opengl.YEGLSurfaceView;
 import com.simley.ndk_day78.player.YEPlayer;
-import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
-import com.simley.ndk_day78.player.audio.listener.WlOnPreparedListener;
 import com.simley.ndk_day78.player.audio.ui.utils.DisplayUtil;
 
 import java.io.File;
@@ -51,7 +49,7 @@ public class VideoPlayerActivity2 extends AppCompatActivity {
         file = new File(Environment.getExternalStorageDirectory(), "input.rmvb");
         paths.add(file.getAbsolutePath());
         paths.add("http://mn.maliuedu.com/music/input.mp4");
-        yePlayer.setPlayerListener(new IPlayerListener() {
+        yePlayer.setPlayerListener(new YEPlayer.IPlayerListener() {
             @Override
             public void onLoad(boolean load) {
 
@@ -126,7 +124,7 @@ public class VideoPlayerActivity2 extends AppCompatActivity {
 
     public void begin(View view) {
 
-        yePlayer.setWlOnPreparedListener(new WlOnPreparedListener() {
+        yePlayer.setWlOnPreparedListener(new YEPlayer.WlOnPreparedListener() {
             @Override
             public void onPrepared() {
                 Log.d(this.getClass().getSimpleName(), "准备好了，可以开始播放声音了");

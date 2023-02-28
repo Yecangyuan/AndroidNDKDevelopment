@@ -43,12 +43,12 @@ public:
     // 混音器
     SLObjectItf outputMixObject = NULL;
     SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
-    SLEnvironmentalReverbSettings reverb_settings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
+    SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
     // PCM
     SLObjectItf pcmPlayerObject = NULL;
     SLPlayItf pcmPlayerPlay = NULL;
-    SLVolumeItf pcm_volume_play = NULL;
+    SLVolumeItf pcmVolumePlay = NULL;
 
     // 缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
@@ -111,10 +111,10 @@ public:
 
     /**
      * 获取当前的采样率
-     * @param sampleRate
+     * @param _sampleRate
      * @return
      */
-    int getCurrentSampleRateForOpenSLES(int sampleRate);
+    int getCurrentSampleRateForOpenSLES(int _sampleRate);
 
     /**
      * 暂停播放

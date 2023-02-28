@@ -77,14 +77,12 @@ find_library( # Sets the name of the path variable.
 target_link_libraries(ndk_day78
         -ljnigraphics
         # GLESv3 android自带的native层的opengl es .so库
+
         # ffmpeg
-        avfilter
-        avcodec
-        avdevice
-        avutil
-        swscale
-        avformat
-        swresample
+        -Wl,--start-group
+        avfilter avcodec avdevice avutil swscale avformat swresample
+        -Wl,--end-group
+
         android
         # opensles
         OpenSLES
@@ -95,5 +93,7 @@ target_link_libraries(ndk_day78
         libopencv_java4
         # 人脸关键点库
         seeta_fa_lib
+        # libz.so动态库 ffmpeg需要的额外支持库，刚好ndk中就有这个库
+        z
         # log
         ${log-lib})

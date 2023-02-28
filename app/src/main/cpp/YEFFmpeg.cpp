@@ -151,7 +151,7 @@ void YEFFmpeg::decodeFfmepgThread() {
                                     callJava);
                 audio->streamIndex = streamIndex;
                 // 音频时长，单位微秒，转换成秒
-                audio->duration = (int) (avFormatContext->duration / AV_TIME_BASE);
+                audio->duration = avFormatContext->duration / AV_TIME_BASE;
                 audio->timeBase = avFormatContext->streams[streamIndex]->time_base;
                 audio->codecParameters = avFormatContext->streams[streamIndex]->codecpar;
                 duration = audio->duration;

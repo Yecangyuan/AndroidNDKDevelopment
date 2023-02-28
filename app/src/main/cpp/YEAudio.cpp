@@ -138,13 +138,11 @@ void pcmBufferCallback(SLAndroidSimpleBufferQueueItf bf, void *context) {
             // 所以每隔一秒才调用一次
             if (wlAudio->clock - wlAudio->lastTime >= 0.1) {
                 wlAudio->lastTime = wlAudio->clock;
-                wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, (int) wlAudio->clock,
-                                                  wlAudio->duration);
+                wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
             }
 
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue,
-                                                (char *) wlAudio->sampleBuffer,
-                                                bufferSize * 2 * 2);
+                                                (char *) wlAudio->sampleBuffer, bufferSize * 2 * 2);
         }
     }
 }
@@ -167,11 +165,11 @@ void YEAudio::initOpenSLES() {
 
     if (SL_RESULT_SUCCESS == sLresult) {
         sLresult = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
-                outputMixEnvironmentalReverb, &reverb_settings);
+                outputMixEnvironmentalReverb, &reverbSettings);
         (void) sLresult;
     }
-    SLDataLocator_OutputMix output_mix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
-    SLDataSink audio_sink = {&output_mix, 0};
+    SLDataLocator_OutputMix outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSink audioSink = {&outputMix, 0};
 
     // 第三步，配置PCM格式信息
     SLDataLocator_AndroidSimpleBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
@@ -185,13 +183,13 @@ void YEAudio::initOpenSLES() {
             SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT, // 立体声（前左前右）
             SL_BYTEORDER_LITTLEENDIAN       // 结束标志
     };
-    SLDataSource sl_datasource = {&android_queue, &pcm};
+    SLDataSource slDataSource = {&android_queue, &pcm};
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
-    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &sl_datasource,
-                                       &audio_sink, 2, ids, req);
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSink, 2,
+                                       ids, req);
     // 初始化播放器
     (*pcmPlayerObject)->Realize(pcmPlayerObject, SL_BOOLEAN_FALSE);
     // 得到接口后调用， 获取Player接口
@@ -199,7 +197,7 @@ void YEAudio::initOpenSLES() {
     // 获取声道操作接口
     (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_MUTESOLO, &pcmMutePlay);
     // 获取播放 暂停 恢复的句柄
-    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_VOLUME, &pcm_volume_play);
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_VOLUME, &pcmVolumePlay);
     // 注册回调缓冲区 获取缓冲队列接口
     (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
     // 缓冲接口回调
@@ -209,9 +207,9 @@ void YEAudio::initOpenSLES() {
     pcmBufferCallback(pcmBufferQueue, this);
 }
 
-int YEAudio::getCurrentSampleRateForOpenSLES(int sampleRate) {
-    int rate;
-    switch (sampleRate) {
+int YEAudio::getCurrentSampleRateForOpenSLES(int _sampleRate) {
+    int rate = 0;
+    switch (_sampleRate) {
         case 8000:
             rate = SL_SAMPLINGRATE_8;
             break;
@@ -295,25 +293,25 @@ void YEAudio::setMute(int mute) {
 }
 
 void YEAudio::setVolume(int percent) {
-    if (pcm_volume_play != NULL) {
+    if (pcmVolumePlay != NULL) {
         if (percent > 30) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -20);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -20);
         } else if (percent > 25) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -22);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -22);
         } else if (percent > 20) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -25);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -25);
         } else if (percent > 15) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -28);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -28);
         } else if (percent > 10) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -30);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -30);
         } else if (percent > 5) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -34);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -34);
         } else if (percent > 3) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -37);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -37);
         } else if (percent > 0) {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -40);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -40);
         } else {
-            (*pcm_volume_play)->SetVolumeLevel(pcm_volume_play, (100 - percent) * -100);
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -100);
         }
     }
 }

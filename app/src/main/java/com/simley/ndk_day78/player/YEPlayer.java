@@ -9,9 +9,6 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.simley.ndk_day78.opengl.YEGLSurfaceView;
-import com.simley.ndk_day78.player.audio.listener.IPlayerListener;
-import com.simley.ndk_day78.player.audio.listener.WlOnPreparedListener;
-import com.simley.ndk_day78.player.audio.listener.YEPlayListener;
 import com.simley.ndk_day78.utils.ThreadPool;
 
 /**
@@ -19,44 +16,120 @@ import com.simley.ndk_day78.utils.ThreadPool;
  */
 public class YEPlayer {
 
-    private AudioTrack audioTrack;
-    private String mSource;
-    private YEPlayListener mYEPlayListener;
-    private IPlayerListener iPlayerListener;
-    private WlOnPreparedListener wlOnPreparedListener;
+    private String mSource; // 数据源
+    private IPlayerListener iPlayerListener;  // 音视频播放回调接口
+
+    private WlOnPreparedListener wlOnPreparedListener; // 回调函数，当数据准备好的时候native层会回调该接口的onPrepared()方法
 
     private YEGLSurfaceView yeglSurfaceView;
 
     private final PlayState playState = PlayState.STARTED;
-    private int duration;
+    private int duration; // 播放时长
 
+    /**
+     * 开始播放
+     *
+     * @param url
+     * @param surface
+     */
     public native void play(String url, Surface surface);
 
-    public native void playSound(String url);
+    /**
+     * 获取视频宽度
+     *
+     * @return
+     */
+    public native int getVideoWidth();
 
-    private native void n_prepared(String source);
+    /**
+     * 获取视频高度
+     *
+     * @return
+     */
+    public native int getVideoHeight();
 
-    private native void n_start();
+//    public native void playSound(String url);
 
-    private native void n_seek(int sec);
+    /**
+     * 准备播放
+     *
+     * @param source
+     */
+    private native void nativePrepared(String source);
 
-    private native void n_resume();
+    /**
+     * 开始播放
+     */
+    private native void nativeStart();
 
-    private native void n_pause();
+    /**
+     * 释放资源
+     */
+    private native void nativeRelease();
 
-    private native void n_mute(int mute);
+    /**
+     * 跳转到 指定播放位置
+     *
+     * @param sec
+     */
+    private native void nativeSeek(int sec);
 
-    public native void n_set_looping(boolean looping);
+    /**
+     * 继续播放
+     */
+    private native void nativeResume();
 
-    private native void n_volume(int percent);
+    /**
+     * 暂停播放
+     */
+    private native void nativePause();
 
-    private native void n_speed(float speed);
+    /**
+     * 设置静音
+     *
+     * @param mute
+     */
+    private native void nativeMute(int mute);
 
-    private native void n_pitch(float pitch);
+    /**
+     * 设置 循环播放
+     *
+     * @param looping
+     */
+    public native void nativeSetLooping(boolean looping);
 
-    private native void n_stop();
+    /**
+     * 设置音量
+     *
+     * @param percent
+     */
+    private native void nativeVolume(int percent);
 
-    private native boolean n_is_looping();
+    /**
+     * 设置播放速度
+     *
+     * @param speed
+     */
+    private native void nativeSpeed(float speed);
+
+    /**
+     * 设置音调
+     *
+     * @param pitch
+     */
+    private native void nativePitch(float pitch);
+
+    /**
+     * 停止播放
+     */
+    private native void nativeStop();
+
+    /**
+     * 是否循环播放
+     *
+     * @return
+     */
+    private native boolean nativeIsLooping();
 
     /**
      * 是否正在播放
@@ -73,7 +146,7 @@ public class YEPlayer {
      * @param speed
      */
     public void setSpeed(float speed) {
-        n_speed(speed);
+        nativeSpeed(speed);
     }
 
     /**
@@ -82,7 +155,7 @@ public class YEPlayer {
      * @param pitch
      */
     public void setPitch(float pitch) {
-        n_pitch(pitch);
+        nativePitch(pitch);
     }
 
     /**
@@ -91,7 +164,7 @@ public class YEPlayer {
      * @param looping
      */
     public void setLooping(boolean looping) {
-        n_set_looping(looping);
+        nativeSetLooping(looping);
     }
 
     /**
@@ -100,7 +173,7 @@ public class YEPlayer {
      * @return
      */
     public boolean isLooping() {
-        return n_is_looping();
+        return nativeIsLooping();
     }
 
     /**
@@ -108,14 +181,14 @@ public class YEPlayer {
      */
     public void stop() {
         new MediaPlayer().start();
-        ThreadPool.getInstance().execute(this::n_stop);
+        ThreadPool.getInstance().execute(this::nativeStop);
     }
 
     public void prepare() {
         if (TextUtils.isEmpty(mSource)) {
             return;
         }
-        ThreadPool.getInstance().execute(() -> n_prepared(mSource));
+        ThreadPool.getInstance().execute(() -> nativePrepared(mSource));
     }
 
     public void onCallLoad(boolean load) {
@@ -140,7 +213,7 @@ public class YEPlayer {
         if (TextUtils.isEmpty(mSource)) {
             throw new IllegalArgumentException("datasource is null, please set the datasource by calling setDataSource method.");
         }
-        ThreadPool.getInstance().execute(this::n_start);
+        ThreadPool.getInstance().execute(this::nativeStart);
     }
 
     public void setDataSource(String dataSource) {
@@ -163,6 +236,14 @@ public class YEPlayer {
             iPlayerListener.onCurrentTime(currentTime, totalTime);
         }
     }
+
+    /**
+     * 释放资源
+     */
+    public void release() {
+        nativeRelease();
+    }
+
 
     public void onError(int errorCode, String errorMsg) {
         if (iPlayerListener != null) {
@@ -213,10 +294,10 @@ public class YEPlayer {
     /**
      * 跳转到指定的 播放 时间点
      *
-     * @param secds
+     * @param sec
      */
-    public void seekTo(int secds) {
-        n_seek(secds);
+    public void seekTo(int sec) {
+        nativeSeek(sec);
     }
 
     public void setVolume(int leftVolume, int rightVolume) {
@@ -234,7 +315,7 @@ public class YEPlayer {
      */
     public void setVolume(int percent) {
         if (percent >= 0 && percent <= 100) {
-            n_volume(percent);
+            nativeVolume(percent);
         }
     }
 
@@ -242,14 +323,14 @@ public class YEPlayer {
      * 暂停播放
      */
     public void pause() {
-        n_pause();
+        nativePause();
     }
 
     /**
      * 继续播放
      */
     public void resume() {
-        n_resume();
+        nativeResume();
     }
 
     /**
@@ -259,7 +340,7 @@ public class YEPlayer {
      * @param mute
      */
     public void setMute(int mute) {
-        n_mute(mute);
+        nativeMute(mute);
     }
 
 
@@ -272,5 +353,26 @@ public class YEPlayer {
         PAUSED,
         STOPPED,
     }
+
+    public interface WlOnPreparedListener {
+        void onPrepared();
+    }
+
+    public interface IPlayerListener {
+        void onLoad(boolean load);
+
+        void onCurrentTime(int currentTime, int totalTime);
+
+        void onError(int code, String msg);
+
+        void onPause(boolean pause);
+
+        void onDbValue(int db);
+
+        void onComplete();
+
+        String onNext();
+    }
+
 
 }
