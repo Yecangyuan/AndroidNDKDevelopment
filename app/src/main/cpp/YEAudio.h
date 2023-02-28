@@ -5,6 +5,7 @@
 #ifndef NDK_DAY78_YEAUDIO_H
 #define NDK_DAY78_YEAUDIO_H
 
+#define PCM_CHANNELS_NUM 2
 #include "YEQueue.h"
 #include "YEPlayStatus.h"
 #include "YECallJava.h"

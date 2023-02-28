@@ -10,25 +10,29 @@
 #include "YEAudio.h"
 #include "YEVideo.h"
 #include "YEPlayStatus.h"
+#include "cstring"
+#include "YeLog.h"
 
 extern "C" {
+#include "libavutil/time.h"
 #include "libavformat/avformat.h"
 };
 
 class YEFFmpeg {
 public:
     YECallJava *callJava = NULL;
-    const char *url = NULL;
-    pthread_t decodeThread;
     AVFormatContext *avFormatContext = NULL;
+    char *url = NULL;
     YEAudio *audio = NULL;
     YEVideo *video = NULL;
     YEPlayStatus *playStatus = NULL;
 
     int duration = 0;
+    bool exit = false;
+
+    pthread_t decodeThread;
     pthread_mutex_t seekMutex;
     pthread_mutex_t initMutex;
-    bool exit = false;
 
 public:
     YEFFmpeg(YEPlayStatus *playStatus, YECallJava *callJava, const char *url);

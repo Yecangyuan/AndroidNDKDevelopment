@@ -4,7 +4,6 @@
 
 #include "YEAudio.h"
 
-#define PCM_CHANNELS_NUM 2
 
 YEAudio::YEAudio(YEPlayStatus *playStatus, int sampleRate, YECallJava *callJava) {
     this->playStatus = playStatus;

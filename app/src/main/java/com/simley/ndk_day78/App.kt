@@ -1,11 +1,10 @@
 package com.simley.ndk_day78
 
-import android.app.Application
 import android.content.Context
+import androidx.multidex.MultiDexApplication
 import com.tencent.bugly.crashreport.CrashReport
-import dagger.hilt.android.HiltAndroidApp
 
-class App : Application() {
+class App : MultiDexApplication() {
 
     init {
         /*

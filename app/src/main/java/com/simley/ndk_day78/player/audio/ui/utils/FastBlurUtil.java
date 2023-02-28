@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
  * Created by jay on 11/7/15.
  */
 public class FastBlurUtil {
-
     public static Bitmap doBlur(Bitmap sentBitmap, int radius, boolean canReuseInBitmap) {
 
         // Stack Blur v1.0 from

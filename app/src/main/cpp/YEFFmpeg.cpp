@@ -3,21 +3,21 @@
 //
 
 #include "YEFFmpeg.h"
-#include "YeLog.h"
 
-extern "C" {
-#include "libavutil/time.h"
-}
 
 YEFFmpeg::YEFFmpeg(YEPlayStatus *playStatus, YECallJava *callJava, const char *url) {
     this->playStatus = playStatus;
     this->callJava = callJava;
-    this->url = url;
+    this->url = new char[strlen(url) + 1];
+    strcpy(this->url, url);
+
+
     pthread_mutex_init(&seekMutex, NULL);
     pthread_mutex_init(&initMutex, NULL);
 }
 
 YEFFmpeg::~YEFFmpeg() {
+    delete this->url;
     avformat_network_deinit();
     pthread_mutex_destroy(&initMutex);
     pthread_mutex_destroy(&seekMutex);
@@ -116,8 +116,11 @@ void YEFFmpeg::decodeFfmepgThread() {
     // 分配上下文
     avFormatContext = avformat_alloc_context();
 
+    AVDictionary *avDictionary = NULL;
+    av_dict_set(&avDictionary, "timeout", "5000000", 0);
+
     int ret;
-    ret = avformat_open_input(&avFormatContext, url, NULL, NULL);
+    ret = avformat_open_input(&avFormatContext, url, NULL, &avDictionary);
     if (ret != 0) {
         // 1. 回调给java层，通知打开文件失败
         callJava->onCallError(CHILD_THREAD, ret, av_err2str(ret));

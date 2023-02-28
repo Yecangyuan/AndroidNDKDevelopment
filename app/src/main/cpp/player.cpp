@@ -425,7 +425,7 @@ jmethodID get_audio_track_write(JNIEnv *env, jobject audio_track) {
 //    }
 //}
 
-YECallJava *call_java = NULL;
+YECallJava *callJava = NULL;
 YEFFmpeg *ffmpeg = NULL;
 YEPlayStatus *play_status = NULL;
 
@@ -455,10 +455,8 @@ JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_player_YEPlayer_nativePrepared(JNIEnv *env, jobject thiz,
                                                           jstring source_) {
     const char *source = env->GetStringUTFChars(source_, JNI_FALSE);
-
     if (ffmpeg == NULL) {
-
-        if (call_java == NULL) {
+        if (callJava == NULL) {
             /*
              * JNIEnv *env：env传递不能跨越线程，否则崩溃。可以跨越函数，该env对象是绑定于线程的，所以只能在当前线程中使用
              *       主线程的都是共用同一个env，无论是native还是java层。
@@ -469,12 +467,12 @@ Java_com_simley_ndk_1day78_player_YEPlayer_nativePrepared(JNIEnv *env, jobject t
              *      【解决方法】：该变量默认是局部变量，将其提升为全局变量即可解决问题
              * _JavaVM *javaVm：java_vm传递可以跨线程和函数，因为JavaVM是Java虚拟机，是全局的，一个进程（应用）只有一个JavaVM对象
              */
-            call_java = new YECallJava(java_vm, env, &thiz);
+            callJava = new YECallJava(java_vm, env, &thiz);
         }
-
         play_status = new YEPlayStatus();
-        ffmpeg = new YEFFmpeg(play_status, call_java, source);
+        ffmpeg = new YEFFmpeg(play_status, callJava, source);
         ffmpeg->prepared();
+        env->ReleaseStringUTFChars(source_, source);
     }
 }
 extern "C"
@@ -545,9 +543,9 @@ Java_com_simley_ndk_1day78_player_YEPlayer_nativeStop(JNIEnv *env, jobject thiz)
     if (ffmpeg != NULL) {
         ffmpeg->release();
         delete ffmpeg;
-        if (call_java != NULL) {
-            delete call_java;
-            call_java = NULL;
+        if (callJava != NULL) {
+            delete callJava;
+            callJava = NULL;
         }
         if (play_status != NULL) {
             delete play_status;

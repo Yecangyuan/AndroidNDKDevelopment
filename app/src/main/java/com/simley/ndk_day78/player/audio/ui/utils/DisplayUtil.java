@@ -73,22 +73,15 @@ public class DisplayUtil {
         return (min < 10 ? "0" + min : min + "") + ":" + (sec < 10 ? "0" + sec : sec + "");
     }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void try2UpdateMusicPicBackground(Activity activity, BackgroundAnimationRelativeLayout mRootLayout, final int musicPicRes) {
         if (mRootLayout.isNeed2UpdateBackground(musicPicRes)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final Drawable foregroundDrawable = getForegroundDrawable(activity, musicPicRes);
-                    activity.runOnUiThread(new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void run() {
-                            mRootLayout.setForeground(foregroundDrawable);
-                            mRootLayout.beginAnimation();
-                        }
-                    });
-                }
+            new Thread(() -> {
+                final Drawable foregroundDrawable = getForegroundDrawable(activity, musicPicRes);
+                activity.runOnUiThread(() -> {
+                    mRootLayout.setForeground(foregroundDrawable);
+                    mRootLayout.beginAnimation();
+                });
             }).start();
         }
     }
@@ -148,7 +141,8 @@ public class DisplayUtil {
 
         return BitmapFactory.decodeResource(context.getResources(), musicPicRes, options);
     }
-    public static String secdsToDateFormat(int secds ) {
+
+    public static String secdsToDateFormat(int secds) {
         long hours = secds / (60 * 60);
         long minutes = (secds % (60 * 60)) / (60);
         long seconds = secds % (60);
@@ -181,6 +175,7 @@ public class DisplayUtil {
         return sm + ":" + ss;
 
     }
+
     public static String secdsToDateFormat(int secds, int totalsecds) {
         long hours = secds / (60 * 60);
         long minutes = (secds % (60 * 60)) / (60);

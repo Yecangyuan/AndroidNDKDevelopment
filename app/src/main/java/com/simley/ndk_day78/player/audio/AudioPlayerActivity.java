@@ -42,6 +42,23 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+//        resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        pause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityAudioPlayerBinding.inflate(getLayoutInflater());
@@ -212,6 +229,12 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    /**
+     * 发送操作
+     * Service会监听到这些action
+     *
+     * @param action
+     */
     private void optMusic(final String action) {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(action));
     }
@@ -256,6 +279,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMusicReceiver);
     }
 

@@ -63,7 +63,6 @@ public class VideoPlayerActivity2 extends AppCompatActivity {
                         tvTime.setText(DisplayUtil.secdsToDateFormat(currentTime)
                                 + "/" + DisplayUtil.secdsToDateFormat(totalTime));
                     });
-
                 }
             }
 

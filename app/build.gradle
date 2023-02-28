@@ -17,6 +17,8 @@ android {
         versionName rootProject.android.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+
         externalNativeBuild {
             cmake {
                 /*
@@ -53,11 +55,11 @@ android {
                 ABI（横向）和cpu（纵向）	armeabi	    armeabi-v7a	    arm64-v8a	mips	mips64	    x86	    x86_64
                 ARMv5	                  支持
                 ARMv7	                  支持	        支持
-                ARMv8	                  支持	        支持	            支持
+                ARMv8	                  支持	        支持	        支持
                 MIPS	 	 	 	                                            支持
                 MIPS64	 	 	 	                                            支持	      支持
                 x86	                    支持（3）	        支持（2）	 	 	 	                       支持（1）
-                x86_64	                  支持	 	 	 	 	                                    支持	        支持
+                x86_64	                  支持	 	 	 	 	                                    支持	  支持
                 ===================================================================================================
              */
             // abiFilters 'arm64-v8a'//, 'x86', 'armeabi-v7a', 'x86_64'
