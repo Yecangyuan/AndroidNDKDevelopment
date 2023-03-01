@@ -56,14 +56,31 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
         binding.sampleText.setCvCameraViewListener(this);
 
         mFaceDetection = new FaceDetection();
+        // 加在Haar级联分类器
 //        loadHaarCascade();
+        // 加载DNN模型
         loadDNNModel();
+        loadDNNRecognitionModel();
+
+        // 开始训练样本------->DNN
+        new Thread(() -> {
+            mFaceDetection.trainingDNNPattern();
+        }).start();
+
         // 开始训练样本
 //        mFaceDetection.trainingPattern();
         // 加载训练样本
 //        mFaceDetection.loadPattern("/storage/emulated/0/face_simley_pattern.xml");
 //        File file = new File(Environment.getExternalStorageDirectory(), "1.png");
 //        Log.e("TAG", file.getAbsolutePath());
+    }
+
+    /**
+     * 加载DNN 人脸识别模型
+     */
+    private void loadDNNRecognitionModel() {
+        String faceModel = FileUtil.copyRawFileToSDCard(this, "dnn", "openface_nn4_small2_v1_t7", R.raw.openface_nn4_small2_v1_t7);
+        mFaceDetection.loadDNNFaceRecognition(faceModel);
     }
 
     /**

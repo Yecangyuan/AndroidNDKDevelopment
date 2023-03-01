@@ -11,10 +11,12 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "cv_helper.h"
 #include "cardocr.h"
+#include "opencv2/dnn.hpp"
 
 using namespace cv;
 using namespace std;
 using namespace face;
+using namespace dnn;
 
 #define IMAGE_SIZE 24
 
@@ -253,7 +255,8 @@ Java_com_simley_ndk_1day78_bandcard_BankCardRecognition_cardOcr(JNIEnv *env, job
     return env->NewStringUTF("123123");
 }
 
-dnn::Net _net;
+Net _net;
+Net face_net;
 
 // 初始化DNN
 // 初始化置信阈值
@@ -262,6 +265,34 @@ double inScaleFactor;
 int inWidth;
 int inHeight;
 Scalar meanVal;
+vector<vector<float>> face_data;   // 每张人脸的特征向量信息
+vector<string> labels;     // 人脸对应名字
+
+
+void recognize_face(Mat &face, Net net, vector<float> &fv) {
+    Mat blob = blobFromImage(face, 1 / 255.0, Size(96, 96), Scalar(0, 0, 0), true, false);
+    net.setInput(blob);
+    Mat probMat = net.forward();
+    Mat vec = probMat.reshape(1, 1);
+    for (int i = 0; i < vec.cols; i++) {
+        fv.push_back(vec.at<float>(0, i));
+    }
+}
+
+float compare(vector<float> &fv1, vector<float> &fv2) {
+    float dot = 0;
+    float sum2 = 0;
+    float sum3 = 0;
+    for (int i = 0; i < fv1.size(); i++) {
+        dot += fv1[i] * fv2[i];
+        sum2 += pow(fv1[i], 2);
+        sum3 += pow(fv2[i], 2);
+    }
+    float norm = sqrt(sum2) * sqrt(sum3);
+    float similary = dot / norm;
+    float dist = acos(similary) / CV_PI;
+    return dist;
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -296,15 +327,22 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
         LOGE("--(!) 摄像头未捕获到图像帧 -- return!");
         return;
     }
-
-    Mat grayMat;
+    int width = src->cols;
+    int height = src->rows;
     // 修改通道数
     if ((*src).channels() == 4) {
-        cvtColor(*src, grayMat, COLOR_BGRA2BGR);
+        cvtColor(*src, *src, COLOR_BGRA2BGR);
     }
 
+//    Mat grayMat;
+//    // 修改通道数
+//    if ((*src).channels() == 4) {
+//        cvtColor(*src, grayMat, COLOR_BGRA2BGR);
+//    }
+//    LOGD("grayMat通道数为%d", grayMat.channels());
+
     // 输入数据调整
-    Mat inputBlob = dnn::blobFromImage(grayMat, inScaleFactor,
+    Mat inputBlob = dnn::blobFromImage(*src, inScaleFactor,
                                        Size(inWidth, inHeight), meanVal, false, false);
 
     _net.setInput(inputBlob, "data");
@@ -316,41 +354,97 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
 
     std::vector<Rect> faces;
     for (int i = 0; i < detectionMat.rows; i++) {
-        //置值度获取
+        // 置值度获取
         float confidence = detectionMat.at<float>(i, 2);
         // 如果大于阈值说明检测到人脸
         if (confidence > confidenceThreshold) {
-            int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * grayMat.cols);
-            int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * grayMat.rows);
-            int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * grayMat.cols);
-            int yRightTop = static_cast<int>(detectionMat.at<float>(i, 6) * grayMat.rows);
+            int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * width);
+            int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * height);
+            int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * width);
+            int yRightTop = static_cast<int>(detectionMat.at<float>(i, 6) * height);
 
             Rect rect((int) xLeftBottom, (int) yLeftBottom, (int) (xRightTop - xLeftBottom),
                       (int) (yRightTop - yLeftBottom));
 
             faces.emplace_back(rect);
+
+            rectangle(*src, rect, Scalar(255, 0, 0, 255), 4, LINE_AA);
+
+//            Mat faceROI = (*src)(rect).clone();
+//
+//            LOGD("faceROI通道数为%d", faceROI.channels());
+//            // 人脸比对与识别
+//            vector<float> curr_fv;      // 计算当前人脸的特征向量
+//            recognize_face(faceROI, face_net, curr_fv);
+//            // 遍历计算与采样图片余弦相似度最小的人脸照片 并给出索引
+//            float minDist = 10;
+//            int index = 0;
+//            for (int i = 0; i < face_data.size(); i++) {
+//                float dist = compare(face_data[i], curr_fv);
+//                if (minDist > dist) {
+//                    minDist = dist;
+//                    index = i;
+//                }
+//            }
+//
+//            if (minDist < 0.19 && index >= 0) { //阈值限定  显示人名
+//                // 识别到了自己
+//                putText(*src, format("Simley:label=%s", labels[i].c_str()),
+//                        Point(rect.x + 20, rect.y - 20),
+//                        HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1,
+//                        LINE_AA);
+//            } else {
+//                // 不是自己
+//                putText(*src, format("UnKnow:label=%s", labels[i].c_str()),
+//                        Point(rect.x + 20, rect.y - 20),
+//                        HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
+//            }
         }
     }
 
-    for (const auto &face: faces) {
-        rectangle(*src, face, Scalar(255, 0, 0, 255), 4, LINE_AA);
-//        Mat faceROI = (*src)(face).clone();
-//
-//        detectEyes(src, face, faceROI);
-//
-//        // 用一个计数器，这里我们做及时的
-//        resize(faceROI, faceROI, Size(IMAGE_SIZE, IMAGE_SIZE));
-//        cvtColor(faceROI, faceROI, COLOR_BGRA2GRAY);
-//        int label = model->predict(faceROI);
-//        if (label == 11) {
-//            // 识别到了自己
-//            putText(*src, format("Simley:label=%d", label), Point(face.x + 20, face.y - 20),
-//                    HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
-//        } else {
-//            // 不是自己
-//            putText(*src, format("UnKnow:label=%d", label), Point(face.x + 20, face.y - 20),
-//                    HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
-//        }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_face_FaceDetection_loadDNNFaceRecognition(JNIEnv *env, jobject thiz,
+                                                                     jstring face_net_model) {
+    const string faceModel = env->GetStringUTFChars(face_net_model, 0);
+    face_net = readNetFromTorch(faceModel);      // 人脸识别模型
+
+    face_net.setPreferableBackend(DNN_BACKEND_OPENCV);
+    face_net.setPreferableTarget(DNN_TARGET_CPU);
+
+    if (!face_net.empty()) {
+        LOGE("DNN人脸识别模型加载成功");
+    } else {
+        LOGE("DNN人脸识别模型加载失败");
     }
+
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_face_FaceDetection_trainingDNNPattern(JNIEnv *env, jobject thiz) {
+
+
+    // 载入采集的样本数据
+    vector<string> faces;      // 采集的人脸图片名称 （含有路径）
+
+    // 分析每张照片  计算每张人脸照片的特征向量 为每张照片对应名称
+    for (int i = 1; i <= 7; ++i) {
+        vector<float> fv;
+        Mat sample = imread(format("/storage/emulated/0/face_%d.jpg", i), IMREAD_COLOR);
+        if (sample.empty()) {
+            LOGE("face mat is empty");
+            continue;
+        }
+        recognize_face(sample, face_net, fv);
+        LOGD("sample通道数为%d", sample.channels());
+
+        face_data.push_back(fv);
+
+        labels.emplace_back("YCY");
+    }
+
 
 }

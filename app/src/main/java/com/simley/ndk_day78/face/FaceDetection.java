@@ -29,6 +29,8 @@ public class FaceDetection {
 
     public native void loadDNNFaceDetector(String modelBin, String modelDes);
 
+    public native void loadDNNFaceRecognition(String faceNetModel);
+
     public native void faceDetectionDNN(long nativeObj);
 
     /**
@@ -50,4 +52,5 @@ public class FaceDetection {
      */
     public native void loadPattern(String patternPath);
 
+    public native void trainingDNNPattern();
 }
