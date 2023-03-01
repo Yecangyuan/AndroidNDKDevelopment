@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
@@ -19,7 +18,7 @@ import android.widget.Toast;
 
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityFaceDetectionBinding;
-import com.simley.ndk_day78.databinding.ActivityMainBinding;
+import com.simley.ndk_day78.utils.FileUtil;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
@@ -27,9 +26,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class FaceDetectionActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -58,79 +54,36 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
         binding.sampleText.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         cameraId = CameraBridgeViewBase.CAMERA_ID_FRONT;
         binding.sampleText.setCvCameraViewListener(this);
-        copyFaceCascadeFile();
-        copyEyeCascadeFile();
 
         mFaceDetection = new FaceDetection();
-        // 加载级联分类器 CascadeClassifier
-        mFaceDetection.loadFaceCascade(mFaceCascadeFile.getAbsolutePath());
-        mFaceDetection.loadEyeCascade(mEyeCascadeFile.getAbsolutePath());
-
+//        loadHaarCascade();
+        loadDNNModel();
         // 开始训练样本
-        mFaceDetection.trainingPattern();
+//        mFaceDetection.trainingPattern();
         // 加载训练样本
-        mFaceDetection.loadPattern("/storage/emulated/0/face_simley_pattern.xml");
-        File file = new File(Environment.getExternalStorageDirectory(), "1.png");
-        Log.e("TAG", file.getAbsolutePath());
+//        mFaceDetection.loadPattern("/storage/emulated/0/face_simley_pattern.xml");
+//        File file = new File(Environment.getExternalStorageDirectory(), "1.png");
+//        Log.e("TAG", file.getAbsolutePath());
     }
 
-
-    private void copyEyeCascadeFile() {
-        InputStream is = getResources().openRawResource(R.raw.haarcascade_eye_tree_eyeglasses);
-        File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-        mEyeCascadeFile = new File(cascadeDir, "haarcascade_eye_tree_eyeglasses.xml");
-        if (mEyeCascadeFile.exists()) return;
-        FileOutputStream os = null;
-        try {
-            os = new FileOutputStream(mEyeCascadeFile);
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException ignored) {
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-                if (os != null) {
-                    os.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    /**
+     * 加载DNN 人脸检测模型
+     */
+    private void loadDNNModel() {
+        String modelDesc = FileUtil.copyRawFileToSDCard(this, "dnn", "opencv_face_detector.pbtxt", R.raw.opencv_face_detector);
+        String modelBin = FileUtil.copyRawFileToSDCard(this, "dnn", "opencv_face_detector_uint8.pb", R.raw.opencv_face_detector_uint8);
+        mFaceDetection.loadDNNFaceDetector(modelBin, modelDesc);
     }
 
-    private void copyFaceCascadeFile() {
-        InputStream is = getResources().openRawResource(R.raw.haarcascade_frontalface_alt);
-        File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-        mFaceCascadeFile = new File(cascadeDir, "haarcascade_frontalface_alt.xml");
-        if (mFaceCascadeFile.exists()) return;
-        FileOutputStream os = null;
-        try {
-            os = new FileOutputStream(mFaceCascadeFile);
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException ignored) {
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-                if (os != null) {
-                    os.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    /**
+     * 加载Haar级联分类器
+     */
+    private void loadHaarCascade() {
+        // 加载级联分类器 CascadeClassifier
+        String eyeCascadeFile = FileUtil.copyRawFileToSDCard(this, "cascade", "haarcascade_eye_tree_eyeglasses.xml", R.raw.haarcascade_eye_tree_eyeglasses);
+        String faceCascadeFile = FileUtil.copyRawFileToSDCard(this, "cascade", "haarcascade_frontalface_alt.xml", R.raw.haarcascade_frontalface_alt);
+        mFaceDetection.loadFaceCascade(faceCascadeFile);
+        mFaceDetection.loadEyeCascade(eyeCascadeFile);
     }
 
 
@@ -228,7 +181,8 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
 //                    break;
 //            }
 //        }
-        mFaceDetection.faceDetection(rgba);
+        mFaceDetection.faceDetectionDNN(rgba.nativeObj);
+//        mFaceDetection.faceDetection(rgba);
         Size size = new Size(cameraView.getWidth(), cameraView.getHeight());
         Imgproc.resize(rgba, rgba, size);
         return rgba;

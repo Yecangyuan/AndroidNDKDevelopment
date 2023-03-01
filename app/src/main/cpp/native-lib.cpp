@@ -25,6 +25,8 @@ CascadeClassifier eyeCascadeClassifier;
 // 人脸识别模型
 Ptr<BasicFaceRecognizer> model = EigenFaceRecognizer::create();
 
+void detectEyes(const Mat *src, const Rect &face, const Mat &faceROI);
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_face_FaceDetection_faceDetection(JNIEnv *env, jobject thiz,
@@ -64,16 +66,8 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetection(JNIEnv *env, jobject
 //                Scalar(255, 0, 255), 4, 8, 0);
         rectangle(*src, face, Scalar(255, 0, 0, 255), 4, LINE_AA);
         Mat faceROI = (*src)(face).clone();
-        std::vector<Rect> eyes;
-        //-- 在每张人脸上检测双眼
-        eyeCascadeClassifier.detectMultiScale(faceROI, eyes, 1.1, 2, 0 | CASCADE_SCALE_IMAGE,
-                                              Size(30, 30));
 
-        for (const auto &eye: eyes) {
-            Point center(face.x + eye.x + eye.width * 0.5, face.y + eye.y + eye.height * 0.5);
-            int radius = cvRound((eye.width + eye.height) * 0.25);
-            circle(*src, center, radius, Scalar(255, 0, 0, 255), 4, LINE_AA, 0);
-        }
+        detectEyes(src, face, faceROI);
 
         // 用一个计数器，这里我们做及时的
         resize(faceROI, faceROI, Size(IMAGE_SIZE, IMAGE_SIZE));
@@ -100,6 +94,21 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetection(JNIEnv *env, jobject
 
 
 }
+
+void detectEyes(const Mat *src, const Rect &face, const Mat &faceROI) {
+    vector<Rect> eyes;
+
+    // 在每张人脸上检测双眼
+    eyeCascadeClassifier.detectMultiScale(faceROI, eyes, 1.1, 2, 0 | CASCADE_SCALE_IMAGE,
+                                          Size(30, 30));
+
+    for (const auto &eye: eyes) {
+        Point center(face.x + eye.x + eye.width * 0.5, face.y + eye.y + eye.height * 0.5);
+        int radius = cvRound((eye.width + eye.height) * 0.25);
+        circle(*src, center, radius, Scalar(255, 0, 0, 255), 4, LINE_AA, 0);
+    }
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simley_ndk_1day78_face_FaceDetection_loadFaceCascade(JNIEnv *env, jobject thiz,
@@ -242,4 +251,106 @@ Java_com_simley_ndk_1day78_bandcard_BankCardRecognition_cardOcr(JNIEnv *env, job
         i++;
     }
     return env->NewStringUTF("123123");
+}
+
+dnn::Net _net;
+
+// 初始化DNN
+// 初始化置信阈值
+float confidenceThreshold;
+double inScaleFactor;
+int inWidth;
+int inHeight;
+Scalar meanVal;
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_face_FaceDetection_loadDNNFaceDetector(JNIEnv *env, jobject thiz,
+                                                                  jstring model_bin,
+                                                                  jstring model_des) {
+    string sbinary = env->GetStringUTFChars(model_bin, 0);
+    string sdesc = env->GetStringUTFChars(model_des, 0);
+
+    confidenceThreshold = 0.6;
+    inScaleFactor = 0.5;
+    inWidth = 300;
+    inHeight = 300;
+    meanVal = Scalar(104.0, 177.0, 123.0);
+
+    _net = dnn::readNetFromTensorflow(sbinary, sdesc);
+    _net.setPreferableBackend(dnn::DNN_BACKEND_OPENCV);
+    _net.setPreferableTarget(dnn::DNN_TARGET_CPU);
+
+    if (!_net.empty()) {
+        LOGE("DNN人脸检测模型加载成功");
+    } else {
+        LOGE("DNN人脸检测模型加载失败");
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobject thiz,
+                                                               jlong native_obj) {
+    Mat *src = reinterpret_cast<Mat *>(native_obj);
+    if (src->empty()) {
+        LOGE("--(!) 摄像头未捕获到图像帧 -- return!");
+        return;
+    }
+
+    Mat grayMat;
+    // 修改通道数
+    if ((*src).channels() == 4) {
+        cvtColor(*src, grayMat, COLOR_BGRA2BGR);
+    }
+
+    // 输入数据调整
+    Mat inputBlob = dnn::blobFromImage(grayMat, inScaleFactor,
+                                       Size(inWidth, inHeight), meanVal, false, false);
+
+    _net.setInput(inputBlob, "data");
+
+    // 人脸检测
+    Mat detection = _net.forward("detection_out");
+
+    Mat detectionMat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
+
+    std::vector<Rect> faces;
+    for (int i = 0; i < detectionMat.rows; i++) {
+        //置值度获取
+        float confidence = detectionMat.at<float>(i, 2);
+        // 如果大于阈值说明检测到人脸
+        if (confidence > confidenceThreshold) {
+            int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * grayMat.cols);
+            int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * grayMat.rows);
+            int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * grayMat.cols);
+            int yRightTop = static_cast<int>(detectionMat.at<float>(i, 6) * grayMat.rows);
+
+            Rect rect((int) xLeftBottom, (int) yLeftBottom, (int) (xRightTop - xLeftBottom),
+                      (int) (yRightTop - yLeftBottom));
+
+            faces.emplace_back(rect);
+        }
+    }
+
+    for (const auto &face: faces) {
+        rectangle(*src, face, Scalar(255, 0, 0, 255), 4, LINE_AA);
+//        Mat faceROI = (*src)(face).clone();
+//
+//        detectEyes(src, face, faceROI);
+//
+//        // 用一个计数器，这里我们做及时的
+//        resize(faceROI, faceROI, Size(IMAGE_SIZE, IMAGE_SIZE));
+//        cvtColor(faceROI, faceROI, COLOR_BGRA2GRAY);
+//        int label = model->predict(faceROI);
+//        if (label == 11) {
+//            // 识别到了自己
+//            putText(*src, format("Simley:label=%d", label), Point(face.x + 20, face.y - 20),
+//                    HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
+//        } else {
+//            // 不是自己
+//            putText(*src, format("UnKnow:label=%d", label), Point(face.x + 20, face.y - 20),
+//                    HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
+//        }
+    }
+
 }

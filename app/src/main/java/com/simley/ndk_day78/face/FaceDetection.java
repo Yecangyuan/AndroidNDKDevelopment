@@ -27,6 +27,10 @@ public class FaceDetection {
      */
     public native void loadEyeCascade(String filePath);
 
+    public native void loadDNNFaceDetector(String modelBin, String modelDes);
+
+    public native void faceDetectionDNN(long nativeObj);
+
     /**
      * 人脸识别
      *

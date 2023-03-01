@@ -54,8 +54,8 @@ public class MyGLRenderer implements
     public MyGLRenderer(MyGLSurfaceView mGLSurfaceView) {
         this.mGLSurfaceView = mGLSurfaceView;
         // 大眼相关代码】  assets Copy到SD卡
-        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "lbpcascade_frontalface.xml",
-                "/sdcard/lbpcascade_frontalface.xml"); // OpenCV的模型
+        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "haarcascade_frontalface_alt.xml",
+                "/sdcard/haarcascade_frontalface_alt.xml"); // OpenCV的模型
         FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
                 "/sdcard/seeta_fa_v1.1.bin"); // 中科院的模型
 
@@ -109,7 +109,7 @@ public class MyGLRenderer implements
         mHeight = height;
 
         // 创建人脸检测跟踪器
-        mFaceTrack = new FaceTrack("/sdcard/lbpcascade_frontalface.xml", "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
+        mFaceTrack = new FaceTrack("/sdcard/haarcascade_frontalface_alt.xml", "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
         mFaceTrack.startTrack(); // 启动跟踪器
 
         mCameraHelper.startPreview(mSurfaceTexture); // 开始预览
