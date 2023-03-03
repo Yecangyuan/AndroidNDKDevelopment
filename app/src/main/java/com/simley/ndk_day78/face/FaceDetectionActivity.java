@@ -49,7 +49,7 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         binding = ActivityFaceDetectionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        requestPermission();
+        activateOpenCVCameraView();
 
         binding.sampleText.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         cameraId = CameraBridgeViewBase.CAMERA_ID_FRONT;
@@ -116,40 +116,21 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
         binding.sampleText.disableView();
     }
 
-
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                activateOpenCVCameraView();
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-            } else {
-                requestPermissions(new String[]{Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_CODE_ADDRESS);
-            }
-        }
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CODE_ADDRESS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                // Permission Granted 授予权限
-                //处理授权之后逻辑
-                activateOpenCVCameraView();
-            } else {
-                // Permission Denied 权限被拒绝
-                Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show();
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == REQUEST_CODE_ADDRESS) {
+//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+//                // Permission Granted 授予权限
+//                //处理授权之后逻辑
+//                activateOpenCVCameraView();
+//            } else {
+//                // Permission Denied 权限被拒绝
+//                Toast.makeText(this, "权限被拒绝", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//    }
 
     private void activateOpenCVCameraView() {
         // everything needed to start a camera preview

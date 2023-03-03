@@ -270,8 +270,11 @@ vector<string> labels;     // 人脸对应名字
 
 int s = 1;
 
-void recognize_face(Mat &face, Net net, vector<float> &fv) {
+void recognizeFace(Mat &face, Net net, vector<float> &fv) {
     Mat blob = blobFromImage(face, 1 / 255.0, Size(96, 96), Scalar(0, 0, 0), true, false);
+//    if (face.type() == CV_8UC3 && face.channels() == 3) {
+//        LOGD("face的通道数:%d且face图像为BGR格式", face.channels());
+//    }
     imwrite(format("/storage/emulated/0/source%d.jpg", s), face);
     imwrite(format("/storage/emulated/0/training%d.jpg", s++), blob);
     net.setInput(blob);
@@ -313,7 +316,7 @@ Java_com_simley_ndk_1day78_face_FaceDetection_loadDNNFaceDetector(JNIEnv *env, j
     inHeight = 300;
     meanVal = Scalar(104.0, 177.0, 123.0);
 
-    _net = dnn::readNetFromTensorflow(sbinary, sdesc);
+    _net = readNetFromTensorflow(sbinary, sdesc);
     _net.setPreferableBackend(dnn::DNN_BACKEND_OPENCV);
     _net.setPreferableTarget(dnn::DNN_TARGET_CPU);
 
@@ -372,6 +375,7 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
             Rect rect((int) xLeftBottom, (int) yLeftBottom, (int) (xRightTop - xLeftBottom),
                       (int) (yRightTop - yLeftBottom));
 
+            // TODO 可以拍摄人脸然后用做 特征值训练
 //            faces.emplace_back(rect);
 //            LOGD("detectionMat的宽%d,detectionMat的高%d", detectionMat.cols, detectionMat.rows);
 
@@ -380,7 +384,7 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
             LOGD("rect的x坐标：%d，rect的y坐标：%d，rect的宽：%d,rect的高：%d", rect.x, rect.y,
                  rect.width, rect.height);
             // 对roi部分进行范围检测，如果小于零 或者 大于原图的大小，则直接break
-            if (rect.x < 0 || rect.y < 0 || rect.width < 0 || rect.height < 0 ||
+            if (rect.x <= 0 || rect.y <= 0 || rect.width <= 0 || rect.height <= 0 ||
                 rect.x + rect.width > src->cols || rect.y + rect.height > src->rows) {
                 break;
             }
@@ -388,7 +392,7 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
 //            // 人脸比对与识别
 //            vector<float> curr_fv;
 //            // 计算当前人脸的特征向量
-//            recognize_face(faceROI, face_net, curr_fv);
+//            recognizeFace(faceROI, face_net, curr_fv);
 //
 //            // 遍历计算与采样图片余弦相似度最小的人脸照片 并给出索引
 //            float minDist = 10;
@@ -400,15 +404,16 @@ Java_com_simley_ndk_1day78_face_FaceDetection_faceDetectionDNN(JNIEnv *env, jobj
 //                    index = j;
 //                }
 //            }
+//
 //            if (minDist < 0.19 && index >= 0) { // 阈值限定  显示人名
 //                // 识别到了自己
-//                putText(*src, format("Simley:label=%s", labels[i].c_str()),
+//                putText(*src, format("Simley:label=%s", labels[index].c_str()),
 //                        Point(rect.x + 20, rect.y - 20),
-//                        HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1,
+//                        HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 255, 0), 1,
 //                        LINE_AA);
 //            } else {
 //                // 不是自己
-//                putText(*src, format("UnKnow:label=%s", labels[i].c_str()),
+//                putText(*src, format("UnKnow:label=%s", labels[index].c_str()),
 //                        Point(rect.x + 20, rect.y - 20),
 //                        HersheyFonts::FONT_HERSHEY_TRIPLEX, 1, Scalar(255, 0, 0, 255), 1, LINE_AA);
 //            }
@@ -454,7 +459,44 @@ Java_com_simley_ndk_1day78_face_FaceDetection_trainingDNNPattern(JNIEnv *env, jo
             LOGE("face mat is empty");
             continue;
         }
-        recognize_face(sample, face_net, fv);
+
+//        Mat inputBlob = blobFromImage(sample, inScaleFactor,
+//                                      Size(inWidth, inHeight), meanVal, false, false);
+//        imwrite(format("/storage/emulated/0/inputBlob%d.jpg", i), inputBlob);
+//        _net.setInput(inputBlob, "data");
+//        // 人脸检测
+//        Mat detection = _net.forward("detection_out");
+//        Mat detectionMat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
+//
+//        int maxDetections = 1;  // 最多只检测一个人
+//        Mat faceROI;
+//        for (int j = 0; j < detectionMat.rows; j++) {
+//            // 置值度获取
+//            float confidence = detectionMat.at<float>(j, 2);
+//            // 如果大于阈值说明检测到人脸
+//            if (confidence > confidenceThreshold) {
+//                int xLeftBottom = static_cast<int>(detectionMat.at<float>(j, 3) * sample.cols);
+//                int yLeftBottom = static_cast<int>(detectionMat.at<float>(j, 4) * sample.rows);
+//                int xRightTop = static_cast<int>(detectionMat.at<float>(j, 5) * sample.cols);
+//                int yRightTop = static_cast<int>(detectionMat.at<float>(j, 6) * sample.rows);
+//
+//                Rect rect((int) xLeftBottom, (int) yLeftBottom, (int) (xRightTop - xLeftBottom),
+//                          (int) (yRightTop - yLeftBottom));
+//
+//                if (rect.x <= 0 || rect.y <= 0 || rect.width <= 0 || rect.height <= 0 ||
+//                    rect.x + rect.width > sample.cols || rect.y + rect.height > sample.rows) {
+//                    break;
+//                }
+//                faceROI = sample(rect).clone();
+//
+//                // 限制检测结果的数量
+//                if (--maxDetections <= 0) {
+//                    break;
+//                }
+//            }
+//        }
+
+        recognizeFace(sample, face_net, fv);
         LOGD("sample通道数为%d", sample.channels());
 
         face_data.push_back(fv);
