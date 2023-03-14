@@ -14,7 +14,7 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_simley_ndk_1day78_serialport_SerialPort_closeNative(JNIEnv *env, jobject thiz);
+Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobject thiz);
 
 /* 通过串口的波特率等信息，构建Java对象-FileDescriptor
  * Class:     android_serialport_api_SerialPort
@@ -22,12 +22,15 @@ Java_com_simley_ndk_1day78_serialport_SerialPort_closeNative(JNIEnv *env, jobjec
  * Signature: (Ljava/lang/String;II)Ljava/io/FileDescriptor;
  */
 JNIEXPORT jobject JNICALL
-Java_com_simley_ndk_1day78_serialport_SerialPort_openNative(JNIEnv *env, jobject thiz, jstring path,
+Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz, jstring path,
                                                             jint baud_rate, jint flags);
+
 
 #ifdef __cplusplus
 }
 #endif
 #endif
+
+
 
 

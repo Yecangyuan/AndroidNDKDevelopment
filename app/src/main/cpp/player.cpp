@@ -428,8 +428,6 @@ jmethodID get_audio_track_write(JNIEnv *env, jobject audio_track) {
 YECallJava *callJava = NULL;
 YEFFmpeg *ffmpeg = NULL;
 YEPlayStatus *play_status = NULL;
-
-
 _JavaVM *java_vm;
 
 /*

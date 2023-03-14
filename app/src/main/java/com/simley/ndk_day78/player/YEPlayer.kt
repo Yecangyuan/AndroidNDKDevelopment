@@ -4,6 +4,8 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.media.MediaPlayer
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Log
 import android.view.Surface
@@ -14,11 +16,12 @@ import com.simley.ndk_day78.utils.ThreadPool
  * 音视频播放器
  */
 class YEPlayer {
+
     private var mSource: String? = null // 数据源
     private var iPlayerListener: IPlayerListener? = null // 音视频播放回调接口
 
     // 回调函数，当数据准备好的时候native层会回调该接口的onPrepared()方法
-    private var wlOnPreparedListener: WlOnPreparedListener? = null
+    private var iOnPreparedListener: IOnPreparedListener? = null
     private var yeglSurfaceView: YEGLSurfaceView? = null
     private val playState = PlayState.STARTED
     var duration = 0 // 播放时长
@@ -202,8 +205,8 @@ class YEPlayer {
     }
 
     fun onCallPrepared() {
-        if (wlOnPreparedListener != null) {
-            wlOnPreparedListener!!.onPrepared()
+        if (iOnPreparedListener != null) {
+            iOnPreparedListener!!.onPrepared()
         }
     }
 
@@ -238,10 +241,10 @@ class YEPlayer {
     /**
      * 设置准备接口回调
      *
-     * @param wlOnPreparedListener
+     * @param iOnPreparedListener
      */
-    fun setWlOnPreparedListener(wlOnPreparedListener: WlOnPreparedListener?) {
-        this.wlOnPreparedListener = wlOnPreparedListener
+    fun setWlOnPreparedListener(iOnPreparedListener: IOnPreparedListener?) {
+        this.iOnPreparedListener = iOnPreparedListener
     }
 
     /**
@@ -253,8 +256,8 @@ class YEPlayer {
      */
     private fun createAudioTrack(sampleRateInHz: Int, nbChannels: Int): AudioTrack {
         Log.d(YEPlayer::class.java.simpleName, "初始化播放器成功")
-        val channelsConfig: Int // 通道数
-        channelsConfig = when (nbChannels) {
+        // 通道数
+        val channelsConfig: Int = when (nbChannels) {
             1 -> AudioFormat.CHANNEL_OUT_MONO
             2 -> AudioFormat.CHANNEL_OUT_STEREO
             else -> AudioFormat.CHANNEL_OUT_MONO
@@ -293,7 +296,7 @@ class YEPlayer {
      * @param percent
      */
     fun setVolume(percent: Int) {
-        if (percent >= 0 && percent <= 100) {
+        if (percent in 0..100) {
             nativeVolume(percent)
         }
     }
@@ -322,6 +325,30 @@ class YEPlayer {
         nativeMute(mute)
     }
 
+
+//    internal class TrackInfo() : Parcelable {
+//        constructor(parcel: Parcel) : this() {
+//        }
+//
+//        override fun describeContents(): Int {
+//        }
+//
+//        override fun writeToParcel(p0: Parcel, p1: Int) {
+//
+//        }
+//
+//        companion object CREATOR : Parcelable.Creator<MediaPlayer.TrackInfo> {
+//            override fun createFromParcel(parcel: Parcel): MediaPlayer.TrackInfo {
+//                return TrackInfo(parcel)
+//            }
+//
+//            override fun newArray(size: Int): Array<TrackInfo?> {
+//                return arrayOfNulls(size)
+//            }
+//        }
+//
+//    }
+
     /**
      * 播放状态
      */
@@ -329,17 +356,84 @@ class YEPlayer {
         STARTED, PLAYING, PAUSED, STOPPED
     }
 
-    interface WlOnPreparedListener {
+    /**
+     * 准备播放接口
+     */
+    interface IOnPreparedListener {
         fun onPrepared()
     }
 
+    /**
+     * 播放器接口
+     */
     interface IPlayerListener {
+
+        /**
+         * 加载
+         */
         fun onLoad(load: Boolean)
+
+        /**
+         * 回调当前时间
+         * @param currentTime 当前播放时间
+         * @param totalTime 总时长
+         */
         fun onCurrentTime(currentTime: Int, totalTime: Int)
+
+        /**
+         * 错误
+         */
         fun onError(code: Int, msg: String?)
+
+        /**
+         * 暂停
+         */
         fun onPause(pause: Boolean)
+
         fun onDbValue(db: Int)
+
+        /**
+         * 播放完成
+         */
         fun onComplete()
+
+        /**
+         * 播放下一个
+         */
         fun onNext(): String?
+    }
+
+    companion object {
+        const val MEDIA_ERROR_IO = -1004
+        const val MEDIA_ERROR_MALFORMED = -1007
+        const val MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK = 200
+        const val MEDIA_ERROR_SERVER_DIED = 100
+        const val MEDIA_ERROR_TIMED_OUT = -110
+        const val MEDIA_ERROR_UNKNOWN = 1
+        const val MEDIA_ERROR_UNSUPPORTED = -1010
+        const val MEDIA_INFO_AUDIO_NOT_PLAYING = 804
+        const val MEDIA_INFO_BAD_INTERLEAVING = 800
+        const val MEDIA_INFO_BUFFERING_END = 702
+        const val MEDIA_INFO_BUFFERING_START = 701
+        const val MEDIA_INFO_METADATA_UPDATE = 802
+        const val MEDIA_INFO_NOT_SEEKABLE = 801
+        const val MEDIA_INFO_STARTED_AS_NEXT = 2
+        const val MEDIA_INFO_SUBTITLE_TIMED_OUT = 902
+        const val MEDIA_INFO_UNKNOWN = 1
+        const val MEDIA_INFO_UNSUPPORTED_SUBTITLE = 901
+        const val MEDIA_INFO_VIDEO_NOT_PLAYING = 805
+        const val MEDIA_INFO_VIDEO_RENDERING_START = 3
+        const val MEDIA_INFO_VIDEO_TRACK_LAGGING = 700
+        const val MEDIA_MIMETYPE_TEXT_SUBRIP = "application/x-subrip"
+        const val PREPARE_DRM_STATUS_PREPARATION_ERROR = 3
+        const val PREPARE_DRM_STATUS_PROVISIONING_NETWORK_ERROR = 1
+        const val PREPARE_DRM_STATUS_PROVISIONING_SERVER_ERROR = 2
+        const val PREPARE_DRM_STATUS_SUCCESS = 0
+        const val SEEK_CLOSEST = 3
+        const val SEEK_CLOSEST_SYNC = 2
+        const val SEEK_NEXT_SYNC = 1
+        const val SEEK_PREVIOUS_SYNC = 0
+        const val VIDEO_SCALING_MODE_SCALE_TO_FIT = 1
+        const val VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING = 2
     }
 }

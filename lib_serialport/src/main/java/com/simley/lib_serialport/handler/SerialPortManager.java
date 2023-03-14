@@ -5,6 +5,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 
+
 import androidx.annotation.NonNull;
 
 import com.simley.lib_serialport.bean.T;

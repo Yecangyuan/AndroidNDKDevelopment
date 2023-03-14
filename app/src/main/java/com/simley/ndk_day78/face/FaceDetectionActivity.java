@@ -122,7 +122,7 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
 //        if (requestCode == REQUEST_CODE_ADDRESS) {
 //            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 //                // Permission Granted 授予权限
-//                //处理授权之后逻辑
+//                // 处理授权之后逻辑
 //                activateOpenCVCameraView();
 //            } else {
 //                // Permission Denied 权限被拒绝

@@ -6,15 +6,16 @@ import java.io.IOException;
 
 public class SerialPort {
 
-//    static {
-//        System.loadLibrary("SerialPort");
-//    }
+    static {
+        System.loadLibrary("SerialPort");
+    }
 
     private static final String TAG = SerialPort.class.getSimpleName();
 
     /**
      * 文件设置最高权限 777 可读 可写 可执行
-     * @param  file 你要对那个文件，获取root权限
+     *
+     * @param file 你要对那个文件，获取root权限
      * @return 权限修改是否成功- 返回：成功 与 失败 结果
      */
     boolean chmod777(File file) {
@@ -40,6 +41,7 @@ public class SerialPort {
 
     /**
      * 通过串口的波特率等信息，构建Java对象-FileDescriptor
+     *
      * @param path     串口文件的路径
      * @param baudRate 波特率（相当于：Android系统设备层 与 硬件层 通讯所共识的频率）
      * @return FileDescriptor 文件读写流（文件句柄） InputStream/OutputStream=串口 发/收

@@ -87,7 +87,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         intentFilter.addAction(ACTION_OPT_MUSIC_RIGHT);
         intentFilter.addAction(ACTION_OPT_MUSIC_VOLUME);
         intentFilter.addAction(ACTION_OPT_MUSIC_CENTER);
-
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_NO_PITCH);
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_NO_AN_PITCH);
         intentFilter.addAction(ACTION_OPT_MUSIC_SPEED_AN_PITCH);

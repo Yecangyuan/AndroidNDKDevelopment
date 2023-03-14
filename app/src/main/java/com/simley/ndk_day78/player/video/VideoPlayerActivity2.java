@@ -123,7 +123,7 @@ public class VideoPlayerActivity2 extends AppCompatActivity {
 
     public void begin(View view) {
 
-        yePlayer.setWlOnPreparedListener(new YEPlayer.WlOnPreparedListener() {
+        yePlayer.setWlOnPreparedListener(new YEPlayer.IOnPreparedListener() {
             @Override
             public void onPrepared() {
                 Log.d(this.getClass().getSimpleName(), "准备好了，可以开始播放声音了");

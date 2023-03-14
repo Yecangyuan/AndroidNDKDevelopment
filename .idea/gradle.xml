@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/lib_layout" />
             <option value="$PROJECT_DIR$/lib_mvp" />
             <option value="$PROJECT_DIR$/lib_network" />
+            <option value="$PROJECT_DIR$/lib_rtmp" />
             <option value="$PROJECT_DIR$/lib_serialport" />
           </set>
         </option>

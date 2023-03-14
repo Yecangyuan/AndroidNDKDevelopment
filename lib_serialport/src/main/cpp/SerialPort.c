@@ -99,7 +99,7 @@ static speed_t getBaudrate(jint baudrate) {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_simley_ndk_1day78_serialport_SerialPort_closeNative(JNIEnv *env, jobject thiz) {
+Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobject thiz) {
     jclass SerialPortClass = (*env)->GetObjectClass(env, thiz);
     jclass FileDescriptorClass = (*env)->FindClass(env, "java/io/FileDescriptor");
 
@@ -124,8 +124,9 @@ Java_com_simley_ndk_1day78_serialport_SerialPort_closeNative(JNIEnv *env, jobjec
  */
 JNIEXPORT jobject
 JNICALL
-Java_com_simley_ndk_1day78_serialport_SerialPort_openNative(JNIEnv *env, jobject thiz, jstring path,
-                                                            jint baud_rate, jint flags) {
+Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz,
+                                                              jstring path,
+                                                              jint baud_rate, jint flags) {
     int fd; // Linux串口文件句柄（本次整个函数最终的关键成果）
     speed_t speed; // 波特率类型的值
     jobject mFileDescriptor; // 文件句柄(最终返回的成果)
