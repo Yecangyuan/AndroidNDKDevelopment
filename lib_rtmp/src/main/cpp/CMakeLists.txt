@@ -13,6 +13,8 @@ include_directories(./librtmp)
 add_library(lib_rtmp
         SHARED
         # Provides a relative path to your source file(s).
+        lib_rtmp.c
+        rtmpmuxer.c   # 复用器
         ./librtmp/amf.c
         ./librtmp/amf.h
         ./librtmp/bytes.h

@@ -34,7 +34,6 @@ public class SerialPortManager extends SerialPort {
     private FileDescriptor mFd; // 文件句柄，对应native的fd
     private OnOpenSerialPortListener mOnOpenSerialPortListener; // 打开串口的监听（打开成功，打开失败）
     private OnSerialPortDataListener mOnSerialPortDataListener; // 串口消息的监听（读取串口消息，写入串口消息）
-
     private HandlerThread mSendingHandlerThread; // 开启发送消息的线程
     private Handler mSendingHandler; // 发送串口数据的Handler
     private SerialPortReadThread mSerialPortReadThread; // 接收消息的线程
@@ -116,9 +115,9 @@ public class SerialPortManager extends SerialPort {
     public boolean sendBytes(byte[] sendBytes) {
         if (null != mFd && null != mFileInputStream && null != mFileOutputStream) {
             if (null != mSendingHandler) {
-                Message message = Message.obtain();
-                message.obj = sendBytes;
-                return mSendingHandler.sendMessage(message);
+                Message msg = Message.obtain();
+                msg.obj = sendBytes;
+                return mSendingHandler.sendMessage(msg);
             }
         }
         return false;
