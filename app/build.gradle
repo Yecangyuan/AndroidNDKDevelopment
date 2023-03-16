@@ -154,7 +154,6 @@ android {
 dependencies {
 
     implementation files("libs\\fmod.jar")
-    implementation project(path: ':lib_rtmp')
     println('===================开始聚合所需模块===================')
     int orderNum = 1
     rootProject.projectsPath.each { path ->

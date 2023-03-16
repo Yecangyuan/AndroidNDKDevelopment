@@ -55,7 +55,7 @@ public class SelectSerialPortActivity extends AppCompatActivity implements Adapt
 
         Intent intent = new Intent(this, SerialPortActivity.class); // SerialPortActivity串口读写操作
         intent.putExtra(SerialPortActivity.DEVICE, device); // 传递串口设备对象
-        intent.putExtra(SerialPortActivity.BOTELV, btlv.getText().toString().trim()); // 传递波特率
+        intent.putExtra(SerialPortActivity.BAUD_RATE, btlv.getText().toString().trim()); // 传递波特率
         startActivity(intent); // 启动SerialPortActivity
     }
 }

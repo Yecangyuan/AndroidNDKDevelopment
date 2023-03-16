@@ -22,8 +22,12 @@ Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobj
  * Signature: (Ljava/lang/String;II)Ljava/io/FileDescriptor;
  */
 JNIEXPORT jobject JNICALL
-Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz, jstring path,
-                                                            jint baud_rate, jint flags);
+Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz,
+                                                              jstring path,
+                                                              jint baud_rate, jint stopBits,
+                                                              jint dataBits,
+                                                              jint parity, jint flowCon,
+                                                              jint flags);
 
 
 #ifdef __cplusplus

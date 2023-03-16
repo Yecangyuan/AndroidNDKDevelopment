@@ -23,8 +23,8 @@ import java.util.Arrays;
 public class SerialPortActivity extends AppCompatActivity implements OnOpenSerialPortListener {
 
     public static final String DEVICE = "device"; // 接收串口文件的标识
-    public static final String BOTELV = "botelv"; // 接收波特率的标识
-    int botelv = -1; // 波特率
+    public static final String BAUD_RATE = "baudRate"; // 接收波特率的标识
+    int baudRate = -1; // 波特率
     private Toast mToast;
 
     private SerialPortManager mSerialPortManager; // 打开串口，关闭串口，发生串口数据 需用的关联类
@@ -40,11 +40,11 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
             finish();
             return;
         }
-        botelv = Integer.parseInt(getIntent().getStringExtra(BOTELV)); // 波特率
+        baudRate = Integer.parseInt(getIntent().getStringExtra(BAUD_RATE)); // 波特率
         String port = device.getFile().getAbsolutePath();
         // TODO：设置奇偶位、校验位、停止位、流控等
         Log.i(T.TAG, "SerialPortActivity onCreate: device = " + device); // device = Device{name='ttyS0', root='serial', file=/dev/ttyS0} 【0】
-        mSerialPortManager = new SerialPortManager(port, botelv);
+        mSerialPortManager = new SerialPortManager(port, baudRate);
         // 打开串口
         boolean openSerialPort = mSerialPortManager.setOnOpenSerialPortListener(this).setOnSerialPortDataListener(new OnSerialPortDataListener() {
                     /**
@@ -71,7 +71,7 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
                         runOnUiThread(() -> showToast(String.format("发送\n%s", new String(finalBytes))));
                     }
                 })
-                .openSerialPort(device.getFile(), botelv); // 串口设备文件，波特率
+                .openSerialPort(device.getFile(), baudRate); // 串口设备文件，波特率
 
         Log.i(T.TAG, "SerialPortActivity onCreate: openSerialPort = " + openSerialPort);
         // openSerialPort = true 【4】
@@ -154,7 +154,7 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
      * @param view view 布局上的按钮点击事件
      */
     public void onSend(View view) {
-        EditText editTextSendContent = (EditText) findViewById(R.id.et_send_content);
+        EditText editTextSendContent = findViewById(R.id.et_send_content);
         if (null == editTextSendContent) {
             return;
         }
