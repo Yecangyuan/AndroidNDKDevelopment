@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.multidex.MultiDexApplication
 import com.tencent.bugly.crashreport.CrashReport
 
+/**
+ * 当dex文件中的方法数超过65535个的时候，就需要将dex文件分成多个
+ */
 class App : MultiDexApplication() {
 
     init {
