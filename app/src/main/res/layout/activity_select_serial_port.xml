@@ -10,22 +10,22 @@
         android:id="@+id/btlv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请你输入波特率" />
+        android:hint="@string/input_baud_rate" />
 
-    <!-- 同学们：列出所有的串口 -->
+    <!-- 列出所有的串口 -->
     <ListView
         android:id="@+id/lv_devices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/btlv" />
 
-    <!-- 同学们：如果每一可用的串口，就会显示下面的UI -->
+    <!-- 如果每一可用的串口，就会将串口列出来 -->
     <TextView
         android:id="@+id/tv_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="没有可用串口"
+        android:text="@string/no_avaiable_serial_port"
         android:textColor="#FF000000"
         android:textSize="30sp" />
 

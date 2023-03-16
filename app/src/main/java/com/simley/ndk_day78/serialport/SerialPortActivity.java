@@ -27,7 +27,6 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
     int botelv = -1; // 波特率
     private Toast mToast;
 
-
     private SerialPortManager mSerialPortManager; // 打开串口，关闭串口，发生串口数据 需用的关联类
 
 
@@ -37,28 +36,27 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
         setContentView(R.layout.activity_serial_port);
 
         Device device = (Device) getIntent().getSerializableExtra(DEVICE); // 串口文件设备描述的JavaBean Device
-        botelv = Integer.parseInt(getIntent().getStringExtra(BOTELV)); // 波特率
-        Log.i(T.TAG, "SerialPortActivity onCreate: device = " + device); // device = Device{name='ttyS0', root='serial', file=/dev/ttyS0} 【0】
         if (null == device) { // 如果串口文件为null，就全部结束返回
             finish();
             return;
         }
-        mSerialPortManager = new SerialPortManager();
-
-
+        botelv = Integer.parseInt(getIntent().getStringExtra(BOTELV)); // 波特率
+        String port = device.getFile().getAbsolutePath();
+        // TODO：设置奇偶位、校验位、停止位、流控等
+        Log.i(T.TAG, "SerialPortActivity onCreate: device = " + device); // device = Device{name='ttyS0', root='serial', file=/dev/ttyS0} 【0】
+        mSerialPortManager = new SerialPortManager(port, botelv);
         // 打开串口
         boolean openSerialPort = mSerialPortManager.setOnOpenSerialPortListener(this).setOnSerialPortDataListener(new OnSerialPortDataListener() {
+                    /**
+                     * 接收到串口数据的监听函数
+                     * @param bytes 接收到的数据
+                     */
                     @Override
-                    public void onDataReceived(byte[] bytes) { // 接收到串口数据的监听函数
+                    public void onDataReceived(byte[] bytes) {
                         Log.i(T.TAG, "SerialPortActivity onDataReceived [ byte[] ]: " + Arrays.toString(bytes));
                         Log.i(T.TAG, "SerialPortActivity onDataReceived [ String ]: " + new String(bytes));
                         final byte[] finalBytes = bytes;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showToast(String.format("接收\n%s", new String(finalBytes)));
-                            }
-                        });
+                        runOnUiThread(() -> showToast(String.format("接收\n%s", new String(finalBytes))));
                     }
 
                     /**
@@ -70,12 +68,7 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
                         Log.i(T.TAG, "SerialPortActivity onDataSent [ byte[] ]: " + Arrays.toString(bytes)); // onDataSent [ byte[] ]: [97] 【发送2】
                         Log.i(T.TAG, "SerialPortActivity onDataSent [ String ]: " + new String(bytes)); // onDataSent [ String ]: a
                         final byte[] finalBytes = bytes;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showToast(String.format("发送\n%s", new String(finalBytes)));
-                            }
-                        });
+                        runOnUiThread(() -> showToast(String.format("发送\n%s", new String(finalBytes))));
                     }
                 })
                 .openSerialPort(device.getFile(), botelv); // 串口设备文件，波特率

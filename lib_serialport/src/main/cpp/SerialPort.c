@@ -126,7 +126,10 @@ JNIEXPORT jobject
 JNICALL
 Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz,
                                                               jstring path,
-                                                              jint baud_rate, jint flags) {
+                                                              jint baud_rate, jint stopBits,
+                                                              jint dataBits,
+                                                              jint parity, jint flowCon,
+                                                              jint flags) {
     int fd; // Linux串口文件句柄（本次整个函数最终的关键成果）
     speed_t speed; // 波特率类型的值
     jobject mFileDescriptor; // 文件句柄(最终返回的成果)
@@ -173,6 +176,69 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
         cfmakeraw(&cfg);          // 将串口设置成原始模式，并且让fd(文件句柄 对串口可读可写)
         cfsetispeed(&cfg, speed); // 设置串口读取波特率
         cfsetospeed(&cfg, speed); // 设置串口写入波特率
+
+        // 选择数据位
+        switch (dataBits) {
+            case 5:
+                cfg.c_cflag |= CS5;     // 使用5位数据位
+                break;
+            case 6:
+                cfg.c_cflag |= CS6;     // 使用6位数据位
+                break;
+            case 7:
+                cfg.c_cflag |= CS7;     // 使用7位数据位
+                break;
+            case 8:
+                cfg.c_cflag |= CS8;     // 使用8位数据位
+                break;
+            default:
+                cfg.c_cflag |= CS8;
+                break;
+        }
+
+        // 选择校验位
+        switch (parity) {
+            case 0:
+                cfg.c_cflag &= ~PARENB;        // 无奇偶校验
+                break;
+            case 1:
+                cfg.c_cflag |= (PARODD | PARENB);   // 奇校验
+                break;
+            case 2:
+                cfg.c_cflag &= ~(IGNPAR | PARMRK);  // 偶校验
+                cfg.c_cflag |= INPCK;
+                cfg.c_cflag |= PARENB;
+                cfg.c_cflag &= ~PARODD;
+                break;
+            default:
+                cfg.c_cflag &= ~PARENB;
+                break;
+        }
+
+        // 选择停止位
+        switch (stopBits) {
+            case 1:
+                cfg.c_cflag &= ~CSTOPB;     // 1位停止位
+            case 2:
+                cfg.c_cflag |= CSTOPB;      // 2位停止位
+                break;
+            default:
+                break;
+        }
+
+        // 硬件流控
+        switch (flowCon) {
+            case 0:
+                cfg.c_cflag &= ~CRTSCTS;    // 不使用流控
+            case 1:
+                cfg.c_cflag | CRTSCTS;      // 硬件流控
+            case 2:
+                cfg.c_cflag |= IXON | IXOFF | IXANY;      // 软件流控
+                break;
+            default:
+                cfg.c_cflag &= ~CRTSCTS;
+                break;
+        }
 
         if (tcsetattr(fd, TCSANOW, &cfg)) { // 根据上面的配置，再次获取串口属性
             LOGE("再配置串口tcgetattr() 失败");

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.simley.lib_serialport.bean.T;
 import com.simley.lib_serialport.listener.OnOpenSerialPortListener;
 import com.simley.lib_serialport.listener.OnSerialPortDataListener;
+import com.simley.lib_serialport.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -38,6 +39,10 @@ public class SerialPortManager extends SerialPort {
     private Handler mSendingHandler; // 发送串口数据的Handler
     private SerialPortReadThread mSerialPortReadThread; // 接收消息的线程
 
+    public SerialPortManager(String sPort, int iBaudRate) {
+        super(sPort, iBaudRate);
+    }
+
 
     /**
      * 打开串口
@@ -52,7 +57,7 @@ public class SerialPortManager extends SerialPort {
 
         // 校验串口权限
         if (!device.canRead() || !device.canWrite()) {
-            boolean hasChanged = chmod777(device);
+            boolean hasChanged = FileUtils.chmod777(device);
             if (!hasChanged) {
                 Log.i(T.TAG, "SerialPortManager openSerialPort: 没有读写权限");
                 if (null != mOnOpenSerialPortListener) {
@@ -62,16 +67,21 @@ public class SerialPortManager extends SerialPort {
             }
         }
         try {
-            mFd = openNative(device.getAbsolutePath(), baudRate, 0);// 打开串口-native函数
-            mFileInputStream = new FileInputStream(mFd); // 读取的流 绑定了 (mFd文件句柄)-通过文件句柄(mFd)包装出 输入流
-            mFileOutputStream = new FileOutputStream(mFd); // 写入的流 绑定了 (mFd文件句柄)-通过文件句柄(mFd)包装出 输出流
-            Log.i(T.TAG, "SerialPortManager openSerialPort: 串口已经打开 " + mFd); // 串口已经打开 FileDescriptor[35] 【2】    }
-
+            // 打开串口
+            mFd = openNative(device.getAbsolutePath(), this.baudRate, this.stopBits, this.dataBits,
+                    this.parity, this.flowCon, 0);
+            // 读取的流 绑定了 (mFd文件句柄)-通过文件句柄(mFd)包装出 输入流
+            mFileInputStream = new FileInputStream(mFd);
+            // 写入的流 绑定了 (mFd文件句柄)-通过文件句柄(mFd)包装出 输出流
+            mFileOutputStream = new FileOutputStream(mFd);
+            // 串口已经打开 FileDescriptor[35] 【2】    }
+            Log.i(T.TAG, "SerialPortManager openSerialPort: 串口已经打开 " + mFd);
             if (null != mOnOpenSerialPortListener) {
                 mOnOpenSerialPortListener.onSuccess(device);
             }
             startSendThread(); // 开启发送消息的线程
             startReadThread(); // 开启接收消息的线程
+            this.isOpen = true;
             return true;
         } catch (Exception e) {
             e.printStackTrace();

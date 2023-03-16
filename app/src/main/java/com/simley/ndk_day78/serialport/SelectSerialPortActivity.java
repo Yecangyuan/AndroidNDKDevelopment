@@ -48,9 +48,8 @@ public class SelectSerialPortActivity extends AppCompatActivity implements Adapt
         // Device{name='ttyS2', root='serial', file=/dev/ttyS2} 这个串口文件 不可用
         // Device{name='ttyS1', root='serial', file=/dev/ttyS1} 这个串口文件 是可以用的，有时候要重启电脑才能正常使用，毕竟是虚拟串口的
         // Device{name='ttyS0', root='serial', file=/dev/ttyS0} 这个串口文件 表面上是可以用的，实际上是一个坑货
-
         if (btlv.getText().toString().isEmpty()) { // 否则用户不填写波特率
-            Toast.makeText(this, "你个货，没有设置波特率啊，我怎么对标频率呀，哎", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "请您设置波特率", Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -5,4 +5,6 @@
     <string name="id_card_recognition">身份证识别</string>
     <string name="car_number_recognition">车牌号识别</string>
     <string name="text_recognition">文本识别</string>
+    <string name="input_baud_rate">请输入波特率</string>
+    <string name="no_avaiable_serial_port">没有可用串口</string>
 </resources>
