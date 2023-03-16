@@ -49,16 +49,16 @@ public class DeviceAdapter extends BaseAdapter {
         ViewHolder holder;
         if (null == convertView) {
             holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.item_device, null);
+            convertView = mInflater.inflate(R.layout.item_device, parent, false);
             holder.device = convertView.findViewById(R.id.tv_device);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        String deviceName = devices.get(position).getName();
-        String driverName = devices.get(position).getRoot();
-        File file = devices.get(position).getFile();
+        Device device = devices.get(position);
+        String deviceName = device.getName();
+        String driverName = device.getRoot();
+        File file = device.getFile();
         boolean canRead = file.canRead();
         boolean canWrite = file.canWrite();
         boolean canExecute = file.canExecute();

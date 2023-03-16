@@ -18,6 +18,8 @@ import java.io.File
 </File> */
 class Driver constructor(val name: String, private val mDeviceRoot: String) {
 
+    private val TAG = Driver::class.java.simpleName
+
     val devices: List<File>
         get() {
             val devices: MutableList<File> = ArrayList()
@@ -34,18 +36,13 @@ class Driver constructor(val name: String, private val mDeviceRoot: String) {
             if (files == null || files.isEmpty()) {
                 return devices
             }
-            var i = 0
-            while (i < files.size) {
-                if (files[i].absolutePath.startsWith(mDeviceRoot)) {
-                    Log.d(TAG, "Found new device: " + files[i])
-                    devices.add(files[i])
+            for (file in files) {
+                if (file.absolutePath.startsWith(mDeviceRoot)) {
+                    devices.add(file)
                 }
-                i++
+                Log.d(TAG, "Found new device: $file")
             }
             return devices
         }
 
-    companion object {
-        private val TAG = Driver::class.java.simpleName
-    }
 }

@@ -21,9 +21,7 @@ public class SerialPortSearcher {
     private static final String SERIAL_FIELD = "serial"; // 在串口配置清单文件里面的内容中，包含serial，才能代表串口
 
     public SerialPortSearcher() {
-        File file = new File(DRIVERS_PATH);
-        boolean b = file.canRead();
-        Log.i(T.TAG, "SerialPortFinder: file.canRead() = " + b);
+        Log.i(T.TAG, "SerialPortFinder: file.canRead() = " + new File(DRIVERS_PATH).canRead());
     }
 
     /**
