@@ -23,7 +23,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobj
  */
 JNIEXPORT jobject JNICALL
 Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz,
-                                                              jstring path,
+                                                              jstring path_,
                                                               jint baud_rate, jint stopBits,
                                                               jint dataBits,
                                                               jint parity, jint flowCon,

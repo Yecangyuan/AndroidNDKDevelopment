@@ -117,7 +117,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobj
  * 打开串口-本质是通过串口的波特率等信息，构建Java对象-FileDescriptor
  * @param env
  * @param thiz
- * @param path     要打开的路径-串口文件的路径
+ * @param path_     要打开的路径-串口文件的路径
  * @param baudrate 波特率（相当于：Android系统设备层 与 硬件层 通讯所共识的频率）
  * @param flags    标记，就是打开串口的时候，用了下
  * @return         文件读写流（文件句柄） InputStream/OutputStream=串口 发/收
@@ -125,7 +125,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_closeNative(JNIEnv *env, jobj
 JNIEXPORT jobject
 JNICALL
 Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobject thiz,
-                                                              jstring path,
+                                                              jstring path_,
                                                               jint baud_rate, jint stopBits,
                                                               jint dataBits,
                                                               jint parity, jint flowCon,
@@ -145,12 +145,12 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
 
     // TODO 第一步：打开串口
     {
-        jboolean iscopy;
-        const char *path_utf = (*env)->GetStringUTFChars(env, path, &iscopy);
-        LOGD("打开串口 路径是:%s", path_utf); // 打开串口 路径是:/dev/ttyS0
-        fd = open(path_utf, O_RDWR /*| flags*/); // 打开串口的函数，O_RDWR(读 和 写)
+        jboolean isCopy;
+        const char *path = (*env)->GetStringUTFChars(env, path_, &isCopy);
+        LOGD("打开串口 路径是:%s", path); // 打开串口 路径是:/dev/ttyS0
+        fd = open(path, O_RDWR /*| flags*/); // 打开串口的函数，O_RDWR(读 和 写)
         LOGD("打开串口 open() fd = %d", fd); // open() fd = 44
-        (*env)->ReleaseStringUTFChars(env, path, path_utf); // 释放操作
+        (*env)->ReleaseStringUTFChars(env, path_, path); // 释放操作
         if (fd == -1) {
             LOGE("无法打开端口");
             return NULL;
@@ -226,7 +226,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
                 break;
         }
 
-        // 硬件流控
+        // 流控
         switch (flowCon) {
             case 0:
                 cfg.c_cflag &= ~CRTSCTS;    // 不使用流控
