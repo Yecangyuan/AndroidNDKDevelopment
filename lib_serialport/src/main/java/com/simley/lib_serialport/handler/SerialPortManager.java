@@ -81,7 +81,7 @@ public class SerialPortManager extends SerialPort {
             }
             startSendThread(); // 开启发送消息的线程
             startReadThread(); // 开启接收消息的线程
-            this.isOpen = true;
+            this.isOpen = true; // 表示已经打开串口
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -205,25 +205,20 @@ public class SerialPortManager extends SerialPort {
         stopSendThread(); // 停止发送消息的线程
         stopReadThread(); // 停止接收消息的线程
 
-        if (null != mFileInputStream) {
-            try {
+        try {
+            if (null != mFileInputStream) {
                 mFileInputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                mFileInputStream = null;
             }
-            mFileInputStream = null;
-        }
-
-        if (null != mFileOutputStream) {
-            try {
+            if (null != mFileOutputStream) {
                 mFileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                mFileOutputStream = null;
             }
-            mFileOutputStream = null;
+            mOnOpenSerialPortListener = null;
+            mOnSerialPortDataListener = null;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        mOnOpenSerialPortListener = null;
-        mOnSerialPortDataListener = null;
     }
 
 }

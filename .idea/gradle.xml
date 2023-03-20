@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/lib_catcher" />
             <option value="$PROJECT_DIR$/lib_ext" />
             <option value="$PROJECT_DIR$/lib_layout" />
+            <option value="$PROJECT_DIR$/lib_mvi" />
             <option value="$PROJECT_DIR$/lib_mvp" />
             <option value="$PROJECT_DIR$/lib_network" />
             <option value="$PROJECT_DIR$/lib_rtmp" />

@@ -12,11 +12,9 @@ import java.io.InputStream;
  */
 public abstract class SerialPortReadThread extends Thread {
 
-
     private static final String TAG = SerialPortReadThread.class.getSimpleName();
     private InputStream mInputStream; // 此输入流==mFileInputStream(关联mFd文件句柄)
     private final byte[] mReadBuffer; // 用于装载读取到的串口数据
-
 
     public SerialPortReadThread(InputStream inputStream) {
         mInputStream = inputStream;
