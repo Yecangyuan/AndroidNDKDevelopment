@@ -134,7 +134,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
     speed_t speed; // 波特率类型的值
     jobject mFileDescriptor; // 文件句柄(最终返回的成果)
 
-    // 同学们：检查参数，获取波特率参数信息 [先确定好波特率]
+    // 检查参数，获取波特率参数信息 [先确定好波特率]
     {
         speed = getBaudrate(baud_rate);
         if (speed == -1) {

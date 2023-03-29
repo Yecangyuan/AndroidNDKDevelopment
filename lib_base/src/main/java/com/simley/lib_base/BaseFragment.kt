@@ -16,7 +16,6 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -34,6 +33,9 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (_binding != null) {
+            _binding = null
+        }
     }
 
     override fun onPause() {

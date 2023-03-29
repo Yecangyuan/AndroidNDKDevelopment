@@ -1,4 +1,4 @@
-package com.simley.ndk_day78.opengl2.filter.effects;
+package com.simley.ndk_day78.opengl2.filter;
 
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_FRAMEBUFFER;

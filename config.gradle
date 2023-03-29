@@ -26,13 +26,13 @@ ext {
 
     deps = [
             Tesseract4Android: 'cz.adaptech.tesseract4android:tesseract4android:4.3.0',
-            hilt_android     : 'com.google.dagger:hilt-android:2.41',
-            rxpermission     : 'com.github.tbruyelle:rxpermissions:0.12',
-            rxjava           : 'io.reactivex.rxjava3:rxjava:3.0.4',
-            rxandroid        : 'io.reactivex.rxjava3:rxandroid:3.0.0',
-            bugly            : 'com.tencent.bugly:crashreport:4.1.9',
-            camera_core      : 'androidx.camera:camera-core:1.1.0',
-            camera_camera2   : 'androidx.camera:camera-camera2:1.1.0'
+            Hilt_android     : 'com.google.dagger:hilt-android:2.41',
+            Rxpermission     : 'com.github.tbruyelle:rxpermissions:0.12',
+            Rxjava           : 'io.reactivex.rxjava3:rxjava:3.1.6',
+            Rxandroid        : 'io.reactivex.rxjava3:rxandroid:3.0.0',
+            Bugly            : 'com.tencent.bugly:crashreport:4.1.9',
+            Camera_core      : 'androidx.camera:camera-core:1.1.0',
+            Camera_camera2   : 'androidx.camera:camera-camera2:1.1.0'
 //            appcompat                : 'androidx.appcompat:appcompat:1.2.0-beta01',
 //            constrainlayout          : 'androidx.constraintlayout:constraintlayout:1.1.3',
 //            recyclerview             : 'androidx.recyclerview:recyclerview:1.1.0',

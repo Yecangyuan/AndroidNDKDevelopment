@@ -5,6 +5,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/face.hpp"
 #include <android/log.h>
+//#include <openssl/sha.h>
 
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -503,4 +504,58 @@ Java_com_simley_ndk_1day78_face_FaceDetection_trainingDNNPattern(JNIEnv *env, jo
 
         labels.emplace_back("YCY");
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simley_ndk_1day78_utils_SignCheck_nativeCheckSign(JNIEnv *env, jobject thiz,
+                                                           jobject context, jstring packageName) {
+
+//    // 获取当前应用程序的签名
+//    jclass contextClass = env->GetObjectClass(thiz);
+//    jmethodID methodID = env->GetMethodID(contextClass, "getPackageName", "()Ljava/lang/String;");
+//    jstring packageName = (jstring) env->CallObjectMethod(thiz, methodID);
+//
+//    const char *pkgName = env->GetStringUTFChars(env, packageName, NULL);
+//
+//    jclass packageManagerClass = env->GetObjectClass(thiz);
+//    jmethodID packageManagerMethodID = env->GetMethodID(packageManagerClass, "getPackageManager",
+//                                                        "()Landroid/content/pm/PackageManager;");
+//    jobject packageManager = env->CallObjectMethod(thiz, packageManagerMethodID);
+//
+//    jmethodID packageInfoMethodID = env->GetMethodID(packageManagerClass, "getPackageInfo",
+//                                                     "(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;");
+//    jobject packageInfo = env->CallObjectMethod(packageManager, packageInfoMethodID, packageName,
+//                                                0);
+//    jclass packageInfoClass = env->GetObjectClass(packageInfo);
+//
+//    jclass signatureClass = env->FindClass("android/content/pm/Signature");
+//    jfieldID signatureFieldID = env->GetFieldID(packageInfoClass, "signatures",
+//                                                "[Landroid/content/pm/Signature;");
+//    auto signatures = (jobjectArray) env->GetObjectField(packageInfo, signatureFieldID);
+//    jobject signature = env->GetObjectArrayElement(signatures, 0);
+//
+//    jmethodID signatureToByteArrayMethodID = env->GetMethodID(signatureClass, "toByteArray",
+//                                                              "()[B");
+//    auto signatureByteArray = (jbyteArray) env->CallObjectMethod(signature,
+//                                                                 signatureToByteArrayMethodID);
+//
+//    jsize signatureLength = env->GetArrayLength(signatureByteArray);
+//    jbyte *signatureBytes = env->GetByteArrayElements(signatureByteArray, NULL);
+//
+//    // 将签名哈希值转换为SHA-1哈希
+//    unsigned char hash[SHA_DIGEST_LENGTH];
+//    SHA1(signatureBytes, signatureLength, hash);
+//
+//    // 与预期的哈希值进行比较
+//    unsigned char expectedHash[] = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34,
+//                                    0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78};
+//    if (memcmp(hash, expectedHash, SHA_DIGEST_LENGTH) == 0) {
+//        return JNI_TRUE;
+//    } else {
+//        return JNI_FALSE;
+//    }
+    // 2.校验签名
+
+
 }

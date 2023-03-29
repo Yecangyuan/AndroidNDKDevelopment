@@ -21,7 +21,7 @@ import java.util.Date;
  * <p>
  * 这是一个用来处理未捕获异常的处理类
  */
-public class CrashHandler implements Thread.UncaughtExceptionHandler {
+public final class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String FILE_NAME_SUFFIX = ".trace";
     private static Thread.UncaughtExceptionHandler mDefaultCrashHandler;

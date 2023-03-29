@@ -1,21 +1,13 @@
 // TODO 美颜的片元着色器代码
 // 既然是美颜，肯定是美颜整个屏幕，所以不需要顶点着色器 直接用base的顶点着色器，只需要美颜的片元着色器
-
 precision mediump float;// 中精度
-
 varying vec2 aCoord;// 纹理坐标
-
 uniform sampler2D vTexture;// 采样器
-
 uniform int width;// 纹理的宽
-
 uniform int height;// 纹理的高
-
 vec2 blurCoordinates[20];
-
 // 大问题思考：我们做美颜，难道要自己写吗？ 不需要自己写美颜功能
 // 美颜功能是基础功能-很复杂的   小米手机  华为手机  xxx手机
-
 // 美颜三部曲：1.高斯模糊，  2.高反差     3.磨皮
 // 官方源码 高斯模糊：采样点 绿色 基本上就可以做高斯模糊了，  我们等下要高rgb，我们会更丰富
 
@@ -53,7 +45,7 @@ void main() {
     vec4 currentColor = texture2D(vTexture, aCoord);// 当前采样点的像素值 vec4代表rgba
     vec3 rgb = currentColor.rgb;
 
-    for (int i = 0; i < 20; i++){ // 计算坐标颜色值的总和
+    for (int i = 0; i < 20; i++) { // 计算坐标颜色值的总和
         rgb += texture2D(vTexture, blurCoordinates[i].xy).rgb;// 采集20个点的像素
     }
 
@@ -66,7 +58,7 @@ void main() {
     vec4 highPassColor = currentColor - blur;// 高反差公式：原图 - 高斯模糊 = 高反差
     // 强度系数 - TODO 强光模式(手电筒照上去)
     // clamp（夹具函数） glsl着色器语音的内置函数 ：取三个参数的中间值
-    highPassColor.r = clamp(2.0*highPassColor.r*highPassColor.r * 24.0, 0.0, 1.0);// 【同学们注意：需要反复去调】
+    highPassColor.r = clamp(2.0*highPassColor.r*highPassColor.r * 24.0, 0.0, 1.0);// 【需要反复去调】
     highPassColor.g = clamp(2.0*highPassColor.g*highPassColor.g * 24.0, 0.0, 1.0);
     highPassColor.b = clamp(2.0*highPassColor.b*highPassColor.b * 24.0, 0.0, 1.0);
 

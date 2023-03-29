@@ -1,20 +1,12 @@
 package com.simley.ndk_day78.face;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityFaceDetectionBinding;
@@ -63,9 +55,7 @@ public class FaceDetectionActivity extends AppCompatActivity implements CameraBr
         loadDNNRecognitionModel();
 
         // 开始训练样本------->DNN
-        new Thread(() -> {
-            mFaceDetection.trainingDNNPattern();
-        }).start();
+        new Thread(() -> mFaceDetection.trainingDNNPattern()).start();
 
         // 开始训练样本
 //        mFaceDetection.trainingPattern();

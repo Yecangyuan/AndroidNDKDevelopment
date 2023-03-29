@@ -11,7 +11,6 @@ android {
         minSdk rootProject.android.minSdk
         targetSdk rootProject.android.targetSdk
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -23,14 +22,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8
     }
-
     buildFeatures {
         viewBinding true
     }
 }
 
 dependencies {
-    rootProject.baseDeps.each { k, v -> api v }
+    rootProject.baseDeps.each { k, v ->  api v  }
 }

@@ -12,7 +12,7 @@ import java.io.InputStream;
 /**
  * 文件工具类
  */
-public class FileUtil {
+public final class FileUtil {
 
     /**
      * @param context 上下文

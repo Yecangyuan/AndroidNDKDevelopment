@@ -10,7 +10,6 @@
 JNIEXPORT jint JNICALL
 Java_com_simley_lib_1rtmp_RTMPMuxer_open(JNIEnv *env, jobject thiz, jstring url_, jint video_width,
                                          jint video_height) {
-
     const char *url = (*env)->GetStringUTFChars(env, url_, NULL);
     int result = rtmp_open_for_write(url, video_width, video_height);
     (*env)->ReleaseStringUTFChars(env, url_, url);

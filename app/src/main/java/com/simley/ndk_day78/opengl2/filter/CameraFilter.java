@@ -1,4 +1,4 @@
-package com.simley.ndk_day78.opengl2.filter.effects;
+package com.simley.ndk_day78.opengl2.filter;
 
 import android.content.Context;
 import android.opengl.GLES11Ext;

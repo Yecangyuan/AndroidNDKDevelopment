@@ -47,32 +47,34 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
         mSerialPortManager = new SerialPortManager(port, baudRate);
         // 打开串口
         boolean openSerialPort = mSerialPortManager.setOnOpenSerialPortListener(this).setOnSerialPortDataListener(new OnSerialPortDataListener() {
-                    /**
-                     * 接收到串口数据的监听函数
-                     * @param bytes 接收到的数据
-                     */
-                    @Override
-                    public void onDataReceived(byte[] bytes) {
-                        Log.i(T.TAG, "SerialPortActivity onDataReceived [ byte[] ]: " + Arrays.toString(bytes));
-                        Log.i(T.TAG, "SerialPortActivity onDataReceived [ String ]: " + new String(bytes));
-                        final byte[] finalBytes = bytes;
-                        runOnUiThread(() -> showToast(String.format("接收\n%s", new String(finalBytes))));
-                    }
+            /**
+             * 接收到串口数据的监听函数
+             * @param bytes 接收到的数据
+             */
+            @Override
+            public void onDataReceived(byte[] bytes) {
+                Log.i(T.TAG, "SerialPortActivity onDataReceived [ byte[] ]: " + Arrays.toString(bytes));
+                Log.i(T.TAG, "SerialPortActivity onDataReceived [ String ]: " + new String(bytes));
+                final byte[] finalBytes = bytes;
+                runOnUiThread(() -> showToast(String.format("接收\n%s", new String(finalBytes))));
+            }
 
-                    /**
-                     * 开启发生消息线程startSendThread - 调用 - 数据发送
-                     * @param bytes 发送的数据
-                     */
-                    @Override
-                    public void onDataSent(byte[] bytes) { // 发送串口数据的监听函数
-                        Log.i(T.TAG, "SerialPortActivity onDataSent [ byte[] ]: " + Arrays.toString(bytes)); // onDataSent [ byte[] ]: [97] 【发送2】
-                        Log.i(T.TAG, "SerialPortActivity onDataSent [ String ]: " + new String(bytes)); // onDataSent [ String ]: a
-                        final byte[] finalBytes = bytes;
-                        runOnUiThread(() -> showToast(String.format("发送\n%s", new String(finalBytes))));
-                    }
-                })
-                .openSerialPort(device.getFile(), baudRate); // 串口设备文件，波特率
+            /**
+             * 开启发生消息线程startSendThread - 调用 - 数据发送
+             * @param bytes 发送的数据
+             */
+            @Override
+            public void onDataSent(byte[] bytes) { // 发送串口数据的监听函数
+                Log.i(T.TAG, "SerialPortActivity onDataSent [ byte[] ]: " + Arrays.toString(bytes)); // onDataSent [ byte[] ]: [97] 【发送2】
+                Log.i(T.TAG, "SerialPortActivity onDataSent [ String ]: " + new String(bytes)); // onDataSent [ String ]: a
+                final byte[] finalBytes = bytes;
+                runOnUiThread(() -> showToast(String.format("发送\n%s", new String(finalBytes))));
+            }
+        }).openSerialPort(device.getFile(), baudRate); // 串口设备文件，波特率
 
+        if (!openSerialPort) {
+            Toast.makeText(this, "打开串口失败", Toast.LENGTH_SHORT).show();
+        }
         Log.i(T.TAG, "SerialPortActivity onCreate: openSerialPort = " + openSerialPort);
         // openSerialPort = true 【4】
     }

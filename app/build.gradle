@@ -66,9 +66,6 @@ android {
             rootProject.abiFilters.each { abi -> abiFilters abi }
         }
     }
-    lintOptions {
-        abortOnError false
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -87,11 +84,15 @@ android {
     }
     buildFeatures {
         viewBinding true
+        aidl true
     }
     sourceSets {
         main {
             jniLibs.srcDirs = ['src/main/cpp/libs']
         }
+    }
+    lint {
+        abortOnError false
     }
 }
 //

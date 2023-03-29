@@ -29,10 +29,14 @@ public class BaseFrameFilter extends BaseFilter {
     @Override // 此方法可以被子类去重写，修改纹理坐标（屏幕坐标）
     protected void changeTextureData() {
         float[] TEXTURE = {
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
+//                0.0f, 0.0f,
+//                1.0f, 0.0f,
+//                0.0f, 1.0f,
+//                1.0f, 1.0f,
+                0.0f, 0.0f,        // TexCoord 0
+                0.0f, 1.0f,        // TexCoord 1
+                1.0f, 1.0f,        // TexCoord 2
+                1.0f, 0.0f         // TexCoord 3
         };
         mTextureBuffer.clear();
         mTextureBuffer.put(TEXTURE);

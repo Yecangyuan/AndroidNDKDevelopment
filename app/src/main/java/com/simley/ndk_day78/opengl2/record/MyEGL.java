@@ -12,7 +12,7 @@ import android.view.Surface;
 
 import androidx.annotation.RequiresApi;
 
-import com.simley.ndk_day78.opengl2.filter.effects.ScreenFilter;
+import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
 
 import static android.opengl.EGL14.*; // 静态导入一次就行了，方便些
 
@@ -96,7 +96,9 @@ public class MyEGL {
      */
     public MyEGL(EGLContext eglContext, Surface surface, Context context, int width, int height) {
         // 第一大步：创建EGL环境
-        createEGL(eglContext);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createEGL(eglContext);
+        }
 
         // 第二大步：创建窗口（画布），绘制线程中的图像，直接往这里创建的mEGLSurface上面画
         int[] attrib_list = {EGL_NONE}; // 一定要有结尾符

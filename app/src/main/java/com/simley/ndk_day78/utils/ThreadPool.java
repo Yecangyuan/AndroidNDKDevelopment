@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ThreadPool {
+public final class ThreadPool {
 
     // CPU数量，可能不太准确
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();

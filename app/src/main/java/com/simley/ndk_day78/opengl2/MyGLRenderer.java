@@ -14,11 +14,11 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.simley.ndk_day78.opengl2.face.FaceTrack;
-import com.simley.ndk_day78.opengl2.filter.effects.BeautyFilter;
-import com.simley.ndk_day78.opengl2.filter.effects.BigEyeFilter;
-import com.simley.ndk_day78.opengl2.filter.effects.CameraFilter;
-import com.simley.ndk_day78.opengl2.filter.effects.ScreenFilter;
-import com.simley.ndk_day78.opengl2.filter.effects.StickFilter;
+import com.simley.ndk_day78.opengl2.filter.BeautyFilter;
+import com.simley.ndk_day78.opengl2.filter.BigEyeFilter;
+import com.simley.ndk_day78.opengl2.filter.CameraFilter;
+import com.simley.ndk_day78.opengl2.filter.ScreenFilter;
+import com.simley.ndk_day78.opengl2.filter.StickFilter;
 import com.simley.ndk_day78.opengl2.record.MyMediaRecorder;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
 import com.simley.ndk_day78.utils.FileUtil;
@@ -35,16 +35,18 @@ public class MyGLRenderer implements
         Camera.PreviewCallback {
     private final MyGLSurfaceView mGLSurfaceView;
     private CameraHelper mCameraHelper;
-    private int[] mTextureID;
+    private int[] mTextureID; // 纹理id
     private SurfaceTexture mSurfaceTexture;
-    private ScreenFilter mScreenFilter;
     float[] mtx = new float[16]; // 矩阵数据，变换矩阵
-    private CameraFilter mCameraFilter;
     private MyMediaRecorder mMediaRecorder;
-
     private int mWidth;
     private int mHeight;
 
+    /**
+     * Filters
+     */
+    private CameraFilter mCameraFilter;
+    private ScreenFilter mScreenFilter;
     private BigEyeFilter mBigEyeFilter;
     private FaceTrack mFaceTrack;
     private StickFilter mStickFilter;
@@ -58,7 +60,6 @@ public class MyGLRenderer implements
                 "/sdcard/haarcascade_frontalface_alt.xml"); // OpenCV的模型
         FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
                 "/sdcard/seeta_fa_v1.1.bin"); // 中科院的模型
-
     }
 
     /**

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
         }
-        String signMD5 = encryptionMD5(signature.toByteArray());
+//        String signMD5 = encryptionMD5(signature.toByteArray());
 
         requestPermissionWithRx();
         initListener();

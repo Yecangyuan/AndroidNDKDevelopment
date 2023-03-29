@@ -54,7 +54,9 @@ public class BaseFilter {
                 -1.0f, -1.0f,
                 1.0f, -1.0f,
                 -1.0f, 1.0f,
-                1.0f, 1.0f,};
+                1.0f, 1.0f,
+        };
+
         mVertexBuffer = BufferHelper.getFloatBuffer(VERTEX); // 保存到 顶点坐标数据缓冲区
 
         // 纹理相关 坐标系
@@ -62,7 +64,8 @@ public class BaseFilter {
                 0.0f, 0.0f,
                 1.0f, 0.0f,
                 0.0f, 1.0f,
-                1.0f, 1.0f,};
+                1.0f, 1.0f,
+        };
 
         mTextureBuffer = BufferHelper.getFloatBuffer(TEXTURE); // 保存到 纹理坐标数据缓冲区
         init(context);
@@ -72,7 +75,7 @@ public class BaseFilter {
     /**
      * 修改纹理坐标 textureData（有需求可以重写该方法）
      */
-    protected void changeTextureData(){
+    protected void changeTextureData() {
 
     }
 
@@ -105,6 +108,7 @@ public class BaseFilter {
 
     /**
      * 让子类去 绘制操作
+     *
      * @param textureId 画布 纹理ID
      */
     public int onDrawFrame(int textureId) {
@@ -137,7 +141,7 @@ public class BaseFilter {
 
         // 不需要关心摄像头 和 矩阵
         // 绑定图层，为什么不需要GL_TEXTURE_EXTERNAL_OES？答：目前拿到的textureId已经是纹理ID了，不是摄像头直接采集到的纹理ID
-        glBindTexture(GL_TEXTURE_2D ,textureId);
+        glBindTexture(GL_TEXTURE_2D, textureId);
 
         // 因为CameraFilter已经做过了，我就直接显示，我用OepnGL 2D GL_TEXTURE_2D 显示就行了
         // glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId); // 由于这种方式并不是通用的，所以先去除
@@ -148,7 +152,7 @@ public class BaseFilter {
         return textureId; // 返回纹理ID，可以告诉下一个过滤器
     }
 
-    public void release(){
+    public void release() {
         glDeleteProgram(mProgramId);
     }
 }

@@ -16,5 +16,4 @@ void main() {
 
     // 部分机型有问题（早期都是这样干）
     // aCoord = vCoord.xy;
-
 }

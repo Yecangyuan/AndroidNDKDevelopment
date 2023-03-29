@@ -60,7 +60,8 @@
             android:exported="false" />
         <activity
             android:name=".opengl2.MyGLSurfaceViewActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".fmod.FmodActivity"
             android:exported="false" />
