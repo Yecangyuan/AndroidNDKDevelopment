@@ -5,6 +5,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/face.hpp"
 #include <android/log.h>
+
 //#include <openssl/sha.h>
 
 #include "opencv2/objdetect/objdetect.hpp"

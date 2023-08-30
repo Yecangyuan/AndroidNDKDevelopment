@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    // 由于Dagger上手比较困难，所以Google基于Dagger自己开发了一套依赖注入框架: Hilt，也是Jetpack中其中一个组件
     id 'dagger.hilt.android.plugin'
 }
 
@@ -29,6 +30,8 @@ android {
                 /*
                 arguments
                     Gradle从远端下载libc++-shared.so库
+                    因为高版本的android系统已经删掉了这个.so库貌似
+                    如果没有这个库，但是又刚好用到那么会报错
                  */
                 arguments '-DANDROID_STL=c++_static'
                 /*
@@ -66,12 +69,32 @@ android {
             rootProject.abiFilters.each { abi -> abiFilters abi }
         }
     }
+    // 项目构建类型
     buildTypes {
+        // 发布版配置
         release {
-            minifyEnabled false
+            // 是否开启混淆
+            minifyEnabled true
+            // 压缩资源
+            shrinkResources true
+            // 混淆规则
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Java代码是否可以调试
+            debuggable false
+            // Jni代码是否可以调试
+            jniDebuggable false
+            // zipAlignEnabled true
+        }
+        // 测试版配置
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable true
+            jniDebuggable true
         }
     }
+    // 使用JDK 1.8进行编译
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -83,7 +106,7 @@ android {
         }
     }
     buildFeatures {
-        viewBinding true
+        viewBinding true        // 在这里开启了Jetpack的ViewBinding组件
         aidl true
     }
     sourceSets {

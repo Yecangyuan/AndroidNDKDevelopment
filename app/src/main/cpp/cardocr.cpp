@@ -173,7 +173,6 @@ int co1::findCardNumbers(const Mat &src_img, std::vector<Mat> &ret) {
     return 0;
 }
 
-// 反复看一看敲一敲
 int co1::findSplitColsPos(Mat mat) {
     // 怎么处理粘连 ，对中心位置的左右 1/4 扫描，记录最少的黑色像素点的这一列的位置，
     // 就当做我们的字符串的粘连位置
