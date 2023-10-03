@@ -15,6 +15,7 @@ import android.widget.SeekBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityAudioPlayerBinding;
 import com.simley.ndk_day78.player.audio.service.MusicService;
@@ -87,6 +88,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         mDisc = findViewById(R.id.discview);
         mDisc.setPlayInfoListener(this);
         binding.ivLast.setOnClickListener(this);
+        binding.discview.ivMenu.setOnClickListener(this);
         binding.ivNext.setOnClickListener(this);
         binding.ivPlayOrPause.setOnClickListener(this);
         binding.musicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -154,6 +156,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
                 mDisc.next();
             case R.id.ivLast:
                 mDisc.last();
+            case R.id.ivMenu:
+                // TODO 弹出底部导航栏
+                break;
             default:
                 break;
         }

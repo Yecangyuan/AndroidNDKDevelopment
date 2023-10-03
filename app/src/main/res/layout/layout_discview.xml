@@ -24,4 +24,17 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_needle" />
 
+    <ImageView
+        android:id="@+id/ivMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_menu" />
+
+
 </com.simley.ndk_day78.player.audio.ui.widget.DiscView>
