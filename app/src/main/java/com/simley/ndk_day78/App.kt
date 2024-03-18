@@ -1,16 +1,18 @@
 package com.simley.ndk_day78
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import androidx.multidex.MultiDexApplication
+import com.simley.ndk_day78.utils.ActivityManager
 import com.simley.ndk_day78.utils.SignCheck
 import com.tencent.bugly.crashreport.CrashReport
-import kotlin.math.sign
-import kotlin.math.sin
 
 /**
  * 当dex文件中的方法数超过65535个的时候，就需要将dex文件分成多个
  */
-class App : MultiDexApplication() {
+class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
 
     init {
         /*
@@ -35,10 +37,34 @@ class App : MultiDexApplication() {
         signCheck.javaCheckSign()
         // 2. 在Native层验证签名
         signCheck.nativeCheckSign(this, packageName)
+
+        registerActivityLifecycleCallbacks(this)
     }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
+    }
+
+    override fun onActivityCreated(p0: Activity, p1: Bundle?) {
+        ActivityManager
+    }
+
+    override fun onActivityStarted(p0: Activity) {
+    }
+
+    override fun onActivityResumed(p0: Activity) {
+    }
+
+    override fun onActivityPaused(p0: Activity) {
+    }
+
+    override fun onActivityStopped(p0: Activity) {
+    }
+
+    override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
+    }
+
+    override fun onActivityDestroyed(p0: Activity) {
     }
 
 }

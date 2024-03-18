@@ -9,7 +9,7 @@ import android.view.View
 import com.simley.lib_base.BaseActivity
 import com.simley.ndk_day78.databinding.ActivityVideoPlayerBinding
 import com.simley.ndk_day78.player.YEPlayer
-import com.simley.ndk_day78.utils.ThreadPool
+import com.simley.ndk_day78.utils.ThreadPoolManager
 import java.io.File
 
 class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), View.OnClickListener {
@@ -50,7 +50,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), View.OnC
             Environment.getExternalStorageDirectory(),
             "/Movies/kali_hacker_video.mp4"
         ).absolutePath
-        ThreadPool.getInstance().execute { yePlayer.play(mp4File, surface) }
+        ThreadPoolManager.getInstance().execute { yePlayer.play(mp4File, surface) }
     }
 
     override fun getViewBinding(layoutInflater: LayoutInflater): ActivityVideoPlayerBinding =

@@ -28,7 +28,7 @@ public abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
     /**
      * 打开软键盘
      */
-    fun openKeyBord(mEditText: EditText, mContext: Context) {
+    fun openKeyBoard(mEditText: EditText, mContext: Context) {
         val imm = mContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(mEditText, InputMethodManager.RESULT_SHOWN)
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)

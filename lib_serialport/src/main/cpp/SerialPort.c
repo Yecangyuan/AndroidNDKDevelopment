@@ -1,21 +1,16 @@
-#include <termios.h>   // 安卓系统串口的支持，打开串口的头文件：系统提供的
-#include <unistd.h>    // 安卓系统串口的支持，打开串口的头文件：系统提供的
-#include <sys/types.h> // 安卓系统串口的支持，打开串口的头文件：系统提供的
-#include <sys/stat.h>  // 安卓系统串口的支持，打开串口的头文件：系统提供的
-#include <fcntl.h>     // 安卓系统串口的支持，打开串口的头文件：系统提供的
+/*
+ * 安卓系统串口的支持，打开串口的头文件：系统提供的
+ */
+#include <termios.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <string.h>
 #include <jni.h>
-
-#include "SerialPort.h" // 头文件
-
-// 下面是 日志区域
+#include "SerialPort.h"
 #include "android/log.h"
-
-static const char *TAG = "DerryCpp";
-#define LOGI(fmt, args...) __android_log_print(ANDROID_LOG_INFO,  TAG, fmt, ##args)
-#define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, TAG, fmt, ##args)
-#define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##args)
 
 /**
  * 获取波特率
@@ -143,7 +138,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
         }
     }
 
-    // TODO 第一步：打开串口
+    // 第一步：打开串口
     {
         jboolean isCopy;
         const char *path = (*env)->GetStringUTFChars(env, path_, &isCopy);
@@ -158,7 +153,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
     }
     LOGD("第一步：打开串口，成功了√√√");
 
-    // TODO 第二步：获取和设置终端属性-配置串口设备
+    // 第二步：获取和设置终端属性-配置串口设备
     /* TCSANOW：不等数据传输完毕就立即改变属性。
        TCSADRAIN：等待所有数据传输结束才改变属性。
        TCSAFLUSH：清空输入输出缓冲区才改变属性。
@@ -248,7 +243,7 @@ Java_com_simley_lib_1serialport_handler_SerialPort_openNative(JNIEnv *env, jobje
     }
     LOGD("第二步：获取和设置终端属性-配置串口设备，成功了√√√");
 
-    // TODO 第三步：构建FileDescriptor.java对象，并赋予丰富串口相关的值
+    // 第三步：构建FileDescriptor.java对象，并赋予丰富串口相关的值
     {
         jclass cFileDescriptor = (*env)->FindClass(env, "java/io/FileDescriptor");
         jmethodID iFileDescriptor = (*env)->GetMethodID(env, cFileDescriptor, "<init>", "()V");

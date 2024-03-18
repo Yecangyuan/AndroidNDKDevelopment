@@ -23,7 +23,6 @@ include ':app'
 // the usage of settings.gradle file
 // It specifies, amongst other things,
 // the project name and any subprojects to be added to your build.
-include ':lib_network'
 include ':lib_layout'
 include ':lib_ext'
 include ':lib_base'
@@ -31,5 +30,9 @@ include ':lib_serialport'
 include ':lib_mvp'
 include ':lib_rtmp'
 include ':lib_catcher'
-include ':lib_rtsp'
 include ':lib_mvi'
+include ':lib_database'
+include ':lib_okhttp'
+include ':lib_socket'
+include ':lib_okio'
+include ':lib_database_room'

@@ -9,7 +9,7 @@ ext {
             versionName      : "1.0",
     ]
 
-    projectsPath = ["lib_network", "lib_layout", "lib_base", "lib_ext", "lib_serialport", "lib_mvp", "lib_rtmp"]
+    projectsPath = ["lib_layout", "lib_base", "lib_ext", "lib_serialport", "lib_mvp", "lib_rtmp"]
 
     abiFilters = [
             'arm64-v8a',

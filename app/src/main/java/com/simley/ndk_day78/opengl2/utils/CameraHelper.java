@@ -40,6 +40,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     /**
      * 与Surface绑定 == surfaceView.getHolder()
+     *
      * @param surfaceHolder
      */
     public void setPreviewDisplay(SurfaceHolder surfaceHolder) {
@@ -117,6 +118,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
 
     /**
      * 在设置宽和高的同时，能够打印 支持的分辨率
+     *
      * @param parameters
      */
     private void setPreviewSize(Camera.Parameters parameters) {
@@ -127,10 +129,8 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
         // 选择一个与设置的差距最小的支持分辨率
         int m = Math.abs(size.width * size.height - mWidth * mHeight);
         supportedPreviewSizes.remove(0);
-        Iterator<Camera.Size> iterator = supportedPreviewSizes.iterator();
         // 遍历
-        while (iterator.hasNext()) {
-            Camera.Size next = iterator.next();
+        for (Camera.Size next : supportedPreviewSizes) {
             Log.d(TAG, "支持 " + next.width + "x" + next.height);
             int n = Math.abs(next.height * next.width - mWidth * mHeight);
             if (n < m) {
@@ -147,6 +147,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
     /**
      * 旋转画面角度（因为默认预览是歪的，所以就需要旋转画面角度）
      * 这个只是画面的旋转，但是数据不会旋转，你还需要额外处理
+     *
      * @param parameters
      */
     private void setPreviewOrientation(Camera.Parameters parameters) {
@@ -194,7 +195,8 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 下面就是SurfaceView 需要的 start
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) { }
+    public void surfaceCreated(SurfaceHolder holder) {
+    }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -212,8 +214,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 下面就是SurfaceView 需要的 end
 
     /**
-     *
-     * @param data 子集nv21 == YUV420类型的数据
+     * @param data   子集nv21 == YUV420类型的数据
      * @param camera
      */
     @Override
@@ -239,8 +240,10 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
         camera.addCallbackBuffer(cameraBuffer);
     }
 
-    /** TODO 新增，把之前的作业给写了
+    /**
+     * TODO 新增，把之前的作业给写了
      * 把nv21的数据进行旋转90度操作
+     *
      * @param data Camera画面预览的原始数据
      */
     private void rotation90(byte[] data) {
@@ -292,7 +295,7 @@ public class CameraHelper implements Camera.PreviewCallback, SurfaceHolder.Callb
     }
 
     public int getCameraID() {
-        return 0;
+        return mCameraID;
     }
 
     public interface OnChangedSizeListener { // 发生改变后的宽和高处理 专用接口

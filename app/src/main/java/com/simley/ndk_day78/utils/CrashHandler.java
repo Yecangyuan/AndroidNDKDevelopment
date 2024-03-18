@@ -24,6 +24,7 @@ import java.util.Date;
 public final class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String FILE_NAME_SUFFIX = ".trace";
+    private static final String FORMATTER_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static Thread.UncaughtExceptionHandler mDefaultCrashHandler;
     private static Context mContext;
 
@@ -80,7 +81,7 @@ public final class CrashHandler implements Thread.UncaughtExceptionHandler {
      * @throws Exception
      */
     private File handleException(Thread t, Throwable e) throws Exception {
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String time = new SimpleDateFormat(FORMATTER_PATTERN).format(new Date());
 
         File f = new File(mContext.getExternalCacheDir().getAbsoluteFile(), "crash_info");
         if (!f.exists()) {

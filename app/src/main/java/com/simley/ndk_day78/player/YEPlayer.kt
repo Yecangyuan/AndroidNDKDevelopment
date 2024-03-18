@@ -4,13 +4,11 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.media.MediaPlayer
-import android.os.Parcel
-import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Log
 import android.view.Surface
 import com.simley.ndk_day78.opengl.YEGLSurfaceView
-import com.simley.ndk_day78.utils.ThreadPool
+import com.simley.ndk_day78.utils.ThreadPoolManager
 
 /**
  * 音视频播放器
@@ -175,14 +173,14 @@ class YEPlayer {
      */
     fun stop() {
         MediaPlayer().start()
-        ThreadPool.getInstance().execute { nativeStop() }
+        ThreadPoolManager.getInstance().execute { nativeStop() }
     }
 
     fun prepare() {
         if (TextUtils.isEmpty(mSource)) {
             return
         }
-        ThreadPool.getInstance().execute { nativePrepared(mSource) }
+        ThreadPoolManager.getInstance().execute { nativePrepared(mSource) }
     }
 
     fun onCallLoad(load: Boolean) {}
@@ -197,7 +195,7 @@ class YEPlayer {
      */
     fun start() {
         require(!TextUtils.isEmpty(mSource)) { "datasource is null, please set the datasource by calling setDataSource method." }
-        ThreadPool.getInstance().execute { nativeStart() }
+        ThreadPoolManager.getInstance().execute { nativeStart() }
     }
 
     fun setDataSource(dataSource: String?) {

@@ -190,7 +190,9 @@ public class MyMediaRecorder {
             } else {
                 // 成功取到一个有效数据
                 ByteBuffer outputBuffer = null;
-                outputBuffer = mMediaCodec.getOutputBuffer(status);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    outputBuffer = mMediaCodec.getOutputBuffer(status);
+                }
                 if (null == outputBuffer) {
                     throw new RuntimeException("getOutputBuffer fail");
                 }

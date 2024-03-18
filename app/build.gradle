@@ -4,9 +4,18 @@ plugins {
     id 'kotlin-kapt'
     // 由于Dagger上手比较困难，所以Google基于Dagger自己开发了一套依赖注入框架: Hilt，也是Jetpack中其中一个组件
     id 'dagger.hilt.android.plugin'
+    id("com.google.devtools.ksp")
+
 }
+// Android 自带的代码覆盖率检测工具
+//apply plugin: 'jacoco'
+//jacoco {
+//    toolVersion = "0.8.5"
+//}
+
 
 android {
+
     namespace 'com.simley.ndk_day78'
     compileSdk rootProject.android.compileSdk
 
@@ -73,6 +82,7 @@ android {
     buildTypes {
         // 发布版配置
         release {
+<<<<<<< HEAD
             // 是否开启混淆
             minifyEnabled true
             // 压缩资源
@@ -92,9 +102,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             debuggable true
             jniDebuggable true
+=======
+            // 代码删减。在 R8 编译中，编译器会通过方法的可达分析来检测方法是否被使用到，如果没被使用到，就会在编译过程中被删减
+            // 开启 R8 很简单，只需要在 build.gradle 中将 minifyEnabled 属性设为 true 即可
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // testCoverageEnabled = true
+>>>>>>> 12452e2 (优化gradle配置，提高构建速度)
         }
+        // debug {
+        // }
     }
+<<<<<<< HEAD
     // 使用JDK 1.8进行编译
+=======
+
+
+>>>>>>> 12452e2 (优化gradle配置，提高构建速度)
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -117,8 +141,13 @@ android {
     lint {
         abortOnError false
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
 }
-//
+
 //project.afterEvaluate {
 //    project.plugins.withId("com.android.application") { AppPlugin p ->
 //        p.getVariantManager().getVariantScopes().each { VariantScope scope ->
@@ -175,9 +204,18 @@ android {
 //    Arrays.asList(soFiles).stream().forEach(File::delete);
 //}
 
+
+// TODO 以下是一些脚本，后续可以拆分到别的gradle文件中
+
 dependencies {
 
     implementation files("libs\\fmod.jar")
+    implementation project(path: ':lib_rtmp')
+
+    // facebook 开源的压缩算法 ztsd
+    // 这个是有人已经集成好了的，如果使用官方的还得自己编译
+    implementation "com.github.luben:zstd-jni:1.5.5-1@aar"
+
     println('===================开始聚合所需模块===================')
     int orderNum = 1
     rootProject.projectsPath.each { path ->
