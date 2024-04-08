@@ -1,9 +1,6 @@
 package org.opencv.android;
 
-import java.util.List;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import static androidx.multidex.BuildConfig.DEBUG;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,9 +15,12 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import androidx.viewbinding.BuildConfig;
-
 import com.simley.ndk_day78.R;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+
+import java.util.List;
 
 /**
  * This is a basic class, implementing the interaction with Camera and OpenCV library.
@@ -444,7 +444,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
             Canvas canvas = getHolder().lockCanvas();
             if (canvas != null) {
                 canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
-                if (BuildConfig.DEBUG)
+                if (DEBUG)
                     Log.d(TAG, "mStretch value: " + mScale);
 
                 if (mScale != 0) {

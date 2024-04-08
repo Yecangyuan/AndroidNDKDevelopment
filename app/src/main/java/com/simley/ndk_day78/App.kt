@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import androidx.multidex.MultiDexApplication
-import com.simley.ndk_day78.utils.ActivityManager
 import com.simley.ndk_day78.utils.SignCheck
 import com.tencent.bugly.crashreport.CrashReport
 
@@ -46,7 +45,6 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-        ActivityManager
     }
 
     override fun onActivityStarted(p0: Activity) {
