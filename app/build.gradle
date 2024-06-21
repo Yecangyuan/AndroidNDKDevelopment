@@ -204,8 +204,7 @@ android {
 // TODO 以下是一些脚本，后续可以拆分到别的gradle文件中
 
 dependencies {
-
-    implementation files("libs/fmod.jar")
+    implementation files('libs/fmod.jar')
     implementation project(path: ':lib_rtmp')
 
     // facebook 开源的压缩算法 ztsd

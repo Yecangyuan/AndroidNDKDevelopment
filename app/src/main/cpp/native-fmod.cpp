@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "com_simley_ndk_day78_fmod_FmodActivity.h"
 #include "YeLog.h"
+#include "fmod/fmod_errors.h"
 
 using namespace FMOD;
 
@@ -20,24 +21,48 @@ Java_com_simley_ndk_1day78_fmod_FmodActivity_voiceChangeNative(JNIEnv *env, jobj
     // Linux 文件
 
     // 音效引擎系统 指针
-    System *system = NULL;
+    System *system;
     // 声音 指针
-    Sound *sound = NULL;
+    Sound *sound;
     // 通道，音轨，声音在上面跑 跑道 指针
-    Channel *channel = NULL;
+    Channel *channel;
     // DSP：digital signal process  == 数字信号处理  指针
-    DSP *dsp = NULL;
+    DSP *dsp;
+
+    FMOD_RESULT result;
 
     // 第一步 创建系统
-    System_Create(&system);
+    result = System_Create(&system);
+    LOGD("System_Create result: %d", result);
+    if (result != FMOD_OK) {
+        LOGE("Failed to create system: %s", FMOD_ErrorString(result));
+        return;
+    }
+
     // 第二步 系统的初始化 参数1：最大音轨数，  参数2：系统初始化标记， 参数3：额外数据
-    system->init(32, FMOD_INIT_NORMAL, 0);
+    result = system->init(32, FMOD_INIT_NORMAL, 0);
+    if (result != FMOD_OK) {
+        LOGE("Failed to init system: %s", FMOD_ErrorString(result));
+        return;
+    }
+
     // 第三步 创建声音  参数1：路径，  参数2：声音初始化标记， 参数3：额外数据， 参数4：声音指针
-    system->createSound(path_, FMOD_DEFAULT, 0, &sound);
+    result = system->createSound(path_, FMOD_DEFAULT, 0, &sound);
+    if (result != FMOD_OK) {
+        LOGE("Failed to create sound: %s", FMOD_ErrorString(result));
+        return;
+    }
+
     // 第四步：播放声音  音轨 声音
+    result = system->playSound(sound, 0, false, &channel);
+    if (result != FMOD_OK) {
+        LOGE("Failed to play sound: %s", FMOD_ErrorString(result));
+        return;
+    }
+
     system->playSound(sound, 0, false, &channel);
-//
-//    // 第五步：增加特效
+
+    // 第五步：增加特效
     switch (mode) {
         case com_simley_ndk_day78_fmod_FmodActivity_MODE_NORMAL: // 原生
             content_ = "原生 播放完毕";
