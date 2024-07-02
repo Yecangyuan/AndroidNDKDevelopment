@@ -3,19 +3,22 @@ package com.simley.ndk_day78.player.audio;
 import static com.simley.ndk_day78.player.audio.service.MusicService.ACTION_OPT_MUSIC_VOLUME;
 import static com.simley.ndk_day78.player.audio.ui.widget.DiscView.DURATION_NEEDLE_ANIAMTOR;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.material.bottomappbar.BottomAppBar;
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityAudioPlayerBinding;
 import com.simley.ndk_day78.player.audio.service.MusicService;
@@ -67,6 +70,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 //        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
 //        yePlayer = new YEPlayer();
         setSupportActionBar(binding.toolBar);
+        checkSelfPermissions();
         initMusicDatas();
         initMusicReceiver();
         initView();
@@ -82,6 +86,22 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         }).start();
+    }
+
+    private void checkSelfPermissions() {
+        // 检查是否已经有了这个权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // 如果应用之前请求过这个权限但用户拒绝了请求，此方法将返回 true。
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // 显示一个对话框解释为什么需要这个权限，然后再次请求权限。
+            } else {
+                // 没有权限，直接请求权限
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 40);
+            }
+        }
     }
 
     private void initView() {

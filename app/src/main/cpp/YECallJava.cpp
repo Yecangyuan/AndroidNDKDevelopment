@@ -16,8 +16,8 @@ YECallJava::YECallJava(_JavaVM *javaVm, JNIEnv *jniEnv, jobject *jObj) {
     jclass jlz = jniEnv->GetObjectClass(*jObj);
     if (!jlz) return;
 
-    jmidPrepared = jniEnv->GetMethodID(jlz, "onCallPrepared", "()V");
     jmidTimeInfo = jniEnv->GetMethodID(jlz, "onCallTimeInfo", "(II)V");
+    jmidPrepared = jniEnv->GetMethodID(jlz, "onCallPrepared", "()V");
     jmidLoad = jniEnv->GetMethodID(jlz, "onCallLoad", "(Z)V");
     jmidRenderYuv = jniEnv->GetMethodID(jlz, "onCallRenderYUV", "(II[B[B[B)V");
     jmidOnError = jniEnv->GetMethodID(jlz, "onError", "(ILjava/lang/String;)V");

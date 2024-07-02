@@ -34,9 +34,15 @@ android {
 
 dependencies {
 
+    implementation("com.google.mlkit:face-detection:16.1.6")
+    implementation("com.google.mlkit:pose-detection:18.0.0-beta4")
+
+
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

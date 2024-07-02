@@ -11,7 +11,6 @@ YEFFmpeg::YEFFmpeg(YEPlayStatus *playStatus, YECallJava *callJava, const char *u
     this->url = new char[strlen(url) + 1];
     strcpy(this->url, url);
 
-
     pthread_mutex_init(&seekMutex, NULL);
     pthread_mutex_init(&initMutex, NULL);
 }

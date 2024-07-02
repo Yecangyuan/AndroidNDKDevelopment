@@ -1,6 +1,8 @@
 package com.simley.ndk_day78.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Environment;
 
 import androidx.annotation.RawRes;
 
@@ -13,6 +15,33 @@ import java.io.InputStream;
  * 文件工具类
  */
 public final class FileUtil {
+
+    // 写一个将bitmap拷贝到sd卡下的方法
+    public static void copyRawFileToSDCard(Bitmap bitmap, String dest, String fileName) {
+        // 在sd卡创建文件夹
+
+
+        File dir = new File("/storage/emulated/0" + dest);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File file = new File(dir, fileName);
+        if (file.exists()) return;
+        FileOutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+        } catch (IOException ignored) {
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * @param context 上下文
@@ -57,10 +86,13 @@ public final class FileUtil {
      * @param dst     目标文件路径
      */
     public static void copyAssets2SDCard(Context context, String src, String dst) {
+        // 使用正确的方法获取SD卡路径
+        String sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String dstPath = sdCardPath + File.separator + dst;
+
         try {
-            File file = new File(dst);
+            File file = new File(dstPath);
             if (!file.exists()) {
-//                boolean mkdirs = file.mkdirs();
                 InputStream is = context.getAssets().open(src);
                 FileOutputStream fos = new FileOutputStream(file);
                 int len;

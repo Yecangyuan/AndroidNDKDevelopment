@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.simley.ndk_day78.player.YEPlayer;
+import com.simley.ndk_day78.utils.FileUtil;
 
 import java.io.File;
 
@@ -103,7 +104,18 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     //监听
     private void play(final int index) {
 //        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
-        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3").getAbsolutePath();
+        File file = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3");
+        if (!file.exists()) {
+            // 复制该文件到指定目录
+            FileUtil.copyAssets2SDCard(this, "琵琶语-林海.mp3", "Music/琵琶语-林海.mp3");
+        }
+
+        if (!file.exists()) {
+            Log.e(TAG, "play: 文件不存在");
+            return;
+        }
+
+        String mp3File = file.getAbsolutePath();
         yePlayer.setDataSource(mp3File);
         yePlayer.prepare();
     }

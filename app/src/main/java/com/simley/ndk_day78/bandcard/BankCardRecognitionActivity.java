@@ -1,13 +1,15 @@
 package com.simley.ndk_day78.bandcard;
 
-import android.content.res.Resources;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.simley.ndk_day78.R;
 import com.simley.ndk_day78.databinding.ActivityBankCardRecognitionBinding;
@@ -27,21 +29,28 @@ public class BankCardRecognitionActivity extends AppCompatActivity {
         binding = ActivityBankCardRecognitionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                File file = new File("/sdcard/tesseract/tessdata");
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-                FileUtil.copyAssets2SDCard(BankCardRecognitionActivity.this,
-                        "eng.traineddata",
-                        "/sdcard/tesseract/tessdata/eng.traineddata");
-            }
-        }).start();
+        // 检查并请求存储权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    0);
+        }
+
+        File file = new File("tesseract/tessdata");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        FileUtil.copyAssets2SDCard(BankCardRecognitionActivity.this,
+                "eng.traineddata",
+                "tesseract/tessdata/eng.traineddata");
 
         mCardBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.card_n);
         binding.cardIv.setImageBitmap(mCardBitmap);
+
+        binding.btnCardOcr.setOnClickListener(this::cardOcr);
+
     }
 
     public void cardOcr(View view) {
@@ -52,8 +61,11 @@ public class BankCardRecognitionActivity extends AppCompatActivity {
 
         // 2. 使用别人的文字识别库
         TesseractOCR tesseractOCR = new TesseractOCR();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.card_n);
-        String bankCardNumber = tesseractOCR.recognizeImage(bitmap);
+
+        // 将这个bitmap拷贝到/storage/emulated/0/tesseract目录下
+        // FileUtil.copyRawFileToSDCard(mCardBitmap, "/tesseract", "card_n.jpg");
+
+        String bankCardNumber = tesseractOCR.recognizeImage(mCardBitmap);
         binding.cardNumberTv.setText(bankCardNumber);
     }
 }
