@@ -27,10 +27,6 @@ class App : MultiDexApplication(), Application.ActivityLifecycleCallbacks {
         super.onCreate()
         CrashReport.initCrashReport(applicationContext, "5c157f40e9", false)
 
-        // 校验签名，java和native层双重验签
-        // 堪比情比金坚锁 过滤部分逆向小白的破解行为
-        // 想破解我？哼
-        // 偷偷告诉你哦：在.so文件中修改破解哦
         // 1. 在Java层验证签名
         val signCheck = SignCheck(this, "")
         signCheck.javaCheckSign()

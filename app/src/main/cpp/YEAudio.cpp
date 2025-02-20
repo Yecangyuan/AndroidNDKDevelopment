@@ -98,6 +98,7 @@ int YEAudio::resampleAudio(void **pcmBuffer) {
                 nowTime = clock;
             }
             clock = nowTime;
+            LOGI("YAudio::resampleAudio()，将clock设置成 nowTime: %ld", nowTime);
 //
             *pcmBuffer = buffer;
 

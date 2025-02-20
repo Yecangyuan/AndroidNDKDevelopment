@@ -33,10 +33,9 @@ android {
 }
 
 dependencies {
-
+    // 集成了人脸识别
     implementation("com.google.mlkit:face-detection:16.1.6")
     implementation("com.google.mlkit:pose-detection:18.0.0-beta4")
-
 
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")

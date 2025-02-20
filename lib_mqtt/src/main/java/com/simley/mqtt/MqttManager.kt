@@ -13,7 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 /**
  * MqttManager
  */
-class MqttManager(context: Context) {
+object MqttManager(context: Context) {
 
     private val context = context.applicationContext
 
@@ -159,8 +159,6 @@ class MqttManager(context: Context) {
 //        context.init(kmf.getKeyManagers(), tmf.trustManagers, null)
 //        return context.socketFactory
 //    }
-
-
 
     /**
      * 断开连接
