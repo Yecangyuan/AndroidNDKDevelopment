@@ -3,6 +3,7 @@ package com.simley.ndk_day78.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Log;
 
 import androidx.annotation.RawRes;
 
@@ -15,6 +16,8 @@ import java.io.InputStream;
  * 文件工具类
  */
 public final class FileUtil {
+
+    private static final String TAG = "FileUtil";
 
     // 写一个将bitmap拷贝到sd卡下的方法
     public static void copyRawFileToSDCard(Bitmap bitmap, String dest, String fileName) {
@@ -79,33 +82,70 @@ public final class FileUtil {
     }
 
     /**
-     * 把 assets目录里面的文件 Copy 到 SDCard目录下
+     * 把 assets 中的文件拷贝到指定目标文件，并自动创建父目录。
+     * <p>
+     * 与 {@link #copyAssets2SDCard} 的区别：失败时抛出 IOException 而不是静默吞掉，
+     * 便于调用方感知并给出提示。目标落在应用私有目录时可免权限使用。
+     *
+     * @param context 上下文
+     * @param src     assets 下的源文件名
+     * @param dest    目标文件（父目录不存在会被自动创建）
+     */
+    public static void copyAsset(Context context, String src, File dest) throws IOException {
+        File parent = dest.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IOException("创建目录失败: " + parent.getAbsolutePath());
+        }
+        InputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = context.getAssets().open(src);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+            os.flush();
+        } finally {
+            closeQuietly(is);
+            closeQuietly(os);
+        }
+    }
+
+    /**
+     * 把 assets 目录里面的文件 Copy 到 SDCard目录下
+     * <p>
+     * 注意：Android 10（API 29）起启用了分区存储（scoped storage），当 targetSdk >= 30 时
+     * 应用无法再向共享存储的任意路径写入（即使 WRITE_EXTERNAL_STORAGE 已被授予）。
+     * 需要可靠读写时请改用应用私有目录（context.getFilesDir() / getExternalFilesDir()）。
      *
      * @param context 上下文
      * @param src     源文件名
-     * @param dst     目标文件路径
+     * @param dst     相对于共享存储根目录的目标路径
      */
     public static void copyAssets2SDCard(Context context, String src, String dst) {
-        // 使用正确的方法获取SD卡路径
         String sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String dstPath = sdCardPath + File.separator + dst;
-
+        File dest = new File(sdCardPath + File.separator + dst);
+        if (dest.exists()) {
+            return;
+        }
         try {
-            File file = new File(dstPath);
-            if (!file.exists()) {
-                InputStream is = context.getAssets().open(src);
-                FileOutputStream fos = new FileOutputStream(file);
-                int len;
-                byte[] buffer = new byte[2048];
-                while ((len = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.flush();
-                is.close();
-                fos.close();
-            }
+            copyAsset(context, src, dest);
         } catch (IOException e) {
-            e.printStackTrace();
+            // 不再静默吞掉：分区存储被拒时会抛 EACCES/ENOENT，必须留下日志才可定位
+            Log.e(TAG, "拷贝 assets/" + src + " 到 " + dest.getAbsolutePath() + " 失败", e);
+        }
+    }
+
+    private static void closeQuietly(java.io.Closeable closeable) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            Log.w(TAG, "关闭流失败", e);
         }
     }
 }
