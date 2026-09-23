@@ -13,7 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 /**
  * MqttManager
  */
-object MqttManager(context: Context) {
+class MqttManager(context: Context) {
 
     private val context = context.applicationContext
 
