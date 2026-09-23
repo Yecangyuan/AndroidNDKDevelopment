@@ -7,6 +7,9 @@ ext {
             targetSdk        : 33,
             versionCode      : 1,
             versionName      : "1.0",
+            // NDK r26 起不再支持 API < 21，而本项目 minSdk 为 19。
+            // 固定到 r25（25.1.8937393）以保持 minSdk 19 的兼容性声明不变。
+            ndkVersion       : "25.1.8937393",
     ]
 
     projectsPath = ["lib_layout", "lib_base", "lib_ext", "lib_serialport", "lib_mvp", "lib_rtmp"]
@@ -27,7 +30,7 @@ ext {
     deps = [
             Tesseract4Android: 'cz.adaptech.tesseract4android:tesseract4android:4.3.0',
             Hilt_android     : 'com.google.dagger:hilt-android:2.41',
-            Rxpermission     : 'com.github.tbruyelle:rxpermissions:0.12',
+            Rxpermission     : 'com.github.tbruyelle:RxPermissions:0.12',
             Rxjava           : 'io.reactivex.rxjava3:rxjava:3.1.6',
             Rxandroid        : 'io.reactivex.rxjava3:rxandroid:3.0.0',
             Bugly            : 'com.tencent.bugly:crashreport:4.1.9',

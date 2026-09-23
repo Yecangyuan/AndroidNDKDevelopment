@@ -81,7 +81,9 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries(ndk_day78
         -ljnigraphics
-        # GLESv3 android自带的native层的opengl es .so库
+        # EGL android自带的native层的 .so库，EGL.cpp 中使用 eglXxx 系列接口必须链接
+        # 注意：后续如调用 glXxx（GLES）系列接口，还需在此补充 GLESv3
+        EGL
 
         # ffmpeg
         -Wl,--start-group

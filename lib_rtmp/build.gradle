@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.simley.lib_rtmp'
     compileSdk 33
+    ndkVersion rootProject.android.ndkVersion
 
     defaultConfig {
         minSdk 19

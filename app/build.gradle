@@ -17,6 +17,7 @@ plugins {
 android {
     namespace 'com.simley.ndk_day78'
     compileSdk rootProject.android.compileSdk
+    ndkVersion rootProject.android.ndkVersion
 
     defaultConfig {
         applicationId rootProject.android.applicationId
@@ -118,7 +119,9 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
+            // 与 lib_rtmp / lib_serialport 保持一致，使用 SDK 中已安装的 CMake
+            // （CMakeLists.txt 的 cmake_minimum_required 为 3.18.1，3.22.1 满足要求）
+            version '3.22.1'
         }
     }
     buildFeatures {

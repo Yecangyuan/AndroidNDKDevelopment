@@ -6,6 +6,7 @@ plugins {
 android {
     namespace 'com.simley.lib_serialport'
     compileSdk rootProject.android.compileSdk
+    ndkVersion rootProject.android.ndkVersion
 
     defaultConfig {
         minSdk rootProject.android.minSdk
