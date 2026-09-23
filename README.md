@@ -205,6 +205,28 @@ subprojects { subproject ->
 ./gradlew :app:assembleDebug
 ```
 
+### 7. JNI 保留规则：被 native 回调的 Java 成员必须显式保留
+
+`debug` 构建同样开启了 `minifyEnabled`，而 `app/proguard-rules.pro` 里的两条规则只保住 **native 方法本身**：
+
+```proguard
+-keepclassmembers class * { native <methods>; }
+-keepclasseswithmembernames class * { native <methods>; }
+```
+
+**「被 native 用 `GetMethodID` / `FindClass` 按名字反查的 Java 成员」不在保护范围内**。这类成员在 Java 侧没有调用者，R8 会移除或改名；native 查不到就会先抛 `NoSuchMethodError` / `ClassNotFoundException`，再因为「带着未决异常继续调用 JNI 函数」而**直接 abort 整个进程**。
+
+实测（`app-debug.apk` 的 dex 中命中数为 0）：`onCallTimeInfo`、`onCallPrepared`、`onCallLoad`、`onCallRenderYUV`、`createAudioTrack` 全被移除，播放界面一点「播放」即崩溃。`proguard-rules.pro` 中已补齐保留规则。
+
+**新增 JNI 回调时务必同步补 `-keepclassmembers`**，并用下面的方式自查（命中数应为 1，为 0 说明被移除了）：
+
+```bash
+unzip -o -q app/build/outputs/apk/debug/app-debug.apk "classes*.dex" -d /tmp/dex
+strings -a /tmp/dex/*.dex | grep -c "^onCallTimeInfo$"
+```
+
+注意 dex 可能有多个（`classes.dex` / `classes2.dex`），**必须全部检查**，只看 `classes.dex` 会得到「全为 0」的错误结论。
+
 ---
 
 ## 六、已知问题与待办
@@ -225,8 +247,13 @@ subprojects { subproject ->
    剩余误差集中在首六位 `622848`——它恰好压在卡面高光水滴上，属图像固有难点。
    要完全正确，需实现 `cardocr.cpp` 里原本设计的 native 逐字切分识别（定位卡区 → 二值化 → 单字符切分 → 逐字比对）。
    该文件目前**无任何 JNI 导出**，是未实现的占位，`BankCardRecognition.cardOcr` 调用会抛 `UnsatisfiedLinkError`。
-8. **`FileUtil.copyAssets2SDCard` 的另外两个调用方同样受分区存储影响**：`MyGLRenderer` 拷贝人脸模型
-   (`/sdcard/haarcascade_frontalface_alt.xml`、`/sdcard/seeta_fa_v1.1.bin`)、`MusicService` 拷贝音频
-   (`/storage/emulated/0/Music/...`)。实测应用 UID 对 `/storage/emulated/0` **不可写**（`mkdir` 返回
-   `Permission denied`，尽管 `WRITE_EXTERNAL_STORAGE` 显示已授予），故这两处拷贝会失败（现已有错误日志）。
-   涉及的功能可能因此不可用，建议一并改为写应用私有目录。银行卡识别已按此方式修复。
+8. ~~`copyAssets2SDCard` 的另外两个调用方受分区存储影响~~ **已修复**：`MyGLRenderer`（人脸模型与人脸关键点模型、
+   录制输出）与 `MusicService`（播放器音频）均已改用应用私有目录。实测 `files/models/` 下两个模型、
+   `files/music/琵琶语-林海.mp3` 正确落位，播放界面可正常播放（进度 00:43 / 04:19）。
+   至此 `copyAssets2SDCard` 已无调用方，该工具保留但已在注释中标注分区存储限制。
+   注意工程内仍有多处 **native 调试输出**写 `/storage/emulated/0/...`（如 `cardocr.cpp`、`utils.cpp`、
+   `text_recognize.cpp`、`native-lib.cpp` 中的 `imwrite`）以及若干**读取**共享存储的页面
+   （`VideoPlayerActivity2`、`TextRecognitionActivity` 等）。前者是调试用途、失败不影响功能，
+   后者需要用户自行放置文件，当前未做处理。
+9. 被 native 回调的 Java 成员若忘记加 `-keepclassmembers`，会被 R8 移除并导致 JNI abort。
+   详见第五节第 7 条。
