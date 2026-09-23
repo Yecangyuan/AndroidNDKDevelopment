@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -16,9 +15,13 @@ import com.simley.ndk_day78.player.YEPlayer;
 import com.simley.ndk_day78.utils.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MusicService extends Service implements MediaPlayer.OnCompletionListener, YEPlayer.IPlayerListener {
     private static final String TAG = "MusicService";
+    /** 音频在应用私有目录下的子目录名 */
+    private static final String MUSIC_DIR = "music";
+    private static final String MUSIC_ASSET = "琵琶语-林海.mp3";
     private YEPlayer yePlayer;
 
     //    private final Handler handler = new Handler(Looper.getMainLooper());
@@ -103,20 +106,24 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     //监听
     private void play(final int index) {
-//        String mp3File = new File(Environment.getExternalStorageDirectory(), "/Download/琵琶语-林海.mp3").getAbsolutePath();
-        File file = new File(Environment.getExternalStorageDirectory(), "/Music/琵琶语-林海.mp3");
+        // 音频放应用私有目录：共享存储 /storage/emulated/0/Music 在 targetSdk >= 30 上
+        // 受分区存储限制，应用 UID 不可写（实测 mkdir 返回 Permission denied），
+        // 原实现写共享存储会一直失败，导致这里 file.exists() 恒为 false，播放界面永远播不出来。
+        File file = new File(new File(getFilesDir(), MUSIC_DIR), MUSIC_ASSET);
         if (!file.exists()) {
-            // 复制该文件到指定目录
-            FileUtil.copyAssets2SDCard(this, "琵琶语-林海.mp3", "Music/琵琶语-林海.mp3");
+            try {
+                FileUtil.copyAsset(this, MUSIC_ASSET, file);
+            } catch (IOException e) {
+                Log.e(TAG, "拷贝音频失败: " + file.getAbsolutePath(), e);
+            }
         }
 
         if (!file.exists()) {
-            Log.e(TAG, "play: 文件不存在");
+            Log.e(TAG, "play: 文件不存在: " + file.getAbsolutePath());
             return;
         }
 
-        String mp3File = file.getAbsolutePath();
-        yePlayer.setDataSource(mp3File);
+        yePlayer.setDataSource(file.getAbsolutePath());
         yePlayer.prepare();
     }
 

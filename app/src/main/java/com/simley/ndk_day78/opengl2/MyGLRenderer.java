@@ -6,11 +6,13 @@ import static android.opengl.GLES10.glClearColor;
 import static android.opengl.GLES10.glGenTextures;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.EGL14;
 import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
+import android.os.Environment;
 import android.util.Log;
 
 import com.simley.ndk_day78.opengl2.face.FaceTrack;
@@ -23,6 +25,7 @@ import com.simley.ndk_day78.opengl2.record.MyMediaRecorder;
 import com.simley.ndk_day78.opengl2.utils.CameraHelper;
 import com.simley.ndk_day78.utils.FileUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -34,6 +37,17 @@ public class MyGLRenderer implements
         SurfaceTexture.OnFrameAvailableListener, // 有可用的数据时，回调此函数，效率高，麻烦，后面需要手动调用一次才行
         Camera.PreviewCallback {
     private final MyGLSurfaceView mGLSurfaceView;
+
+    private static final String TAG = "MyGLRenderer";
+    /** 人脸模型在应用私有目录下的子目录名 */
+    private static final String MODELS_DIR = "models";
+    private static final String FACE_CASCADE_ASSET = "haarcascade_frontalface_alt.xml";
+    private static final String SEETA_MODEL_ASSET = "seeta_fa_v1.1.bin";
+
+    /** 模型在私有目录中的绝对路径（构造时确定，onSurfaceChanged 时传给 native） */
+    private final String mFaceCascadePath;
+    private final String mSeetaModelPath;
+
     private CameraHelper mCameraHelper;
     private int[] mTextureID; // 纹理id
     private SurfaceTexture mSurfaceTexture;
@@ -55,11 +69,44 @@ public class MyGLRenderer implements
 
     public MyGLRenderer(MyGLSurfaceView mGLSurfaceView) {
         this.mGLSurfaceView = mGLSurfaceView;
-        // 大眼相关代码】  assets Copy到SD卡
-        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "haarcascade_frontalface_alt.xml",
-                "/sdcard/haarcascade_frontalface_alt.xml"); // OpenCV的模型
-        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(), "seeta_fa_v1.1.bin",
-                "/sdcard/seeta_fa_v1.1.bin"); // 中科院的模型
+        // 大眼特效依赖两个人脸模型（OpenCV 人脸检测 + 中科院人脸关键点）。
+        // 必须放应用私有目录：/sdcard 在 targetSdk >= 30 的设备上受分区存储限制，
+        // 应用 UID 对共享存储任意路径不可写（实测 mkdir 返回 Permission denied），
+        // 原实现写 /sdcard 会导致模型永远缺失、人脸检测拿不到模型。
+        Context context = mGLSurfaceView.getContext();
+        File modelsDir = new File(context.getFilesDir(), MODELS_DIR);
+        mFaceCascadePath = new File(modelsDir, FACE_CASCADE_ASSET).getAbsolutePath();
+        mSeetaModelPath = new File(modelsDir, SEETA_MODEL_ASSET).getAbsolutePath();
+        copyAssetIfAbsent(context, FACE_CASCADE_ASSET, new File(mFaceCascadePath));
+        copyAssetIfAbsent(context, SEETA_MODEL_ASSET, new File(mSeetaModelPath));
+    }
+
+    /** 把 assets 拷到私有目录；已存在则跳过，失败只记录不阻断（后续 native 侧会报模型加载失败） */
+    private static void copyAssetIfAbsent(Context context, String asset, File dest) {
+        if (dest.exists()) {
+            return;
+        }
+        try {
+            FileUtil.copyAsset(context, asset, dest);
+        } catch (IOException e) {
+            Log.e(TAG, "拷贝模型失败: " + dest.getAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * 录制输出目录：应用私有外部目录（无需任何权限），外部存储不可用时退回内部私有目录。
+     * 原实现写 "/sdcard/Movies" + 时间戳，既受分区存储限制，又漏了路径分隔符。
+     */
+    private File createRecorderOutputFile() {
+        Context context = mGLSurfaceView.getContext();
+        File dir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+        if (dir == null) {
+            dir = new File(context.getFilesDir(), "movies");
+        }
+        if (!dir.exists() && !dir.mkdirs()) {
+            Log.e(TAG, "创建录制目录失败: " + dir.getAbsolutePath());
+        }
+        return new File(dir, "record_" + System.currentTimeMillis() + ".mp4");
     }
 
     /**
@@ -93,7 +140,7 @@ public class MyGLRenderer implements
         // 初始化录制工具类
         EGLContext eglContext = EGL14.eglGetCurrentContext();
         mMediaRecorder = new MyMediaRecorder(480, 800,
-                "/sdcard/Movies" + System.currentTimeMillis() + ".mp4", eglContext,
+                createRecorderOutputFile().getAbsolutePath(), eglContext,
                 mGLSurfaceView.getContext());
     }
 
@@ -109,8 +156,8 @@ public class MyGLRenderer implements
         mWidth = width;
         mHeight = height;
 
-        // 创建人脸检测跟踪器
-        mFaceTrack = new FaceTrack("/sdcard/haarcascade_frontalface_alt.xml", "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
+        // 创建人脸检测跟踪器（模型路径为应用私有目录，见构造函数）
+        mFaceTrack = new FaceTrack(mFaceCascadePath, mSeetaModelPath, mCameraHelper);
         mFaceTrack.startTrack(); // 启动跟踪器
 
         mCameraHelper.startPreview(mSurfaceTexture); // 开始预览
