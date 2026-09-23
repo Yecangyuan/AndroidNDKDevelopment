@@ -79,7 +79,7 @@
             android:textColor="@drawable/rbtn_record_speed_text" />
     </RadioGroup>
 
-    <com.simley.ndk_day78.widget.MyRecordButton
+    <com.simley.ndk_day78.widget.RecordButton
         android:id="@+id/btn_record"
         android:layout_width="80dp"
         android:layout_height="80dp"

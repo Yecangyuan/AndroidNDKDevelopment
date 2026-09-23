@@ -1,18 +1,14 @@
 package com.simley.ndk_day78.opengl2;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.simley.ndk_day78.MainActivity;
 import com.simley.ndk_day78.R;
-import com.simley.ndk_day78.widget.MyRecordButton;
+import com.simley.ndk_day78.widget.RecordButton;
 
 public class TiktokVideoFastSlowActivity extends AppCompatActivity {
     // 布局 ---> MainActivity.java ---> MyGLSurfaceView ---> MyGlRenderer ---> MyMediaRecorder ---> MyEGL --->
@@ -25,8 +21,8 @@ public class TiktokVideoFastSlowActivity extends AppCompatActivity {
         mGLSurfaceView = findViewById(R.id.glSurfaceView);
 
         // 圆形红色按钮的 按住拍/录制完成
-        ((MyRecordButton) findViewById(R.id.btn_record)).setOnRecordListener(
-                new MyRecordButton.OnRecordListener() {
+        ((RecordButton) findViewById(R.id.btn_record)).setOnRecordListener(
+                new RecordButton.OnRecordListener() {
 
                     @Override
                     public void onStartRecording() { // 开始录制

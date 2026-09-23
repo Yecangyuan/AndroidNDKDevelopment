@@ -10,19 +10,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
 // 自定义控件
-public class MyRecordButton extends AppCompatTextView {
+public class RecordButton extends AppCompatTextView {
 
     private OnRecordListener mListener;
 
-    public MyRecordButton(Context context) {
+    public RecordButton(Context context) {
         this(context, null);
     }
 
-    public MyRecordButton(Context context, @Nullable AttributeSet attrs) {
+    public RecordButton(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public MyRecordButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public RecordButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
