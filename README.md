@@ -215,13 +215,15 @@ subprojects { subproject ->
 4. `lib_glide` / `lib_hls` / `lib_network` / `lib_rtsp` 未纳入 `settings.gradle`，当前不参与构建。
 5. 工程版本存在错配：AGP 8.11.2（2025）搭配 Kotlin 1.8.10（2023）。当前靠固定 Java 工具链规避，长期建议整体对齐版本。
 6. `.workbuddy/`（本地工具数据目录）未被 `.gitignore` 忽略，建议补充忽略规则，避免误提交。
-7. **银行卡识别的准确率受限**。参数已按真机矩阵实测选定（2 种模型 × 3 种引擎 × 4 种版面 × 5 种预处理）：
-   `OEM_LSTM_ONLY` + `PSM_RAW_LINE`，并先按 native 侧 `co1::findCardNumberArea` 的同一比例启发式裁出卡号条带
-   （`x=cols/12, y=rows/2, w=cols*5/6, h=rows/4`）。注意 `PSM_SINGLE_LINE` 会把该条带判为无效而返回空。
-   但受 Tesseract 4.1.1 与自带 31.8 MB `eng.traineddata`（老模型）限制，对 `R.mipmap.card_n` 样张
-   最佳仅识别到 **11/19 位**（得 `10993123007`，真值 `6228481099312404479`）。
-   同图同参数换用 `tessdata_fast`（4.1 MB）可提升到 16/19 位；首六位 `622848` 恰压在卡面高光上，属图像固有难点。
-   要完全正确，需实现 `cardocr.cpp` 里原本设计的 native 逐字切分识别（定位卡区 → 二值化 → 单字符切分 → 逐字比对），
+7. **银行卡识别的准确率仍不完整（16/19 位）**。参数已按真机矩阵实测选定（2 种模型 × 3 种引擎 × 4 种版面 × 5 种预处理）：
+   `OEM_LSTM_ONLY` + `PSM_RAW_LINE` + 先按 native 侧 `co1::findCardNumberArea` 的同一比例启发式裁出卡号条带
+   （`x=cols/12, y=rows/2, w=cols*5/6, h=rows/4`）+ 灰度化。注意 `PSM_SINGLE_LINE` 会把该条带判为无效而返回空。
+   训练数据已由 31.8 MB 的老模型换为 `tessdata_fast`（4.1 MB）：源文件减少 26.5 MiB，因 APK 内 assets 按 Deflate
+   压缩存储（约 50%），APK 净减约 14 MB。
+   实测：换模型前 11/19 位（得 `10993123007`），换模型 + 灰度后 **16/19 位**（得 `2284109931240479`，
+   真值 `6228481099312404479`）。放大 2x/3x 反而变差。
+   剩余误差集中在首六位 `622848`——它恰好压在卡面高光水滴上，属图像固有难点。
+   要完全正确，需实现 `cardocr.cpp` 里原本设计的 native 逐字切分识别（定位卡区 → 二值化 → 单字符切分 → 逐字比对）。
    该文件目前**无任何 JNI 导出**，是未实现的占位，`BankCardRecognition.cardOcr` 调用会抛 `UnsatisfiedLinkError`。
 8. **`FileUtil.copyAssets2SDCard` 的另外两个调用方同样受分区存储影响**：`MyGLRenderer` 拷贝人脸模型
    (`/sdcard/haarcascade_frontalface_alt.xml`、`/sdcard/seeta_fa_v1.1.bin`)、`MusicService` 拷贝音频
