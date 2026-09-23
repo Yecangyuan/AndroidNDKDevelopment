@@ -7,4 +7,11 @@
     <string name="text_recognition">文本识别</string>
     <string name="input_baud_rate">请输入波特率</string>
     <string name="no_avaiable_serial_port">没有可用串口</string>
+
+    <!-- 串口设备选择页 -->
+    <string name="serial_device_title">串口设备</string>
+    <string name="serial_device_subtitle">选择要打开的串口设备，并填写与之匹配的波特率</string>
+    <string name="serial_available_devices">可用设备</string>
+    <string name="serial_baud_rate_required">请您先设置波特率</string>
+    <string name="serial_empty_hint">请确认设备已连接，且 /dev/ttyS* 具备访问权限</string>
 </resources>

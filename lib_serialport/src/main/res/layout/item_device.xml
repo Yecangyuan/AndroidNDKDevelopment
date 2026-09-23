@@ -1,15 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  串口设备列表项。
+  布局约定（DeviceAdapter 依赖这些 id，改名需同步）：
+    tv_device     设备名，如 ttyS1
+    tv_driver     驱动名标签，如 serial
+    tv_path       设备文件路径，如 /dev/ttyS1
+    tv_perm_read  可读权限标签
+    tv_perm_write 可写权限标签
+    tv_perm_exec  可执行权限标签
+  外层 LinearLayout 负责左右留白，内层才是卡片本体——这样 ListView 无需额外分隔。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="6dp">
 
-    <TextView
-        android:id="@+id/tv_device"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:textColor="#5805EC"
-        tools:text="串口号 [root] (路径)" />
+        android:background="@drawable/serial_bg_item"
+        android:orientation="vertical"
+        android:padding="14dp">
 
-</RelativeLayout>
+        <!-- 第一行：图标 + 设备名 + 驱动名标签 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_serial_port" />
+
+            <TextView
+                android:id="@+id/tv_device"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/serial_text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="ttyS1" />
+
+            <TextView
+                android:id="@+id/tv_driver"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/serial_bg_tag"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:textColor="@color/serial_tag_text"
+                android:textSize="11sp"
+                tools:text="serial" />
+        </LinearLayout>
+
+        <!-- 第二行：设备文件路径 -->
+        <TextView
+            android:id="@+id/tv_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:textColor="@color/serial_text_secondary"
+            android:textSize="12sp"
+            tools:text="/dev/ttyS1" />
+
+        <!-- 第三行：权限标签 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_perm_read"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                tools:background="@drawable/serial_bg_chip_ok"
+                tools:text="可读" />
+
+            <TextView
+                android:id="@+id/tv_perm_write"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                tools:background="@drawable/serial_bg_chip_ok"
+                tools:text="可写" />
+
+            <TextView
+                android:id="@+id/tv_perm_exec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:textSize="10sp"
+                tools:background="@drawable/serial_bg_chip_no"
+                tools:text="不可执行" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

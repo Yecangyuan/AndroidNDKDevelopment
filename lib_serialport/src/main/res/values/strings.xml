@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  串口列表 UI 文案。
+  放在资源里而不是硬编码在 Java，便于宿主工程统一改文案/做多语言。
+  命名统一加 serial_ 前缀，避免与宿主工程 strings.xml 冲突。
+-->
+<resources>
+    <!-- 权限标签：已授予 -->
+    <string name="serial_perm_read">可读</string>
+    <string name="serial_perm_write">可写</string>
+    <string name="serial_perm_exec">可执行</string>
+
+    <!-- 权限标签：未授予 -->
+    <string name="serial_perm_no_read">不可读</string>
+    <string name="serial_perm_no_write">不可写</string>
+    <string name="serial_perm_no_exec">不可执行</string>
+
+    <!--
+      三项权限都没有时的汇总标签。
+      本模块打开串口的方式是 chmod777（su + chmod 777，见 FileUtils），
+      所以此处直接点明「需要 root 授权」，比笼统的「无权限」更可操作。
+    -->
+    <string name="serial_perm_need_root">需 root 授权</string>
+</resources>

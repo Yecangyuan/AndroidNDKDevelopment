@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  串口列表 UI 配色。
+  命名统一加 serial_ 前缀，避免与宿主工程（app 模块）的 colors.xml 冲突。
+  所有色值显式写死，使列表在 DayNight 主题下也保持同一套浅色观感。
+-->
+<resources>
+    <!-- 列表项卡片 -->
+    <color name="serial_item_bg">#FFFFFFFF</color>
+    <color name="serial_item_bg_pressed">#FFE9F0FA</color>
+    <color name="serial_item_stroke">#FFE3E8F0</color>
+    <color name="serial_item_stroke_pressed">#FFC7D8EF</color>
+
+    <!-- 文字 -->
+    <color name="serial_text_primary">#FF16233A</color>
+    <color name="serial_text_secondary">#FF6B7A90</color>
+    <color name="serial_text_tertiary">#FFA6AEBB</color>
+
+    <!-- 驱动名标签 -->
+    <color name="serial_tag_bg">#FFEAF3FF</color>
+    <color name="serial_tag_text">#FF1976D2</color>
+
+    <!-- 权限标签：已授予 -->
+    <color name="serial_chip_ok_bg">#FFE3F6EC</color>
+    <color name="serial_chip_ok_stroke">#FFB7E4C7</color>
+    <color name="serial_chip_ok_text">#FF1B7F4B</color>
+
+    <!-- 权限标签：未授予 -->
+    <color name="serial_chip_no_bg">#FFF1F3F6</color>
+    <color name="serial_chip_no_stroke">#FFDCE1E8</color>
+    <color name="serial_chip_no_text">#FF8A93A0</color>
+
+    <!-- 品牌色（与 app 模块 blue_gradient 保持一致） -->
+    <color name="serial_brand_start">#FF0097A7</color>
+    <color name="serial_brand_end">#FF1976D2</color>
+</resources>

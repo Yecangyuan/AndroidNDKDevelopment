@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 串口设备图标：终端窗口造型（提示符 + 光标），用于列表项与空状态 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 窗口 -->
+    <path
+        android:fillColor="@color/serial_brand_end"
+        android:pathData="M4,3h16a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-16a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
+
+    <!-- 提示符 > -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M6.2,7.2l3.6,2.9l-3.6,2.9z" />
+
+    <!-- 光标 _ -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.2,12.6h4.8v1.6h-4.8z" />
+
+    <!-- 底座 -->
+    <path
+        android:fillColor="@color/serial_brand_start"
+        android:pathData="M8,18.4h8v1.4h-8z" />
+</vector>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 串口设备页背景：极浅的竖向渐变，让白色卡片浮起来 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:endColor="#FFEDF2FA"
+        android:startColor="#FFF7F9FC"
+        android:type="linear" />
+</shape>
